@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Direct Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-8">
+    <h1 class="text-2xl font-bold mb-4">Direct API Test</h1>
+    
+    <div class="bg-white p-6 rounded-lg shadow mb-4">
+        <h2 class="text-lg font-bold mb-2">Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+    
+    <button onclick="testDirectAPI()" class="bg-blue-600 text-white px-4 py-2 rounded">
+        Test Direct API Call
+    </button>
+    
+    <button onclick="testWithCurrentFilters()" class="bg-green-600 text-white px-4 py-2 rounded ml-2">
+        Test with Current Filters
+    </button>
+
+    <!-- Include scripts -->
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/api.js"></script>
+    
+    <script>
+        function log(message) {
+            const div = document.createElement('div');
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            document.getElementById('test-results').appendChild(div);
+            console.log(message);
+        }
+
+        async function testDirectAPI() {
+            log('Testing direct API call...');
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/opportunities/');
+                log(`Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`Response data: ${JSON.stringify(data, null, 2)}`);
+                    log(`Opportunities count: ${data.results ? data.results.length : 'No results array'}`);
+                } else {
+                    log(`Error: ${response.statusText}`);
+                }
+            } catch (error) {
+                log(`Fetch error: ${error.message}`);
+            }
+        }
+
+        async function testWithCurrentFilters() {
+            log('Testing with current filters...');
+            
+            try {
+                // Initialize api if not already done
+                if (typeof api !== 'undefined') {
+                    const params = { page: 1, page_size: 12 };
+                    log(`Using params: ${JSON.stringify(params)}`);
+                    
+                    const response = await api.opportunities.getList(params);
+                    log(`API response: ${JSON.stringify(response, null, 2)}`);
+                } else {
+                    log('API object not available');
+                }
+            } catch (error) {
+                log(`API error: ${error.message}`);
+            }
+        }
+
+        // Auto test on load
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Page loaded, testing...');
+            setTimeout(testDirectAPI, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# Production requirements for Opportuni MVP
+# This includes all dependencies needed for production deployment
+
+# Core Django requirements
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+
+# Database
+psycopg2-binary==2.9.7
+
+# Environment management
+python-decouple==3.8
+
+# File handling
+Pillow==10.0.1
+
+# WSGI server for production
+gunicorn==21.2.0
+
+# Optional: For caching with Redis (uncomment if needed)
+# redis==5.0.1
+# django-redis==5.4.0
+
+# Optional: For background tasks (uncomment if needed)
+# celery==5.3.4
+
+# Optional: For enhanced security (uncomment if needed)
+# django-security==0.20.0
+
+# Optional: For monitoring and logging (uncomment if needed)
+# sentry-sdk==1.38.0

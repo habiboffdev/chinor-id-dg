@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test</h1>
+    <div id="output"></div>
+    
+    <script>
+        // Inline constants for testing
+        const API_BASE_URL = 'http://localhost:8000/api';
+        const Utils = {
+            storage: {
+                get(key) {
+                    try {
+                        const value = localStorage.getItem(key);
+                        return value ? JSON.parse(value) : null;
+                    } catch {
+                        return null;
+                    }
+                },
+                set(key, value) {
+                    try {
+                        localStorage.setItem(key, JSON.stringify(value));
+                    } catch (error) {
+                        console.error('Error saving to localStorage:', error);
+                    }
+                },
+                remove(key) {
+                    localStorage.removeItem(key);
+                }
+            }
+        };
+    </script>
+    <script src="assets/js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const output = document.getElementById('output');
+            
+            output.innerHTML += '<p>API_BASE_URL: ' + (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'UNDEFINED') + '</p>';
+            output.innerHTML += '<p>Utils: ' + (typeof Utils !== 'undefined' ? 'Available' : 'UNDEFINED') + '</p>';
+            output.innerHTML += '<p>window.api: ' + (typeof window.api) + '</p>';
+            
+            if (window.api) {
+                output.innerHTML += '<p>API applications: ' + (typeof window.api.applications) + '</p>';
+                if (window.api.applications) {
+                    output.innerHTML += '<p>API applications.getDetails: ' + (typeof window.api.applications.getDetails) + '</p>';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

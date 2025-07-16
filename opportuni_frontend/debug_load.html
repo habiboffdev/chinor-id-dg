@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Opportunities Load</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Debug Opportunities Load</h1>
+        
+        <!-- Debug output -->
+        <div class="bg-gray-900 text-green-400 rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">Debug Console</h2>
+            <div id="debug-output" class="font-mono text-sm max-h-64 overflow-y-auto"></div>
+        </div>
+        
+        <!-- Manual controls -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">Manual Controls</h2>
+            <div class="flex gap-4">
+                <button onclick="manualLoadOpportunities()" class="bg-blue-600 text-white px-4 py-2 rounded">
+                    Load Opportunities
+                </button>
+                <button onclick="clearCurrentFilters()" class="bg-red-600 text-white px-4 py-2 rounded">
+                    Clear All Filters
+                </button>
+                <button onclick="showCurrentState()" class="bg-green-600 text-white px-4 py-2 rounded">
+                    Show Current State
+                </button>
+            </div>
+        </div>
+
+        <!-- Active Filters Display -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">Active Filters</h2>
+            <div id="active-filters"></div>
+        </div>
+
+        <!-- Opportunities Container -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4">Opportunities</h2>
+            <div id="opportunities-container" class="min-h-48"></div>
+        </div>
+    </div>
+
+    <!-- Include scripts -->
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/opportunities.js"></script>
+
+    <script>
+        // Override console.log to capture all output
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const debugOutput = document.getElementById('debug-output');
+        
+        function addDebugMessage(message, isError = false) {
+            const div = document.createElement('div');
+            div.className = isError ? 'text-red-400' : 'text-green-400';
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            debugOutput.appendChild(div);
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            addDebugMessage(message);
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            addDebugMessage(`ERROR: ${message}`, true);
+        };
+
+        // Manual functions
+        function manualLoadOpportunities() {
+            console.log('🔧 Manual loadOpportunities() called');
+            if (typeof loadOpportunities === 'function') {
+                loadOpportunities();
+            } else {
+                console.error('loadOpportunities function not available');
+            }
+        }
+
+        function clearCurrentFilters() {
+            console.log('🔧 Manual clearAllFilters() called');
+            if (typeof clearAllFilters === 'function') {
+                clearAllFilters();
+            } else if (typeof window.clearAllFilters === 'function') {
+                window.clearAllFilters();
+            } else {
+                console.error('clearAllFilters function not available');
+                // Manual clear
+                if (typeof currentFilters !== 'undefined') {
+                    currentFilters = {};
+                    console.log('✅ Manually cleared currentFilters');
+                }
+            }
+        }
+
+        function showCurrentState() {
+            console.log('🔧 === CURRENT STATE ===');
+            console.log('currentFilters:', typeof currentFilters !== 'undefined' ? currentFilters : 'not defined');
+            console.log('currentPage:', typeof currentPage !== 'undefined' ? currentPage : 'not defined');
+            console.log('totalPages:', typeof totalPages !== 'undefined' ? totalPages : 'not defined');
+            console.log('currentViewMode:', typeof currentViewMode !== 'undefined' ? currentViewMode : 'not defined');
+            console.log('isLoading:', typeof isLoading !== 'undefined' ? isLoading : 'not defined');
+            console.log('currentLoadRequest:', typeof currentLoadRequest !== 'undefined' ? currentLoadRequest : 'not defined');
+            
+            // Check containers
+            const container = document.getElementById('opportunities-container');
+            console.log('opportunities-container found:', !!container);
+            if (container) {
+                console.log('container innerHTML length:', container.innerHTML.length);
+                console.log('container first 100 chars:', container.innerHTML.substring(0, 100));
+            }
+        }
+
+        // Auto-initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Debug page loaded');
+            
+            // Small delay then show initial state
+            setTimeout(() => {
+                showCurrentState();
+                console.log('🔧 Auto-calling loadOpportunities in 2 seconds...');
+                setTimeout(manualLoadOpportunities, 2000);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

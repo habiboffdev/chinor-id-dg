@@ -1,0 +1,2640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile - Opportuni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    
+    <!-- Custom Styles for Enhanced Profile Design -->
+    <style>
+        /* Modern Form Input Styles */
+        .form-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .form-input:hover, .form-textarea:hover, .form-select:hover {
+            border-color: #9ca3af;
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        /* Floating Label Effect */
+        .form-group.focused .form-label {
+            transform: translateY(-1.5rem) scale(0.875);
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        .form-label {
+            transition: all 0.2s ease;
+            transform-origin: left top;
+            position: absolute;
+            left: 0.75rem;
+            top: 0.75rem;
+            pointer-events: none;
+            background: linear-gradient(to bottom, transparent 50%, white 50%);
+            padding: 0 0.25rem;
+            z-index: 1;
+        }
+        
+        /* Enhanced Gradient Backgrounds */
+        .gradient-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .gradient-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .gradient-btn:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Success States */
+        .input-success {
+            border-color: #10b981 !important;
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+        
+        .input-error {
+            border-color: #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+        
+        /* Profile Picture Hover Effect */
+        .profile-picture-container {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-picture-container:hover {
+            transform: scale(1.05);
+        }
+        
+        .profile-picture-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .profile-picture-container:hover .profile-picture-overlay {
+            opacity: 1;
+        }
+        
+        /* Tab Animation */
+        .profile-tab {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 2px 2px 0 0;
+        }
+        
+        /* Achievement Badge Animation */
+        @keyframes bounce-in {
+            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.1) rotate(5deg); opacity: 0.8; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        .achievement-badge {
+            animation: bounce-in 0.6s ease-out;
+        }
+        
+        /* Loading States */
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .form-label {
+                font-size: 0.875rem;
+            }
+            
+            .form-group.focused .form-label {
+                transform: translateY(-1.25rem) scale(0.8);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="dashboard.html" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Opportuni</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="opportunities.html" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-search mr-1"></i>Browse Opportunities
+                    </a>
+                    
+                    <button id="notificationBtn" class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                    
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <span id="userName" class="text-gray-700 font-medium">Student</span>
+                            <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
+                        </button>
+                        <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-10">
+                            <a href="profile.html" class="block px-4 py-2 text-blue-600 bg-blue-50 border-b border-gray-100">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="dashboard.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                                <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                            </a>
+                            <a href="applications.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                                <i class="fas fa-file-alt mr-2"></i>Applications
+                            </a>
+                            <a href="settings.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </a>
+                            <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <!-- Header -->
+        <div class="bg-white border-b border-gray-200">
+            <div class="px-4 sm:px-6 lg:px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">My Profile</h1>
+                        <p class="text-gray-600 mt-1">Manage your personal information and preferences</p>
+                    </div>
+                    <!-- Profile completion badge -->
+                    <div id="completionBadge" class="hidden">
+                        <div class="flex items-center space-x-3 bg-yellow-50 px-4 py-2 rounded-lg border border-yellow-200">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-chart-pie text-yellow-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-yellow-800">Profile <span id="completionPercentage">0</span>% complete</p>
+                                </div>
+                            </div>
+                            <div class="w-20 h-2 bg-yellow-200 rounded-full">
+                                <div id="completionBar" class="h-2 bg-yellow-600 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Login prompt for unauthenticated users -->
+                    <div id="loginPrompt" class="hidden">
+                        <div class="flex items-center space-x-3 bg-red-50 px-4 py-2 rounded-lg border border-red-200">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-red-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-red-800">Please log in to view your profile</p>
+                                </div>
+                            </div>
+                            <button onclick="window.location.href='login.html'" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                Login
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Header Card -->
+        <div class="px-4 sm:px-6 lg:px-8 py-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+                <div class="flex items-center space-x-6">
+                    <!-- Enhanced Profile Picture -->
+                    <div class="relative flex-shrink-0 group">
+                        <div id="profilePictureContainer" class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold profile-picture-container cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        
+                        <!-- Hover Overlay -->
+                        <div class="profile-picture-overlay">
+                            <div class="text-center">
+                                <i class="fas fa-camera text-white text-lg mb-1"></i>
+                                <p class="text-white text-xs font-medium">Change Photo</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Camera Button -->
+                        <button id="changePictureBtn" class="absolute bottom-0 right-0 w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-110 shadow-lg">
+                            <i class="fas fa-camera text-xs"></i>
+                        </button>
+                        
+                        <!-- Upload Progress Indicator -->
+                        <div id="uploadProgress" class="absolute inset-0 bg-black bg-opacity-50 rounded-full hidden flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-spinner fa-spin text-white text-lg mb-1"></i>
+                                <p class="text-white text-xs">Uploading...</p>
+                            </div>
+                        </div>
+                        
+                        <input type="file" id="profilePicture" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" class="hidden">
+                    </div>
+                    
+                    <!-- Profile Info -->
+                    <div class="flex-1">
+                        <h2 id="profileName" class="text-2xl font-bold text-gray-900 mb-1">Student Name</h2>
+                        <div class="flex items-center space-x-2 mb-3">
+                            <p id="profileEmail" class="text-gray-600">student@email.com</p>
+                            <a href="settings.html" class="text-blue-600 hover:text-blue-700 text-sm">
+                                <i class="fas fa-cog mr-1"></i>Change in Settings
+                            </a>
+                        </div>
+                        <div class="flex items-center space-x-6 text-sm">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-file-alt text-blue-600 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p id="applicationsCount" class="font-semibold text-gray-900">0</p>
+                                    <p class="text-gray-500">Applications</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-green-600 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p id="acceptedCount" class="font-semibold text-green-600">0</p>
+                                    <p class="text-gray-500">Accepted</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="flex-shrink-0 flex space-x-3">
+                        <button id="downloadResumeBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                            <i class="fas fa-download mr-2"></i>Download Resume
+                        </button>
+                        <button id="viewApplicationsBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-file-alt mr-2"></i>Applications
+                        </button>
+                        <button id="browseOpportunitiesBtn" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                            <i class="fas fa-search mr-2"></i>Browse
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Profile Content -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <!-- Improved Tab Navigation -->
+                <div class="border-b border-gray-200 bg-gray-50">
+                    <nav class="flex space-x-8 px-6 overflow-x-auto" aria-label="Tabs">
+                        <button class="profile-tab active py-4 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600 whitespace-nowrap" data-tab="personal">
+                            <i class="fas fa-user mr-2"></i>Personal Info
+                        </button>
+                        <button class="profile-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap" data-tab="education">
+                            <i class="fas fa-graduation-cap mr-2"></i>Education
+                        </button>
+                        <button class="profile-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap" data-tab="experience">
+                            <i class="fas fa-briefcase mr-2"></i>Experience
+                        </button>
+                        <button class="profile-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap" data-tab="skills">
+                            <i class="fas fa-cogs mr-2"></i>Skills
+                        </button>
+                        <button class="profile-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap" data-tab="projects">
+                            <i class="fas fa-project-diagram mr-2"></i>Projects
+                        </button>
+                        <button class="profile-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap" data-tab="achievements">
+                            <i class="fas fa-trophy mr-2"></i>Achievements
+                        </button>
+                        <button class="profile-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap" data-tab="languages">
+                            <i class="fas fa-language mr-2"></i>Languages
+                        </button>
+                        <button class="profile-tab py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap" data-tab="preferences">
+                            <i class="fas fa-cog mr-2"></i>Preferences
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Form Content -->
+                <div class="p-6 lg:p-8">`
+                        <!-- Personal Information Tab -->
+                        <div id="personalTab" class="tab-content">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Personal Information</h3>
+                            </div>
+                            
+                            <form id="personalForm">
+                                <div class="space-y-6">
+                                    <!-- Basic Information Row -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                                            <input type="text" id="firstName" name="firstName" required 
+                                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                        <div>
+                                            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                                            <input type="text" id="lastName" name="lastName" required 
+                                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Contact & Location Row -->
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div>
+                                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                            <input type="tel" id="phone" name="phone" 
+                                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                        <div>
+                                            <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                                            <input type="date" id="dateOfBirth" name="dateOfBirth" 
+                                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                        <div>
+                                            <label for="location" class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                                            <input type="text" id="location" name="location" placeholder="City, Country" 
+                                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Bio Section -->
+                                    <div>
+                                        <label for="bio" class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                                        <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..." 
+                                                  class="form-textarea w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                                        <!-- Character counter for bio -->
+                                        <div id="bioCounter" class="text-gray-500 text-sm mt-1">0/500</div>
+                                    </div>
+                                    
+                                    <!-- URLs Row -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="portfolioUrl" class="block text-sm font-medium text-gray-700 mb-2">Portfolio URL</label>
+                                            <input type="url" id="portfolioUrl" name="portfolioUrl" placeholder="https://your-portfolio.com" 
+                                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                        <div>
+                                            <label for="githubUrl" class="block text-sm font-medium text-gray-700 mb-2">GitHub URL</label>
+                                            <input type="url" id="githubUrl" name="githubUrl" placeholder="https://github.com/yourname" 
+                                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Resume Upload Section -->
+                                    <div class="bg-gray-50 rounded-xl p-6">
+                                        <label class="block text-sm font-medium text-gray-700 mb-4">Resume Upload</label>
+                                        <div class="flex items-center space-x-4">
+                                            <div id="resumeStatus" class="flex-1 p-4 bg-white rounded-lg border-2 border-dashed border-gray-300 text-center">
+                                                <i class="fas fa-file-upload text-gray-400 text-2xl mb-2"></i>
+                                                <p class="text-sm text-gray-600">No resume uploaded</p>
+                                            </div>
+                                            <div class="flex flex-col space-y-2">
+                                                <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" class="hidden">
+                                                <button type="button" id="uploadResumeBtn" 
+                                                        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                                    <i class="fas fa-upload mr-2"></i>Upload Resume
+                                                </button>
+                                                <p class="text-xs text-gray-500 text-center">PDF, DOC, DOCX up to 5MB</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-4 pt-8 border-t border-gray-200 mt-8">
+                                    <button type="button" onclick="cancelForm()" 
+                                            class="px-8 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" 
+                                            class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center">
+                                        <span>Save Changes</span>
+                                        <i class="fas fa-save ml-2"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Education Tab -->
+                        <div id="educationTab" class="tab-content hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Education</h3>
+                                <button id="addEducationBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i>Add Education
+                                </button>
+                            </div>
+                            
+                            <div id="educationList" class="space-y-4">
+                                <!-- Education items will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Experience Tab -->
+                        <div id="experienceTab" class="tab-content hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Experience</h3>
+                                <button id="addExperienceBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i>Add Experience
+                                </button>
+                            </div>
+                            
+                            <div id="experienceList" class="space-y-4">
+                                <!-- Experience items will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Skills Tab -->
+                        <div id="skillsTab" class="tab-content hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Skills</h3>
+                                <button id="addSkillBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i>Add Skill
+                                </button>
+                            </div>
+                            
+                            <div id="skillsList" class="space-y-4">
+                                <!-- Skills items will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Projects Tab -->
+                        <div id="projectsTab" class="tab-content hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Projects</h3>
+                                <button id="addProjectBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i>Add Project
+                                </button>
+                            </div>
+                            
+                            <div id="projectsList" class="space-y-4">
+                                <!-- Projects items will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Achievements Tab -->
+                        <div id="achievementsTab" class="tab-content hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Achievements</h3>
+                                <button id="addAchievementBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i>Add Achievement
+                                </button>
+                            </div>
+                            
+                            <div id="achievementsList" class="space-y-4">
+                                <!-- Achievements items will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Languages Tab -->
+                        <div id="languagesTab" class="tab-content hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Languages</h3>
+                                <button id="addLanguageBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i>Add Language
+                                </button>
+                            </div>
+                            
+                            <div id="languagesList" class="space-y-4">
+                                <!-- Languages items will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Preferences Tab -->
+                        <div id="preferencesTab" class="tab-content hidden">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Preferences</h3>
+                            </div>
+                            
+                            <form id="preferencesForm">
+                                <div class="space-y-8">
+                                    <!-- Opportunity Types Section -->
+                                    <div class="bg-gray-50 rounded-xl p-6">
+                                        <label class="block text-sm font-medium text-gray-700 mb-4">Opportunity Types</label>
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <label class="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 cursor-pointer">
+                                                <input type="checkbox" class="opportunity-type rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="internship">
+                                                <span class="text-sm font-medium">Internships</span>
+                                            </label>
+                                            <label class="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 cursor-pointer">
+                                                <input type="checkbox" class="opportunity-type rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="job">
+                                                <span class="text-sm font-medium">Full-time Jobs</span>
+                                            </label>
+                                            <label class="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 cursor-pointer">
+                                                <input type="checkbox" class="opportunity-type rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="research">
+                                                <span class="text-sm font-medium">Research</span>
+                                            </label>
+                                            <label class="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 cursor-pointer">
+                                                <input type="checkbox" class="opportunity-type rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="scholarship">
+                                                <span class="text-sm font-medium">Scholarships</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Location Preferences -->
+                                    <div>
+                                        <label for="preferredLocations" class="block text-sm font-medium text-gray-700 mb-2">Preferred Locations</label>
+                                        <input type="text" id="preferredLocations" name="preferredLocations" 
+                                               placeholder="e.g. New York, San Francisco, Remote (comma separated)" 
+                                               class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <!-- Privacy Settings -->
+                                    <div class="bg-gray-50 rounded-xl p-6">
+                                        <h4 class="text-md font-medium text-gray-900 mb-4">Privacy Settings</h4>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
+                                                <div>
+                                                    <label for="phoneVisible" class="text-sm font-medium text-gray-700">Phone Visible</label>
+                                                    <p class="text-sm text-gray-500">Show your phone number to recruiters</p>
+                                                </div>
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="phoneVisible" name="phoneVisible" class="sr-only peer">
+                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                                </label>
+                                            </div>
+                                            <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
+                                                <div>
+                                                    <label for="emailVisible" class="text-sm font-medium text-gray-700">Email Visible</label>
+                                                    <p class="text-sm text-gray-500">Show your email to recruiters</p>
+                                                </div>
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="emailVisible" name="emailVisible" class="sr-only peer" checked>
+                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-4 pt-8 border-t border-gray-200 mt-8">
+                                    <button type="button" onclick="cancelForm()" 
+                                            class="px-8 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" 
+                                            class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center">
+                                        <span>Save Preferences</span>
+                                        <i class="fas fa-save ml-2"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span class="text-gray-700">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Modal Overlay -->
+    <div id="modalOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div id="modalContent" class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <!-- Modal content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script>
+        // Global state
+        let currentProfileData = null;
+        let currentTab = 'personal';
+        let availableSkills = [];
+        
+        // Initialize API instance
+        const api = new API();
+
+        // Utility functions
+        function showLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Make functions globally accessible for debugging
+        window.currentProfileData = currentProfileData;
+        window.populatePersonalForm = function(profile) {
+            console.log('populatePersonalForm called with:', profile);
+            
+            // Check if elements exist before setting values
+            const elements = ['firstName', 'lastName', 'phone', 'dateOfBirth', 'location', 'bio', 'portfolioUrl'];
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    const value = profile[id === 'firstName' ? 'first_name' : 
+                                         id === 'lastName' ? 'last_name' : 
+                                         id === 'dateOfBirth' ? 'date_of_birth' :
+                                         id === 'portfolioUrl' ? 'portfolio_url' : id] || '';
+                    element.value = value;
+                    console.log(`Set ${id} to:`, value);
+                } else {
+                    console.error(`Element not found: ${id}`);
+                }
+            });
+            
+            // Update resume status
+            if (profile.resume) {
+                const resumeStatus = document.getElementById('resumeStatus');
+                if (resumeStatus) {
+                    resumeStatus.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm text-green-600"><i class="fas fa-file-pdf mr-2"></i>Resume uploaded</p>
+                            <button type="button" onclick="downloadResume()" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        };
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize event listeners first (before auth check)
+            initializeEventListeners();
+            
+            // Check authentication
+            try {
+                if (!window.auth || !auth.isLoggedIn()) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Wait for user to be fully loaded
+                await auth.waitForUser();
+                
+                // Check if user is a student (but don't fail if user data isn't loaded yet)
+                const currentUser = auth.getCurrentUser();
+                if (currentUser && currentUser.user_type && currentUser.user_type !== 'student') {
+                    showToast('This page is for students only', 'error');
+                    auth.redirectToDashboard();
+                    return;
+                }
+            } catch (error) {
+                console.log('Auth check failed, continuing anyway for debugging:', error);
+            }
+            
+            // Initialize page data
+            try {
+                showLoading();
+                await loadProfile();
+                await loadAllData();
+                hideLoading();
+            } catch (error) {
+                console.error('Error initializing profile page:', error);
+                hideLoading();
+                showToast('Error loading profile page', 'error');
+                // Continue anyway to allow testing
+            }
+        });
+
+        // Initialize all event listeners
+        function initializeEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.addEventListener('click', handleTabSwitch);
+            });
+
+            // Personal form
+            document.getElementById('personalForm').addEventListener('submit', handlePersonalFormSubmit);
+
+            // Preferences form
+            document.getElementById('preferencesForm').addEventListener('submit', handlePreferencesFormSubmit);
+
+            // Bio character counter
+            const bioTextarea = document.getElementById('bio');
+            const bioCounter = document.getElementById('bioCounter');
+            if (bioTextarea && bioCounter) {
+                function updateBioCounter() {
+                    const currentLength = bioTextarea.value.length;
+                    const maxLength = 500;
+                    bioCounter.textContent = `${currentLength}/${maxLength}`;
+                    
+                    // Change color based on usage
+                    if (currentLength > maxLength * 0.9) {
+                        bioCounter.className = 'text-red-500 text-sm font-medium';
+                    } else if (currentLength > maxLength * 0.7) {
+                        bioCounter.className = 'text-yellow-500 text-sm font-medium';
+                    } else {
+                        bioCounter.className = 'text-gray-500 text-sm';
+                    }
+                }
+                
+                bioTextarea.addEventListener('input', updateBioCounter);
+                bioTextarea.addEventListener('keyup', updateBioCounter);
+                // Initialize counter
+                updateBioCounter();
+            }
+
+            // Input animations and enhancements
+            document.querySelectorAll('.form-input, .form-textarea, .form-select').forEach(input => {
+                // Add floating label effect
+                const handleFocus = () => {
+                    input.parentElement.classList.add('focused');
+                };
+                
+                const handleBlur = () => {
+                    if (!input.value) {
+                        input.parentElement.classList.remove('focused');
+                    }
+                };
+                
+                input.addEventListener('focus', handleFocus);
+                input.addEventListener('blur', handleBlur);
+                
+                // Initialize state
+                if (input.value) {
+                    input.parentElement.classList.add('focused');
+                }
+            });
+
+            // Graduation year validation
+            const graduationYearInput = document.getElementById('graduationYear');
+            if (graduationYearInput) {
+                graduationYearInput.addEventListener('input', (e) => {
+                    const currentYear = new Date().getFullYear();
+                    const value = parseInt(e.target.value);
+                    
+                    if (value && (value < currentYear - 10 || value > currentYear + 10)) {
+                        e.target.setCustomValidity('Please enter a valid graduation year');
+                    } else {
+                        e.target.setCustomValidity('');
+                    }
+                });
+            }
+
+            // Phone number formatting
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', (e) => {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 6) {
+                        value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+                    } else if (value.length >= 3) {
+                        value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // Picture upload - Enhanced with multiple click targets
+            document.getElementById('changePictureBtn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('profilePicture').click();
+            });
+            
+            // Also allow clicking on the profile picture container itself
+            document.getElementById('profilePictureContainer').addEventListener('click', () => {
+                document.getElementById('profilePicture').click();
+            });
+            
+            document.getElementById('profilePicture').addEventListener('change', handlePictureUpload);
+
+            // Resume upload
+            document.getElementById('uploadResumeBtn').addEventListener('click', () => {
+                document.getElementById('resume').click();
+            });
+            document.getElementById('resume').addEventListener('change', handleResumeUpload);
+
+            // Add buttons
+            const addButtons = [
+                { id: 'addEducationBtn', handler: () => showEducationModal() },
+                { id: 'addExperienceBtn', handler: () => showExperienceModal() },
+                { id: 'addSkillBtn', handler: () => showSkillModal() },
+                { id: 'addProjectBtn', handler: () => showProjectModal() },
+                { id: 'addAchievementBtn', handler: () => showAchievementModal() },
+                { id: 'addLanguageBtn', handler: () => showLanguageModal() }
+            ];
+
+            addButtons.forEach(({ id, handler }) => {
+                const button = document.getElementById(id);
+                if (button) {
+                    button.addEventListener('click', handler);
+                } else {
+                    console.error('Button not found:', id);
+                }
+            });
+
+            // Quick actions
+            document.getElementById('downloadResumeBtn').addEventListener('click', downloadResume);
+            document.getElementById('viewApplicationsBtn').addEventListener('click', () => {
+                window.location.href = 'applications.html';
+            });
+            document.getElementById('browseOpportunitiesBtn').addEventListener('click', () => {
+                window.location.href = 'opportunities.html';
+            });
+
+            // User menu
+            document.getElementById('userMenuBtn').addEventListener('click', toggleUserMenu);
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+            // Close modal on overlay click
+            document.getElementById('modalOverlay').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('modalOverlay')) {
+                    hideModal();
+                }
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const userMenu = document.getElementById('userMenu');
+                const userMenuBtn = document.getElementById('userMenuBtn');
+                
+                if (!userMenuBtn.contains(event.target) && !userMenu.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Load profile data
+        async function loadProfile() {
+            try {
+                // Check if user is authenticated
+                const token = Utils.storage.get('auth_token');
+                if (!token) {
+                    console.log('No authentication token found');
+                    document.getElementById('loginPrompt').classList.remove('hidden');
+                    document.getElementById('completionBadge').classList.add('hidden');
+                    
+                    // Show dummy data but indicate user needs to login
+                    currentProfileData = {
+                        first_name: 'Please',
+                        last_name: 'Login',
+                        email: 'login@required.com',
+                        phone: '',
+                        bio: 'Please log in to view your profile',
+                        user: {
+                            first_name: 'Please',
+                            last_name: 'Login',
+                            email: 'login@required.com'
+                        }
+                    };
+                    updateProfileHeader(currentProfileData);
+                    populatePersonalForm(currentProfileData);
+                    return;
+                }
+
+                // Set token in API
+                api.setToken(token);
+                
+                console.log('Loading profile data...');
+                const response = await api.students.getProfile();
+                currentProfileData = response; // API returns data directly, not wrapped
+                window.currentProfileData = currentProfileData; // Make globally accessible
+                
+                if (!currentProfileData) {
+                    throw new Error('No profile data received from API');
+                }
+                
+                console.log('Profile data loaded successfully:', currentProfileData);
+                
+                // Hide login prompt and show completion badge
+                document.getElementById('loginPrompt').classList.add('hidden');
+                document.getElementById('completionBadge').classList.remove('hidden');
+                
+                updateProfileHeader(currentProfileData);
+                populatePersonalForm(currentProfileData);
+                populatePreferencesForm(currentProfileData);
+                updateProfileCompletion(currentProfileData);
+                
+                // Also load stats
+                await loadStats();
+                
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                
+                // Check if it's an authentication error
+                if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+                    console.log('Authentication error, showing login prompt');
+                    Utils.storage.remove('auth_token');
+                    document.getElementById('loginPrompt').classList.remove('hidden');
+                    document.getElementById('completionBadge').classList.add('hidden');
+                    
+                    currentProfileData = {
+                        first_name: 'Please',
+                        last_name: 'Login',
+                        email: 'login@required.com',
+                        phone: '',
+                        bio: 'Please log in to view your profile',
+                        user: {
+                            first_name: 'Please',
+                            last_name: 'Login',
+                            email: 'login@required.com'
+                        }
+                    };
+                    updateProfileHeader(currentProfileData);
+                    populatePersonalForm(currentProfileData);
+                    return;
+                }
+                
+                showToast('Failed to load profile: ' + (error.message || 'Unknown error'), 'error');
+                
+                // Set dummy data for testing ONLY if not an auth error
+                currentProfileData = {
+                    first_name: 'Test',
+                    last_name: 'User',
+                    email: 'test@example.com',
+                    phone: '',
+                    bio: 'This is test data - API connection failed',
+                    user: {
+                        first_name: 'Test',
+                        last_name: 'User',
+                        email: 'test@example.com'
+                    }
+                };
+                updateProfileHeader(currentProfileData);
+                populatePersonalForm(currentProfileData);
+            }
+        }
+
+        // Load all related data
+        async function loadAllData() {
+            try {
+                // Load available skills for skill selection
+                const skillsResponse = await api.get('/students/skills/available/');
+                availableSkills = skillsResponse.results || skillsResponse.data || skillsResponse || [];
+                console.log('Available skills loaded:', availableSkills);
+                
+                // Use the profile data that was already loaded instead of making separate API calls
+                if (currentProfileData) {
+                    displayEducationList(currentProfileData.education || []);
+                    displayExperienceList(currentProfileData.experiences || []);
+                    displaySkillsList(currentProfileData.skills || []);
+                    displayProjectsList(currentProfileData.projects || []);
+                    displayAchievementsList(currentProfileData.achievements || []);
+                    displayLanguagesList(currentProfileData.languages || []);
+                    
+                    // Update profile completion
+                    updateProfileCompletion(currentProfileData);
+                } else {
+                    console.warn('No profile data available for displaying sections');
+                }
+                
+            } catch (error) {
+                console.error('Error loading section data:', error);
+                showToast('Error loading some profile sections', 'warning');
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await api.students.getDashboardStats();
+                const stats = response.data || response;
+                
+                document.getElementById('applicationsCount').textContent = stats.total_applications || 0;
+                document.getElementById('acceptedCount').textContent = stats.accepted_applications || 0;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                document.getElementById('applicationsCount').textContent = '0';
+                document.getElementById('acceptedCount').textContent = '0';
+            }
+        }
+
+        // Update profile header
+        function updateProfileHeader(profile) {
+            const container = document.getElementById('profilePictureContainer');
+            
+            // Check for avatar in user object or profile_picture field
+            const avatarUrl = profile.user?.avatar || profile.profile_picture || profile.avatar;
+            
+            if (avatarUrl) {
+                container.innerHTML = `<img src="${avatarUrl}" alt="Profile" class="w-full h-full object-cover rounded-full">`;
+                container.className = 'w-20 h-20 rounded-full overflow-hidden profile-picture-container relative';
+            } else {
+                const initials = (profile.first_name?.[0] || '') + (profile.last_name?.[0] || '');
+                if (initials) {
+                    container.innerHTML = `<span class="text-white font-semibold text-lg">${initials}</span>`;
+                } else {
+                    container.innerHTML = '<i class="fas fa-user text-gray-400 text-2xl"></i>';
+                }
+                container.className = 'w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center profile-picture-container relative';
+            }
+            
+            document.getElementById('profileName').textContent = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Student Name';
+            document.getElementById('profileEmail').textContent = profile.email || 'student@email.com';
+            document.getElementById('userName').textContent = profile.first_name || 'Student';
+        }
+
+        // Populate personal form
+        // populatePersonalForm is now defined globally above
+
+        // Populate preferences form
+        function populatePreferencesForm(profile) {
+            document.getElementById('preferredLocations').value = (profile.preferred_locations || []).join(', ');
+            document.getElementById('phoneVisible').checked = profile.phone_visible ?? false;
+            document.getElementById('emailVisible').checked = profile.email_visible ?? true;
+            
+            // Opportunity types
+            const preferredTypes = profile.preferred_opportunity_types || [];
+            document.querySelectorAll('.opportunity-type').forEach(checkbox => {
+                checkbox.checked = preferredTypes.includes(checkbox.value);
+            });
+        }
+
+        // Update profile completion with motivational messaging
+        function updateProfileCompletion(profile) {
+            const fields = [
+                profile.first_name, profile.last_name, profile.email, profile.phone,
+                profile.university, profile.major, profile.graduation_year, profile.bio,
+                profile.resume, profile.portfolio_url, profile.avatar
+            ];
+            
+            const completedFields = fields.filter(field => field && field.toString().trim()).length;
+            const percentage = Math.round((completedFields / fields.length) * 100);
+            
+            // Update completion percentage display - check if elements exist first
+            const percentageElement = document.getElementById('completionPercentage');
+            const barElement = document.getElementById('completionBar');
+            const badgeElement = document.getElementById('completionBadge');
+            
+            if (percentageElement) {
+                percentageElement.textContent = percentage;
+            }
+            
+            if (barElement) {
+                barElement.style.width = `${percentage}%`;
+                
+                // Dynamic color based on completion
+                if (percentage >= 90) {
+                    barElement.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                } else if (percentage >= 70) {
+                    barElement.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)';
+                } else if (percentage >= 50) {
+                    barElement.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+                } else {
+                    barElement.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                }
+            }
+            
+            if (badgeElement) {
+                // Show motivational message based on completion
+                const messages = {
+                    100: { text: "🎉 Profile Perfect!", class: "bg-green-50 border-green-200", color: "text-green-800" },
+                    90: { text: "🌟 Almost There!", class: "bg-blue-50 border-blue-200", color: "text-blue-800" },
+                    70: { text: "🚀 Great Progress!", class: "bg-purple-50 border-purple-200", color: "text-purple-800" },
+                    50: { text: "📈 Keep Going!", class: "bg-yellow-50 border-yellow-200", color: "text-yellow-800" },
+                    0: { text: "✨ Let's Start!", class: "bg-red-50 border-red-200", color: "text-red-800" }
+                };
+                
+                let message = messages[0];
+                for (const threshold of [100, 90, 70, 50]) {
+                    if (percentage >= threshold) {
+                        message = messages[threshold];
+                        break;
+                    }
+                }
+                
+                badgeElement.className = `flex items-center space-x-3 px-4 py-2 rounded-lg border ${message.class}`;
+                badgeElement.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-pie text-blue-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium ${message.color}">${message.text} <span id="completionPercentage">${percentage}</span>% complete</p>
+                        </div>
+                    </div>
+                    <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="completionBar" class="h-2 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                
+                // Achievement celebration for milestones
+                if (percentage === 100) {
+                    setTimeout(() => {
+                        showToast('🎉 Congratulations! Your profile is now complete and ready to attract amazing opportunities!', 'success', 5000);
+                    }, 500);
+                } else if (percentage >= 90 && percentage < 100) {
+                    // Show helpful tip for completion
+                    const missingFields = [];
+                    if (!profile.resume) missingFields.push('resume');
+                    if (!profile.portfolio_url) missingFields.push('portfolio');
+                    if (!profile.bio) missingFields.push('bio');
+                    if (!profile.avatar) missingFields.push('profile picture');
+                    
+                    if (missingFields.length > 0) {
+                        setTimeout(() => {
+                            showToast(`🌟 You're almost there! Consider adding: ${missingFields.join(', ')}`, 'info', 4000);
+                        }, 1000);
+                    }
+                }
+            }
+            
+            // Only try to update completionAlert if it exists
+            const alertElement = document.getElementById('completionAlert');
+            if (alertElement) {
+                if (percentage < 80) {
+                    alertElement.classList.remove('hidden');
+                } else {
+                    alertElement.classList.add('hidden');
+                }
+            }
+        }
+
+        // Handle tab switching
+        function handleTabSwitch(e) {
+            const targetTab = e.target.dataset.tab;
+            currentTab = targetTab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.classList.remove('active', 'border-blue-600', 'text-blue-600');
+                tab.classList.add('border-transparent', 'text-gray-500');
+            });
+            e.target.classList.add('active', 'border-blue-600', 'text-blue-600');
+            e.target.classList.remove('border-transparent', 'text-gray-500');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${targetTab}Tab`).classList.remove('hidden');
+            
+            // Load data for the current tab if needed
+            loadTabData(targetTab);
+        }
+
+        // Load data for specific tab
+        async function loadTabData(tab) {
+            try {
+                switch (tab) {
+                    case 'education':
+                        await loadEducationData();
+                        break;
+                    case 'experience':
+                        await loadExperienceData();
+                        break;
+                    case 'skills':
+                        await loadSkillsData();
+                        break;
+                    case 'projects':
+                        await loadProjectsData();
+                        break;
+                    case 'achievements':
+                        await loadAchievementsData();
+                        break;
+                    case 'languages':
+                        await loadLanguagesData();
+                        break;
+                }
+            } catch (error) {
+                console.error(`Error loading ${tab} data:`, error);
+            }
+        }
+
+        // Handle personal form submission
+        async function handlePersonalFormSubmit(e) {
+            e.preventDefault();
+            
+            // Clear previous error states
+            document.querySelectorAll('.form-input, .form-textarea').forEach(input => {
+                input.classList.remove('input-error', 'input-success');
+            });
+            
+            const formData = new FormData(e.target);
+            const personalData = Object.fromEntries(formData);
+            
+            // Validate required fields
+            const requiredFields = ['firstName', 'lastName'];
+            let hasErrors = false;
+            
+            requiredFields.forEach(field => {
+                if (!personalData[field] || personalData[field].trim() === '') {
+                    const input = document.querySelector(`[name="${field}"]`);
+                    if (input) {
+                        input.classList.add('input-error');
+                        hasErrors = true;
+                    }
+                }
+            });
+            
+            if (hasErrors) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Map frontend field names to backend field names
+            const mappedData = {
+                first_name: personalData.firstName,
+                last_name: personalData.lastName,
+                phone: personalData.phone,
+                date_of_birth: personalData.dateOfBirth || null,
+                location: personalData.location,
+                bio: personalData.bio,
+                portfolio_url: personalData.portfolioUrl
+            };
+            
+            // Remove undefined/empty values
+            Object.keys(mappedData).forEach(key => {
+                if (mappedData[key] === undefined || mappedData[key] === '') {
+                    if (key === 'date_of_birth') {
+                        mappedData[key] = null;
+                    } else {
+                        mappedData[key] = '';
+                    }
+                }
+            });
+            
+            console.log('Sending personal data:', mappedData);
+            
+            // Visual feedback for form submission
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Updating...';
+            submitBtn.disabled = true;
+            
+            try {
+                await api.students.updateProfile(mappedData);
+                
+                // Mark fields as successful
+                document.querySelectorAll('.form-input, .form-textarea').forEach(input => {
+                    if (input.value) {
+                        input.classList.add('input-success');
+                    }
+                });
+                
+                showToast('Personal information updated successfully! 🎉', 'success');
+                await loadProfile();
+                
+                // Trigger completion calculation
+                updateProfileCompletion();
+                
+            } catch (error) {
+                console.error('Error updating personal information:', error);
+                
+                // Handle specific field errors
+                if (error.response && error.response.data) {
+                    const errorData = error.response.data;
+                    Object.keys(errorData).forEach(fieldName => {
+                        const frontendFieldName = {
+                            'first_name': 'firstName',
+                            'last_name': 'lastName',
+                            'date_of_birth': 'dateOfBirth',
+                            'portfolio_url': 'portfolioUrl'
+                        }[fieldName] || fieldName;
+                        
+                        const input = document.querySelector(`[name="${frontendFieldName}"]`);
+                        if (input) {
+                            input.classList.add('input-error');
+                        }
+                    });
+                }
+                
+                showToast('Failed to update personal information. Please check your input.', 'error');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                // Clear success states after a delay
+                setTimeout(() => {
+                    document.querySelectorAll('.input-success').forEach(input => {
+                        input.classList.remove('input-success');
+                    });
+                }, 3000);
+            }
+        }
+
+        // Handle preferences form submission
+        async function handlePreferencesFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const preferencesData = Object.fromEntries(formData);
+            
+            // Process opportunity types
+            const opportunityTypes = Array.from(document.querySelectorAll('.opportunity-type:checked')).map(cb => cb.value);
+            preferencesData.preferred_opportunity_types = opportunityTypes;
+            
+            // Process preferred locations
+            preferencesData.preferred_locations = preferencesData.preferredLocations.split(',').map(loc => loc.trim()).filter(loc => loc);
+            
+            try {
+                showLoading();
+                await api.students.updateProfile(preferencesData);
+                showToast('Preferences updated successfully!', 'success');
+                await loadProfile();
+            } catch (error) {
+                console.error('Error updating preferences:', error);
+                showToast('Failed to update preferences', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Debug function to check authentication status
+        function debugAuth() {
+            console.log('=== Authentication Debug ===');
+            console.log('Auth token:', Utils.storage.get('auth_token'));
+            console.log('Refresh token:', Utils.storage.get('refresh_token'));
+            console.log('Current user:', auth ? auth.getCurrentUser() : 'Auth not loaded');
+            console.log('API has token:', api.hasToken());
+            
+            // Try to load profile data directly
+            if (api.hasToken()) {
+                console.log('Attempting to load profile...');
+                api.students.getProfile()
+                    .then(data => {
+                        console.log('Profile loaded successfully:', data);
+                    })
+                    .catch(error => {
+                        console.error('Profile loading failed:', error);
+                    });
+            } else {
+                console.log('No token available, cannot load profile');
+            }
+        }
+        
+        // Make debug function available in console
+        window.debugAuth = debugAuth;
+
+        // Utility functions
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        function showModal() {
+            document.getElementById('modalOverlay').classList.remove('hidden');
+        }
+
+        function hideModal() {
+            document.getElementById('modalOverlay').classList.add('hidden');
+        }
+
+        function toggleUserMenu() {
+            document.getElementById('userMenu').classList.toggle('hidden');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                auth.logout();
+                window.location.href = 'index.html';
+            }
+        }
+
+        function cancelForm() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Picture upload handling
+        async function handlePictureUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Validate file size
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('File size must be less than 2MB 📏', 'error');
+                return;
+            }
+            
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                showToast('Please select a valid image file (JPEG, PNG, GIF, WebP) 🖼️', 'error');
+                return;
+            }
+            
+            const container = document.getElementById('profilePictureContainer');
+            const progressIndicator = document.getElementById('uploadProgress');
+            
+            // Show preview immediately with loading overlay
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                container.innerHTML = `<img src="${e.target.result}" alt="Profile" class="w-full h-full object-cover rounded-full">`;
+                container.className = 'w-24 h-24 rounded-full overflow-hidden profile-picture-container cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 relative';
+            };
+            reader.readAsDataURL(file);
+            
+            // Show upload progress
+            if (progressIndicator) {
+                progressIndicator.classList.remove('hidden');
+            }
+            
+            try {
+                // Upload to server
+                const response = await api.students.uploadProfilePicture(file);
+                
+                // Hide progress indicator
+                if (progressIndicator) {
+                    progressIndicator.classList.add('hidden');
+                }
+                
+                // Update with server response or keep preview
+                if (response.avatar_url) {
+                    container.innerHTML = `<img src="${response.avatar_url}" alt="Profile" class="w-full h-full object-cover rounded-full">`;
+                }
+                
+                showToast('Profile picture updated successfully! 📸✨', 'success');
+                
+                // Reload profile to get updated data and completion status
+                await loadProfile();
+                
+            } catch (error) {
+                console.error('Error uploading profile picture:', error);
+                
+                // Hide progress indicator
+                if (progressIndicator) {
+                    progressIndicator.classList.add('hidden');
+                }
+                
+                // Revert to previous image or default
+                if (currentProfileData && currentProfileData.avatar) {
+                    container.innerHTML = `<img src="${currentProfileData.avatar}" alt="Profile" class="w-full h-full object-cover rounded-full">`;
+                    container.className = 'w-24 h-24 rounded-full overflow-hidden profile-picture-container cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 relative';
+                } else {
+                    const initials = (currentProfileData?.first_name?.[0] || '') + (currentProfileData?.last_name?.[0] || '');
+                    if (initials) {
+                        container.innerHTML = `<span class="text-white font-semibold text-lg">${initials}</span>`;
+                    } else {
+                        container.innerHTML = '<i class="fas fa-user text-white text-2xl"></i>';
+                    }
+                    container.className = 'w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center profile-picture-container cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105';
+                }
+                
+                let errorMessage = 'Failed to upload profile picture. Please try again. 😞';
+                if (error.response && error.response.data && error.response.data.error) {
+                    errorMessage = error.response.data.error + ' 🚫';
+                }
+                showToast(errorMessage, 'error');
+            }
+            
+            // Clear the input so the same file can be selected again
+            e.target.value = '';
+        }
+
+        // Resume upload handling
+        async function handleResumeUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('File size must be less than 5MB', 'error');
+                    return;
+                }
+                
+                // Show uploading status
+                document.getElementById('resumeStatus').innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm text-blue-600"><i class="fas fa-file-pdf mr-2"></i>${file.name}</p>
+                        <span class="text-xs text-gray-500">Uploading...</span>
+                    </div>
+                `;
+                
+                try {
+                    // Upload the resume (uploadFile expects a file, not FormData)
+                    const response = await api.students.uploadResume(file);
+                    
+                    // Update status on success
+                    document.getElementById('resumeStatus').innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm text-green-600"><i class="fas fa-file-pdf mr-2"></i>${file.name}</p>
+                            <span class="text-xs text-green-500">Uploaded successfully</span>
+                        </div>
+                    `;
+                    
+                    showToast('Resume uploaded successfully!', 'success');
+                    
+                    // Reload profile to get updated data
+                    await loadProfile();
+                    
+                } catch (error) {
+                    console.error('Error uploading resume:', error);
+                    showToast('Failed to upload resume: ' + (error.message || 'Unknown error'), 'error');
+                    
+                    // Reset status on error
+                    document.getElementById('resumeStatus').innerHTML = `
+                        <p class="text-sm text-red-600">Upload failed</p>
+                    `;
+                }
+            }
+        }
+
+        // Download resume
+        async function downloadResume() {
+            try {
+                const response = await api.students.getProfile();
+                const resumeUrl = response.data.resume;
+                
+                if (resumeUrl) {
+                    window.open(resumeUrl, '_blank');
+                } else {
+                    showToast('No resume uploaded', 'error');
+                }
+            } catch (error) {
+                console.error('Error downloading resume:', error);
+                showToast('Failed to download resume', 'error');
+            }
+        }
+
+        // Section data loading functions - these will be implemented based on the specific needs
+        async function loadEducationData() {
+            try {
+                const response = await api.students.getEducation();
+                const education = response.results || response.data || response || [];
+                displayEducationList(education);
+            } catch (error) {
+                console.error('Error loading education data:', error);
+                displayEducationList([]);
+            }
+        }
+
+        async function loadExperienceData() {
+            try {
+                const response = await api.students.getExperience();
+                const experience = response.results || response.data || response || [];
+                displayExperienceList(experience);
+            } catch (error) {
+                console.error('Error loading experience data:', error);
+                displayExperienceList([]);
+            }
+        }
+
+        async function loadSkillsData() {
+            try {
+                const response = await api.students.getSkills();
+                const skills = response.results || response.data || response || [];
+                displaySkillsList(skills);
+            } catch (error) {
+                console.error('Error loading skills data:', error);
+                displaySkillsList([]);
+            }
+        }
+
+        async function loadProjectsData() {
+            try {
+                const response = await api.students.getProjects();
+                const projects = response.results || response.data || response || [];
+                displayProjectsList(projects);
+            } catch (error) {
+                console.error('Error loading projects data:', error);
+                displayProjectsList([]);
+            }
+        }
+
+        async function loadAchievementsData() {
+            try {
+                const response = await api.students.getAchievements();
+                const achievements = response.results || response.data || response || [];
+                displayAchievementsList(achievements);
+            } catch (error) {
+                console.error('Error loading achievements data:', error);
+                displayAchievementsList([]);
+            }
+        }
+
+        async function loadLanguagesData() {
+            try {
+                const response = await api.students.getLanguages();
+                const languages = response.results || response.data || response || [];
+                displayLanguagesList(languages);
+            } catch (error) {
+                console.error('Error loading languages data:', error);
+                displayLanguagesList([]);
+            }
+        }
+
+        // Display functions for each section
+        function displayEducationList(education) {
+            console.log('displayEducationList called with:', education);
+            const container = document.getElementById('educationList');
+            
+            if (!container) {
+                console.error('educationList container not found');
+                return;
+            }
+            
+            if (education.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-graduation-cap text-4xl mb-4"></i>
+                        <p>No education records yet.</p>
+                        <p class="text-sm">Click "Add Education" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = education.map(edu => `
+                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900">${edu.degree} in ${edu.field_of_study}</h4>
+                            <p class="text-gray-600">${edu.institution}</p>
+                            <p class="text-sm text-gray-500">
+                                ${edu.start_date}${edu.end_date ? ' - ' + edu.end_date : ' - Present'}
+                                ${edu.gpa ? ' | GPA: ' + edu.gpa : ''}
+                            </p>
+                            ${edu.description ? `<p class="text-sm text-gray-700 mt-2">${edu.description}</p>` : ''}
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editEducation(${edu.id})" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteEducation(${edu.id})" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayExperienceList(experience) {
+            const container = document.getElementById('experienceList');
+            if (experience.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-briefcase text-4xl mb-4"></i>
+                        <p>No experience records yet.</p>
+                        <p class="text-sm">Click "Add Experience" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = experience.map(exp => `
+                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900">${exp.title}</h4>
+                            <p class="text-gray-600">${exp.company}</p>
+                            <p class="text-sm text-gray-500">
+                                ${exp.experience_type} | ${exp.start_date}${exp.end_date ? ' - ' + exp.end_date : ' - Present'}
+                                ${exp.location ? ' | ' + exp.location : ''}
+                            </p>
+                            <p class="text-sm text-gray-700 mt-2">${exp.description}</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editExperience(${exp.id})" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteExperience(${exp.id})" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displaySkillsList(skills) {
+            const container = document.getElementById('skillsList');
+            if (skills.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-cogs text-4xl mb-4"></i>
+                        <p>No skills added yet.</p>
+                        <p class="text-sm">Click "Add Skill" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = skills.map(skill => `
+                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900">${skill.skill.name}</h4>
+                            <p class="text-gray-600">${skill.skill.category}</p>
+                            <p class="text-sm text-gray-500">
+                                Proficiency: ${skill.proficiency_level}/4
+                                ${skill.years_experience ? ' | ' + skill.years_experience + ' years' : ''}
+                                ${skill.verified ? ' | Verified' : ''}
+                            </p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editSkill(${skill.id})" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteSkill(${skill.id})" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayProjectsList(projects) {
+            const container = document.getElementById('projectsList');
+            if (projects.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-project-diagram text-4xl mb-4"></i>
+                        <p>No projects added yet.</p>
+                        <p class="text-sm">Click "Add Project" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = projects.map(project => `
+                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900">${project.title}</h4>
+                            <p class="text-sm text-gray-700 mt-1">${project.description}</p>
+                            <p class="text-sm text-gray-500 mt-2">
+                                ${project.start_date}${project.end_date ? ' - ' + project.end_date : ' - Ongoing'}
+                            </p>
+                            <div class="flex space-x-2 mt-2">
+                                ${project.project_url ? `<a href="${project.project_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-external-link-alt mr-1"></i>View Project</a>` : ''}
+                                ${project.github_url ? `<a href="${project.github_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fab fa-github mr-1"></i>GitHub</a>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editProject(${project.id})" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteProject(${project.id})" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayAchievementsList(achievements) {
+            const container = document.getElementById('achievementsList');
+            if (achievements.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-trophy text-4xl mb-4"></i>
+                        <p>No achievements added yet.</p>
+                        <p class="text-sm">Click "Add Achievement" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = achievements.map(achievement => `
+                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900">${achievement.title}</h4>
+                            <p class="text-gray-600">${achievement.issuing_organization}</p>
+                            <p class="text-sm text-gray-500">${achievement.achievement_type} | ${achievement.date_achieved}</p>
+                            <p class="text-sm text-gray-700 mt-1">${achievement.description}</p>
+                            ${achievement.certificate_url ? `<a href="${achievement.certificate_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm mt-2 inline-block"><i class="fas fa-certificate mr-1"></i>View Certificate</a>` : ''}
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editAchievement(${achievement.id})" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteAchievement(${achievement.id})" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayLanguagesList(languages) {
+            const container = document.getElementById('languagesList');
+            if (languages.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-language text-4xl mb-4"></i>
+                        <p>No languages added yet.</p>
+                        <p class="text-sm">Click "Add Language" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = languages.map(language => `
+                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900">${language.language}</h4>
+                            <p class="text-gray-600">${language.proficiency}</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editLanguage(${language.id})" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteLanguage(${language.id})" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal functions - these will show forms for adding/editing items
+        function showEducationModal(education = null) {
+            const isEdit = education !== null;
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">${isEdit ? 'Edit' : 'Add'} Education</h3>
+                    <form id="educationForm">
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Institution *</label>
+                                    <input type="text" name="institution" required value="${education?.institution || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Degree *</label>
+                                    <select name="degree" required 
+                                            class="form-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Select degree...</option>
+                                        <option value="high_school" ${education?.degree === 'high_school' ? 'selected' : ''}>High School</option>
+                                        <option value="associate" ${education?.degree === 'associate' ? 'selected' : ''}>Associate Degree</option>
+                                        <option value="bachelor" ${education?.degree === 'bachelor' ? 'selected' : ''}>Bachelor Degree</option>
+                                        <option value="master" ${education?.degree === 'master' ? 'selected' : ''}>Master Degree</option>
+                                        <option value="phd" ${education?.degree === 'phd' ? 'selected' : ''}>PhD</option>
+                                        <option value="certificate" ${education?.degree === 'certificate' ? 'selected' : ''}>Certificate</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Field of Study *</label>
+                                <input type="text" name="field_of_study" required value="${education?.field_of_study || ''}" 
+                                       class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
+                                    <input type="date" name="start_date" required value="${education?.start_date || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                                    <input type="date" name="end_date" value="${education?.end_date || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">GPA</label>
+                                    <input type="number" name="gpa" min="0" max="4" step="0.01" value="${education?.gpa || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="is_current" ${education?.is_current ? 'checked' : ''} 
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <label class="ml-2 text-sm text-gray-700">Currently studying here</label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                <textarea name="description" rows="3" placeholder="Additional details about your education..." 
+                                          class="form-textarea w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">${education?.description || ''}</textarea>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
+                            <button type="button" onclick="hideModal()" 
+                                    class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                ${isEdit ? 'Update' : 'Add'} Education
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            // Add form submission handler
+            document.getElementById('educationForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData);
+                data.is_current = formData.has('is_current');
+                
+                try {
+                    if (isEdit) {
+                        await api.students.updateEducation(education.id, data);
+                        showToast('Education updated successfully!', 'success');
+                    } else {
+                        await api.students.addEducation(data);
+                        showToast('Education added successfully!', 'success');
+                    }
+                    hideModal();
+                    await loadEducationData();
+                } catch (error) {
+                    console.error('Error saving education:', error);
+                    showToast('Failed to save education', 'error');
+                }
+            });
+            
+            showModal();
+        }
+
+        // Experience Modal
+        function showExperienceModal(experience = null) {
+            const isEdit = experience !== null;
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">${isEdit ? 'Edit' : 'Add'} Experience</h3>
+                    <form id="experienceForm">
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Job Title *</label>
+                                    <input type="text" name="title" required value="${experience?.title || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Company *</label>
+                                    <input type="text" name="company" required value="${experience?.company || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Experience Type *</label>
+                                    <select name="experience_type" required 
+                                            class="form-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Select type...</option>
+                                        <option value="internship" ${experience?.experience_type === 'internship' ? 'selected' : ''}>Internship</option>
+                                        <option value="part_time" ${experience?.experience_type === 'part_time' ? 'selected' : ''}>Part-time</option>
+                                        <option value="full_time" ${experience?.experience_type === 'full_time' ? 'selected' : ''}>Full-time</option>
+                                        <option value="volunteer" ${experience?.experience_type === 'volunteer' ? 'selected' : ''}>Volunteer</option>
+                                        <option value="freelance" ${experience?.experience_type === 'freelance' ? 'selected' : ''}>Freelance</option>
+                                        <option value="project" ${experience?.experience_type === 'project' ? 'selected' : ''}>Project</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                                    <input type="text" name="location" value="${experience?.location || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
+                                    <input type="date" name="start_date" required value="${experience?.start_date || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                                    <input type="date" name="end_date" value="${experience?.end_date || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" name="is_current" ${experience?.is_current ? 'checked' : ''} 
+                                       id="is_current_checkbox"
+                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <label class="ml-2 text-sm text-gray-700">Currently working here</label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                                <textarea name="description" rows="4" required placeholder="Describe your responsibilities and achievements..." 
+                                          class="form-textarea w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">${experience?.description || ''}</textarea>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
+                            <button type="button" onclick="hideModal()" 
+                                    class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                ${isEdit ? 'Update' : 'Add'} Experience
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.getElementById('experienceForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData);
+                data.is_current = formData.has('is_current');
+                
+                // If current job, clear end_date
+                if (data.is_current) {
+                    data.end_date = '';
+                }
+                
+                // Clean up empty fields - don't send empty strings for optional fields
+                Object.keys(data).forEach(key => {
+                    if (data[key] === '' && !['title', 'company', 'experience_type', 'description', 'start_date'].includes(key)) {
+                        delete data[key];
+                    }
+                });
+                
+                // Ensure required fields are not empty
+                const requiredFields = ['title', 'company', 'experience_type', 'description', 'start_date'];
+                const missingFields = requiredFields.filter(field => !data[field] || data[field].trim() === '');
+                
+                if (missingFields.length > 0) {
+                    showToast(`Please fill in required fields: ${missingFields.join(', ')}`, 'error');
+                    return;
+                }
+                
+                // Debug: Log the data being sent
+                console.log('Experience form data being sent:', data);
+                
+                try {
+                    if (isEdit) {
+                        console.log('Updating experience with ID:', experience.id);
+                        await api.students.updateExperience(experience.id, data);
+                        showToast('Experience updated successfully!', 'success');
+                    } else {
+                        console.log('Adding new experience');
+                        await api.students.addExperience(data);
+                        showToast('Experience added successfully!', 'success');
+                    }
+                    hideModal();
+                    await loadExperienceData();
+                } catch (error) {
+                    console.error('Error saving experience:', error);
+                    showToast(`Failed to save experience: ${error.message}`, 'error');
+                }
+            });
+            
+            showModal();
+            
+            // Set up current job checkbox handler after modal is shown
+            setTimeout(() => {
+                const checkbox = document.getElementById('is_current_checkbox');
+                const endDateInput = document.querySelector('input[name="end_date"]');
+                if (checkbox && endDateInput) {
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            endDateInput.value = '';
+                            endDateInput.disabled = true;
+                        } else {
+                            endDateInput.disabled = false;
+                        }
+                    });
+                }
+            }, 100);
+        }
+
+        // Skills Modal
+        function showSkillModal(skill = null) {
+            const isEdit = skill !== null;
+            const modalContent = document.getElementById('modalContent');
+            
+            // Create skill options from available skills
+            const skillOptions = availableSkills.map(s => 
+                `<option value="${s.id}" ${skill?.skill?.id === s.id ? 'selected' : ''}>${s.name} (${s.category})</option>`
+            ).join('');
+            
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">${isEdit ? 'Edit' : 'Add'} Skill</h3>
+                    <form id="skillForm">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Skill *</label>
+                                <select name="skill_id" required 
+                                        class="form-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="">Select a skill...</option>
+                                    ${skillOptions}
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Proficiency Level *</label>
+                                    <select name="proficiency_level" required 
+                                            class="form-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Select level...</option>
+                                        <option value="1" ${skill?.proficiency_level === 1 ? 'selected' : ''}>Beginner</option>
+                                        <option value="2" ${skill?.proficiency_level === 2 ? 'selected' : ''}>Intermediate</option>
+                                        <option value="3" ${skill?.proficiency_level === 3 ? 'selected' : ''}>Advanced</option>
+                                        <option value="4" ${skill?.proficiency_level === 4 ? 'selected' : ''}>Expert</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>
+                                    <input type="number" name="years_experience" min="0" value="${skill && skill.years_experience ? skill.years_experience : 0}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
+                            <button type="button" onclick="hideModal()" 
+                                    class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                ${isEdit ? 'Update' : 'Add'} Skill
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.getElementById('skillForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData);
+                data.proficiency_level = parseInt(data.proficiency_level);
+                data.years_experience = data.years_experience ? parseInt(data.years_experience) : null;
+                data.skill_id = parseInt(data.skill_id);
+                
+                try {
+                    if (isEdit) {
+                        await api.students.updateSkill(skill.id, data);
+                        showToast('Skill updated successfully!', 'success');
+                    } else {
+                        await api.students.addSkill(data);
+                        showToast('Skill added successfully!', 'success');
+                    }
+                    hideModal();
+                    await loadSkillsData();
+                } catch (error) {
+                    console.error('Error saving skill:', error);
+                    showToast('Failed to save skill', 'error');
+                }
+            });
+            
+            showModal();
+        }
+
+        // Projects Modal
+        function showProjectModal(project = null) {
+            const isEdit = project !== null;
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">${isEdit ? 'Edit' : 'Add'} Project</h3>
+                    <form id="projectForm">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Project Title *</label>
+                                <input type="text" name="title" required value="${project?.title || ''}" 
+                                       class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                                <textarea name="description" rows="4" required placeholder="Describe your project..." 
+                                          class="form-textarea w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">${project?.description || ''}</textarea>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Project URL</label>
+                                    <input type="url" name="project_url" value="${project?.project_url || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">GitHub URL</label>
+                                    <input type="url" name="github_url" value="${project?.github_url || ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
+                                    <input type="date" name="start_date" required value="${project && project.start_date ? project.start_date.split('T')[0] : ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                                    <input type="date" name="end_date" value="${project && project.end_date ? project.end_date.split('T')[0] : ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="is_ongoing" ${project?.is_ongoing ? 'checked' : ''} 
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-2 text-sm text-gray-700">Ongoing project</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="featured" ${project?.featured ? 'checked' : ''} 
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-2 text-sm text-gray-700">Featured project</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
+                            <button type="button" onclick="hideModal()" 
+                                    class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                ${isEdit ? 'Update' : 'Add'} Project
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.getElementById('projectForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData);
+                data.is_ongoing = formData.has('is_ongoing');
+                data.featured = formData.has('featured');
+                
+                try {
+                    if (isEdit) {
+                        await api.students.updateProject(project.id, data);
+                        showToast('Project updated successfully!', 'success');
+                    } else {
+                        await api.students.addProject(data);
+                        showToast('Project added successfully!', 'success');
+                    }
+                    hideModal();
+                    await loadProjectsData();
+                } catch (error) {
+                    console.error('Error saving project:', error);
+                    showToast('Failed to save project', 'error');
+                }
+            });
+            
+            showModal();
+        }
+
+        // Achievements Modal
+        function showAchievementModal(achievement = null) {
+            const isEdit = achievement !== null;
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">${isEdit ? 'Edit' : 'Add'} Achievement</h3>
+                    <form id="achievementForm">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                                <input type="text" name="title" required value="${achievement?.title || ''}" 
+                                       class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Type *</label>
+                                    <select name="achievement_type" required 
+                                            class="form-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Select type...</option>
+                                        <option value="award" ${achievement?.achievement_type === 'award' ? 'selected' : ''}>Award</option>
+                                        <option value="certification" ${achievement?.achievement_type === 'certification' ? 'selected' : ''}>Certification</option>
+                                        <option value="competition" ${achievement?.achievement_type === 'competition' ? 'selected' : ''}>Competition</option>
+                                        <option value="scholarship" ${achievement?.achievement_type === 'scholarship' ? 'selected' : ''}>Scholarship</option>
+                                        <option value="recognition" ${achievement?.achievement_type === 'recognition' ? 'selected' : ''}>Recognition</option>
+                                        <option value="publication" ${achievement?.achievement_type === 'publication' ? 'selected' : ''}>Publication</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date Achieved *</label>
+                                    <input type="date" name="date_achieved" required value="${achievement && achievement.date_achieved ? achievement.date_achieved.split('T')[0] : ''}" 
+                                           class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Issuing Organization *</label>
+                                <input type="text" name="issuing_organization" required value="${achievement?.issuing_organization || ''}" 
+                                       class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                                <textarea name="description" rows="3" required placeholder="Describe your achievement..." 
+                                          class="form-textarea w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">${achievement?.description || ''}</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Certificate URL</label>
+                                <input type="url" name="certificate_url" value="${achievement?.certificate_url || ''}" 
+                                       class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
+                            <button type="button" onclick="hideModal()" 
+                                    class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                ${isEdit ? 'Update' : 'Add'} Achievement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.getElementById('achievementForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData);
+                
+                try {
+                    if (isEdit) {
+                        await api.students.updateAchievement(achievement.id, data);
+                        showToast('Achievement updated successfully!', 'success');
+                    } else {
+                        await api.students.addAchievement(data);
+                        showToast('Achievement added successfully!', 'success');
+                    }
+                    hideModal();
+                    await loadAchievementsData();
+                } catch (error) {
+                    console.error('Error saving achievement:', error);
+                    showToast('Failed to save achievement', 'error');
+                }
+            });
+            
+            showModal();
+        }
+
+        // Languages Modal
+        function showLanguageModal(language = null) {
+            const isEdit = language !== null;
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">${isEdit ? 'Edit' : 'Add'} Language</h3>
+                    <form id="languageForm">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Language *</label>
+                                <input type="text" name="language" required value="${language?.language || ''}" 
+                                       class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Proficiency Level *</label>
+                                <select name="proficiency" required 
+                                        class="form-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="">Select proficiency...</option>
+                                    <option value="elementary" ${language?.proficiency === 'elementary' ? 'selected' : ''}>Elementary</option>
+                                    <option value="limited_working" ${language?.proficiency === 'limited_working' ? 'selected' : ''}>Limited Working</option>
+                                    <option value="professional_working" ${language?.proficiency === 'professional_working' ? 'selected' : ''}>Professional Working</option>
+                                    <option value="full_professional" ${language?.proficiency === 'full_professional' ? 'selected' : ''}>Full Professional</option>
+                                    <option value="native" ${language?.proficiency === 'native' ? 'selected' : ''}>Native/Bilingual</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-6">
+                            <button type="button" onclick="hideModal()" 
+                                    class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                ${isEdit ? 'Update' : 'Add'} Language
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.getElementById('languageForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData);
+                
+                try {
+                    if (isEdit) {
+                        await api.students.updateLanguage(language.id, data);
+                        showToast('Language updated successfully!', 'success');
+                    } else {
+                        await api.students.addLanguage(data);
+                        showToast('Language added successfully!', 'success');
+                    }
+                    hideModal();
+                    await loadLanguagesData();
+                } catch (error) {
+                    console.error('Error saving language:', error);
+                    showToast('Failed to save language', 'error');
+                }
+            });
+            
+            showModal();
+        }
+
+        // Delete functions
+        async function deleteEducation(id) {
+            if (confirm('Are you sure you want to delete this education record?')) {
+                try {
+                    await api.students.deleteEducation(id);
+                    showToast('Education deleted successfully!', 'success');
+                    await loadEducationData();
+                } catch (error) {
+                    console.error('Error deleting education:', error);
+                    showToast('Failed to delete education', 'error');
+                }
+            }
+        }
+
+        async function deleteExperience(id) {
+            if (confirm('Are you sure you want to delete this experience record?')) {
+                try {
+                    await api.students.deleteExperience(id);
+                    showToast('Experience deleted successfully!', 'success');
+                    await loadExperienceData();
+                } catch (error) {
+                    console.error('Error deleting experience:', error);
+                    showToast('Failed to delete experience', 'error');
+                }
+            }
+        }
+
+        async function deleteSkill(id) {
+            if (confirm('Are you sure you want to delete this skill?')) {
+                try {
+                    await api.students.deleteSkill(id);
+                    showToast('Skill deleted successfully!', 'success');
+                    await loadSkillsData();
+                } catch (error) {
+                    console.error('Error deleting skill:', error);
+                    showToast('Failed to delete skill', 'error');
+                }
+            }
+        }
+
+        async function deleteProject(id) {
+            if (confirm('Are you sure you want to delete this project?')) {
+                try {
+                    await api.students.deleteProject(id);
+                    showToast('Project deleted successfully!', 'success');
+                    await loadProjectsData();
+                } catch (error) {
+                    console.error('Error deleting project:', error);
+                    showToast('Failed to delete project', 'error');
+                }
+            }
+        }
+
+        async function deleteAchievement(id) {
+            if (confirm('Are you sure you want to delete this achievement?')) {
+                try {
+                    await api.students.deleteAchievement(id);
+                    showToast('Achievement deleted successfully!', 'success');
+                    await loadAchievementsData();
+                } catch (error) {
+                    console.error('Error deleting achievement:', error);
+                    showToast('Failed to delete achievement', 'error');
+                }
+            }
+        }
+
+        async function deleteLanguage(id) {
+            if (confirm('Are you sure you want to delete this language?')) {
+                try {
+                    await api.delete(`/students/languages/${id}/`);
+                    showToast('Language deleted successfully!', 'success');
+                    await loadLanguagesData();
+                } catch (error) {
+                    console.error('Error deleting language:', error);
+                    showToast('Failed to delete language', 'error');
+                }
+            }
+        }
+
+        // Edit functions
+        function editEducation(id) {
+            // Find the education record and show modal
+            api.students.getEducation().then(response => {
+                const education = (response.data || response).find(edu => edu.id === id);
+                if (education) {
+                    showEducationModal(education);
+                }
+            });
+        }
+
+        function editExperience(id) {
+            // Find the experience record and show modal
+            api.students.getExperience().then(response => {
+                const experience = (response.data || response).find(exp => exp.id === id);
+                if (experience) {
+                    showExperienceModal(experience);
+                }
+            });
+        }
+
+        function editSkill(id) {
+            // Find the skill record and show modal
+            api.students.getSkills().then(response => {
+                const skill = (response.data || response).find(s => s.id === id);
+                if (skill) {
+                    showSkillModal(skill);
+                }
+            });
+        }
+
+        function editProject(id) {
+            // Find the project record and show modal
+            api.students.getProjects().then(response => {
+                const project = (response.data || response).find(p => p.id === id);
+                if (project) {
+                    showProjectModal(project);
+                }
+            });
+        }
+
+        function editAchievement(id) {
+            // Find the achievement record and show modal
+            api.students.getAchievements().then(response => {
+                const achievement = (response.data || response).find(a => a.id === id);
+                if (achievement) {
+                    showAchievementModal(achievement);
+                }
+            });
+        }
+
+        function editLanguage(id) {
+            // Find the language record and show modal
+            api.get('/students/languages/').then(response => {
+                const language = (response.data || response).find(l => l.id === id);
+                if (language) {
+                    showLanguageModal(language);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Opportuni</title>
+    <meta name="description" content="Create an account on Opportuni - The premier platform connecting students with opportunities.">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        secondary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            200: '#f5d0fe',
+                            300: '#f0abfc',
+                            400: '#e879f9',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                            700: '#a21caf',
+                            800: '#86198f',
+                            900: '#701a75',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto flex justify-between items-center py-4 px-6">
+            <a href="index.html" class="flex items-center gap-2">
+                <img src="assets/images/logo.png" alt="Opportuni Logo" class="h-10">
+                <span class="text-2xl font-bold text-primary-600">Opportuni</span>
+            </a>
+            <nav>
+                <ul class="flex items-center space-x-6">
+                    <li><a href="index.html" class="text-gray-600 hover:text-primary-600 transition-colors duration-200">Home</a></li>
+                    <li><a href="login.html" class="text-white bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-md transition-colors duration-200">Sign In</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center py-12 px-6">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-8 animate-fade-in">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Create Your Account</h1>
+                <p class="text-gray-600">Join the Opportuni community</p>
+            </div>
+            
+            <div class="mb-8 flex justify-center">
+                <div class="inline-flex rounded-md shadow-sm" role="group">
+                    <button type="button" onclick="switchUserType('student')" id="btn-student"
+                            class="px-6 py-3 text-sm font-medium rounded-l-lg bg-primary-600 text-white hover:bg-primary-700 focus:z-10 focus:ring-2 focus:ring-primary-500">
+                        Student
+                    </button>
+                    <button type="button" onclick="switchUserType('organization')" id="btn-organization"
+                            class="px-6 py-3 text-sm font-medium rounded-r-lg bg-gray-200 text-gray-700 hover:bg-gray-300 focus:z-10 focus:ring-2 focus:ring-primary-500">
+                        Organization
+                    </button>
+                </div>
+            </div>
+            
+            <form id="signup-form" class="space-y-6" data-user-type="student">
+                <div id="student-fields" class="space-y-6">
+                    <div class="form-group">
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <input type="text" id="name" name="name" required 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="email" name="email" required 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    </div>
+                </div>
+                
+                <div id="organization-fields" class="space-y-6 hidden">
+                    <div class="form-group">
+                        <label for="org-name" class="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>
+                        <input type="text" id="org-name" name="org_name" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="org-email" class="block text-sm font-medium text-gray-700 mb-2">Organization Email</label>
+                        <input type="email" id="org-email" name="org_email" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="org-type" class="block text-sm font-medium text-gray-700 mb-2">Organization Type</label>
+                        <select id="org-type" name="org_type" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="">Select Organization Type</option>
+                            <option value="university">University</option>
+                            <option value="company">Company</option>
+                            <option value="non-profit">Non-Profit Organization</option>
+                            <option value="government">Government Agency</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" required 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <button type="button" onclick="togglePassword(this)" 
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                    <div class="relative">
+                        <input type="password" id="confirm-password" name="confirm_password" required 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <button type="button" onclick="togglePassword(this)" 
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input type="checkbox" id="terms" name="terms" required class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                    </div>
+                    <label for="terms" class="ml-2 text-sm text-gray-600">
+                        I agree to the <a href="#" class="text-primary-600 hover:text-primary-500">Terms of Service</a> and 
+                        <a href="#" class="text-primary-600 hover:text-primary-500">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <button type="submit" 
+                        class="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                    Create Account
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">
+                    Already have an account? 
+                    <a href="login.html" class="text-primary-600 hover:text-primary-500 font-semibold">
+                        Sign in
+                    </a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-6">
+            <div class="text-center">
+                <p class="text-gray-400 text-sm">
+                    © 2025 Opportuni. All rights reserved.
+                </p>
+                <div class="mt-4 flex justify-center space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2"></div>
+
+    <!-- Scripts -->
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up the signup form
+            const signupForm = document.getElementById('signup-form');
+            if (signupForm) {
+                signupForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    try {
+                        const userType = signupForm.getAttribute('data-user-type');
+                        
+                        // Form validation
+                        const password = document.getElementById('password').value;
+                        const confirmPassword = document.getElementById('confirm-password').value;
+                        
+                        if (password !== confirmPassword) {
+                            showToast('Passwords do not match', 'error');
+                            return;
+                        }
+                        
+                        // Show loading state
+                        const submitBtn = signupForm.querySelector('button[type="submit"]');
+                        const originalBtnText = submitBtn.innerHTML;
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Creating account...';
+                        
+                        // Prepare form data based on user type, matching backend expectations
+                        let formData;
+                        
+                        // Get full name from the form
+                        let fullName;
+                        let email;
+                        
+                        if (userType === 'student') {
+                            fullName = document.getElementById('name').value;
+                            email = document.getElementById('email').value;
+                        } else {
+                            fullName = document.getElementById('org-name').value; // Organization name
+                            email = document.getElementById('org-email').value;
+                        }
+                        
+                        // Split name into first and last name
+                        const nameParts = fullName.split(' ');
+                        const firstName = nameParts[0] || '';
+                        const lastName = nameParts.slice(1).join(' ') || '';
+                        
+                        // Create username from email (remove @ and domain)
+                        const username = email.split('@')[0];
+                        
+                        formData = {
+                            email: email,
+                            username: username,
+                            first_name: firstName,
+                            last_name: lastName,
+                            user_type: userType === 'student' ? 'student' : 'organization',
+                            password: password,
+                            password_confirm: password
+                        };
+                        
+                        // Add org_type if it's an organization
+                        if (userType === 'organization') {
+                            formData.org_type = document.getElementById('org-type').value;
+                        }
+                        
+                        // Call signup API
+                        try {
+                            await auth.register(formData);
+                            showToast('Account created successfully! Redirecting to login...', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 2000);
+                        } catch (error) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                            showToast(error.message || 'Registration failed. Please try again.', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Registration error:', error);
+                        showToast(error.message || 'An unexpected error occurred', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                    }
+                });
+            }
+        });
+
+        // Password toggle function
+        function togglePassword(button) {
+            const input = button.parentElement.querySelector('input');
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+        
+        // User type switcher
+        function switchUserType(type) {
+            const form = document.getElementById('signup-form');
+            const studentFields = document.getElementById('student-fields');
+            const orgFields = document.getElementById('organization-fields');
+            const studentBtn = document.getElementById('btn-student');
+            const orgBtn = document.getElementById('btn-organization');
+            
+            if (type === 'student') {
+                form.setAttribute('data-user-type', 'student');
+                studentFields.classList.remove('hidden');
+                orgFields.classList.add('hidden');
+                studentBtn.classList.remove('bg-gray-200', 'text-gray-700');
+                studentBtn.classList.add('bg-primary-600', 'text-white');
+                orgBtn.classList.remove('bg-primary-600', 'text-white');
+                orgBtn.classList.add('bg-gray-200', 'text-gray-700');
+                
+                // Toggle required attributes
+                document.getElementById('name').required = true;
+                document.getElementById('email').required = true;
+                document.getElementById('org-name').required = false;
+                document.getElementById('org-email').required = false;
+                document.getElementById('org-type').required = false;
+            } else {
+                form.setAttribute('data-user-type', 'organization');
+                studentFields.classList.add('hidden');
+                orgFields.classList.remove('hidden');
+                studentBtn.classList.remove('bg-primary-600', 'text-white');
+                studentBtn.classList.add('bg-gray-200', 'text-gray-700');
+                orgBtn.classList.remove('bg-gray-200', 'text-gray-700');
+                orgBtn.classList.add('bg-primary-600', 'text-white');
+                
+                // Toggle required attributes
+                document.getElementById('name').required = false;
+                document.getElementById('email').required = false;
+                document.getElementById('org-name').required = true;
+                document.getElementById('org-email').required = true;
+                document.getElementById('org-type').required = true;
+            }
+        }
+        
+        // Check URL parameters for user type
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('type') === 'organization') {
+                switchUserType('organization');
+            }
+        });
+    </script>
+</body>
+</html>

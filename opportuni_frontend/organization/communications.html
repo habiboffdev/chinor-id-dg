@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communications - Opportuni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="dashboard.html" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Opportuni</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button id="notificationBtn" class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                    
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-building text-white text-sm"></i>
+                            </div>
+                            <span id="orgName" class="text-gray-700 font-medium">Organization</span>
+                            <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
+                        </button>
+                        <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-10">
+                            <a href="profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="students.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                                <i class="fas fa-users mr-2"></i>Students
+                            </a>
+                            <a href="applications.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                                <i class="fas fa-file-alt mr-2"></i>Applications
+                            </a>
+                            <a href="communications.html" class="block px-4 py-2 text-blue-600 bg-blue-50 border-b border-gray-100">
+                                <i class="fas fa-comments mr-2"></i>Communications
+                            </a>
+                            <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Communications</h1>
+                    <p class="text-gray-600">Manage conversations with students and applicants</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button id="composeBtn" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200">
+                        <i class="fas fa-plus mr-2"></i>New Message
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Conversations List -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Conversations</h3>
+                            <button class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-refresh"></i>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <input type="text" id="conversationSearch" placeholder="Search conversations..." 
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div id="conversationsList" class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+                        <!-- Conversations will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-[600px] flex flex-col">
+                    <!-- Chat Header -->
+                    <div id="chatHeader" class="p-4 border-b border-gray-200 bg-gray-50 hidden">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium">
+                                    <span id="chatUserInitials">S</span>
+                                </div>
+                                <div>
+                                    <h3 id="chatUserName" class="font-medium text-gray-900">Student Name</h3>
+                                    <p id="chatUserEmail" class="text-sm text-gray-600">student@email.com</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="viewProfileBtn" class="p-2 text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-user"></i>
+                                </button>
+                                <button id="moreOptionsBtn" class="p-2 text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyChat" class="flex-1 flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-comments text-gray-400 text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Select a conversation</h3>
+                            <p class="text-gray-600">Choose a conversation from the list to start messaging</p>
+                        </div>
+                    </div>
+
+                    <!-- Messages Area -->
+                    <div id="messagesArea" class="flex-1 flex flex-col hidden">
+                        <div id="messagesList" class="flex-1 overflow-y-auto p-4 space-y-4">
+                            <!-- Messages will be loaded here -->
+                        </div>
+                        
+                        <!-- Message Input -->
+                        <div class="border-t border-gray-200 p-4">
+                            <form id="messageForm" class="flex space-x-3">
+                                <div class="flex-1">
+                                    <textarea id="messageInput" rows="2" placeholder="Type your message..." 
+                                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                                </div>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors self-end">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Compose Message Modal -->
+    <div id="composeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-900">New Message</h3>
+                <button id="closeComposeBtn" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="composeForm" class="p-6">
+                <div class="mb-4">
+                    <label for="recipientSelect" class="block text-sm font-medium text-gray-700 mb-2">To:</label>
+                    <select id="recipientSelect" required 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select a student...</option>
+                        <!-- Students will be loaded here -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="messageSubject" class="block text-sm font-medium text-gray-700 mb-2">Subject:</label>
+                    <input type="text" id="messageSubject" placeholder="Message subject..." 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="mb-6">
+                    <label for="messageContent" class="block text-sm font-medium text-gray-700 mb-2">Message:</label>
+                    <textarea id="messageContent" rows="4" required placeholder="Type your message..." 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelComposeBtn" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200">
+                        Send Message
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span class="text-gray-700">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script>
+        // Communications Page Logic
+        let currentConversation = null;
+        let messagesPolling = null;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize auth and check user type
+            if (!auth.isAuthenticated() || auth.getUserType() !== 'organization') {
+                window.location.href = '../index.html';
+                return;
+            }
+
+            // Initialize UI
+            auth.updateUI();
+            await loadConversations();
+            await loadStudents();
+            
+            // Check for student parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentId = urlParams.get('student');
+            if (studentId) {
+                // Find and select conversation with this student
+                setTimeout(() => selectStudentConversation(studentId), 1000);
+            }
+            
+            // Event listeners
+            document.getElementById('composeBtn').addEventListener('click', showComposeModal);
+            document.getElementById('closeComposeBtn').addEventListener('click', hideComposeModal);
+            document.getElementById('cancelComposeBtn').addEventListener('click', hideComposeModal);
+            document.getElementById('composeForm').addEventListener('submit', handleSendMessage);
+            document.getElementById('messageForm').addEventListener('submit', handleSendReply);
+            document.getElementById('conversationSearch').addEventListener('input', debounce(filterConversations, 300));
+        });
+
+        async function loadConversations() {
+            try {
+                const response = await api.communications.getConversations();
+                const conversations = response.data.results || response.data;
+                
+                renderConversations(conversations);
+            } catch (error) {
+                console.error('Error loading conversations:', error);
+                showToast('Failed to load conversations', 'error');
+            }
+        }
+
+        async function loadStudents() {
+            try {
+                const response = await api.organizations.getStudents();
+                const students = response.data.results || response.data;
+                
+                const select = document.getElementById('recipientSelect');
+                select.innerHTML = '<option value="">Select a student...</option>';
+                
+                students.forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.id;
+                    option.textContent = `${student.first_name} ${student.last_name} (${student.email})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        function renderConversations(conversations) {
+            const container = document.getElementById('conversationsList');
+            
+            if (conversations.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center text-gray-500">
+                        <i class="fas fa-comments text-3xl mb-2"></i>
+                        <p>No conversations yet</p>
+                        <p class="text-sm">Start a new message to begin</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = conversations.map(conv => `
+                <div class="conversation-item p-4 hover:bg-gray-50 cursor-pointer transition-colors" data-id="${conv.id}" onclick="selectConversation(${conv.id})">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">
+                            ${(conv.student.first_name?.[0] || '') + (conv.student.last_name?.[0] || '')}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-medium text-gray-900 truncate">${conv.student.first_name} ${conv.student.last_name}</p>
+                                <p class="text-xs text-gray-500">${formatTime(conv.last_message_at)}</p>
+                            </div>
+                            <p class="text-sm text-gray-600 truncate">${conv.last_message || 'No messages yet'}</p>
+                            ${conv.unread_count > 0 ? `
+                            <div class="flex items-center justify-between mt-1">
+                                <span class="text-xs text-gray-500">${conv.student.email}</span>
+                                <span class="bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">${conv.unread_count}</span>
+                            </div>
+                            ` : `<p class="text-xs text-gray-500 mt-1">${conv.student.email}</p>`}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function selectConversation(conversationId) {
+            try {
+                currentConversation = conversationId;
+                
+                // Update UI to show selected conversation
+                document.querySelectorAll('.conversation-item').forEach(item => {
+                    item.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-600');
+                });
+                document.querySelector(`[data-id="${conversationId}"]`).classList.add('bg-blue-50', 'border-l-4', 'border-blue-600');
+                
+                // Load conversation details
+                const response = await api.communications.getConversation(conversationId);
+                const conversation = response.data;
+                
+                // Update chat header
+                updateChatHeader(conversation.student);
+                
+                // Load messages
+                await loadMessages(conversationId);
+                
+                // Show chat area
+                document.getElementById('emptyChat').classList.add('hidden');
+                document.getElementById('chatHeader').classList.remove('hidden');
+                document.getElementById('messagesArea').classList.remove('hidden');
+                
+                // Start polling for new messages
+                startMessagesPolling();
+                
+            } catch (error) {
+                console.error('Error selecting conversation:', error);
+                showToast('Failed to load conversation', 'error');
+            }
+        }
+
+        async function selectStudentConversation(studentId) {
+            try {
+                // Find conversation with this student
+                const conversations = document.querySelectorAll('.conversation-item');
+                for (let conv of conversations) {
+                    const convId = conv.dataset.id;
+                    const response = await api.communications.getConversation(convId);
+                    if (response.data.student.id == studentId) {
+                        selectConversation(convId);
+                        break;
+                    }
+                }
+            } catch (error) {
+                console.error('Error finding student conversation:', error);
+            }
+        }
+
+        function updateChatHeader(student) {
+            const initials = (student.first_name?.[0] || '') + (student.last_name?.[0] || '');
+            document.getElementById('chatUserInitials').textContent = initials;
+            document.getElementById('chatUserName').textContent = `${student.first_name} ${student.last_name}`;
+            document.getElementById('chatUserEmail').textContent = student.email;
+            
+            document.getElementById('viewProfileBtn').onclick = () => {
+                window.location.href = `students.html?student=${student.id}`;
+            };
+        }
+
+        async function loadMessages(conversationId) {
+            try {
+                const response = await api.communications.getMessages(conversationId);
+                const messages = response.data.results || response.data;
+                
+                renderMessages(messages);
+                scrollToBottom();
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                showToast('Failed to load messages', 'error');
+            }
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('messagesList');
+            
+            container.innerHTML = messages.map(message => {
+                const isOutgoing = message.sender_type === 'organization';
+                return `
+                    <div class="flex ${isOutgoing ? 'justify-end' : 'justify-start'}">
+                        <div class="max-w-xs lg:max-w-md ${isOutgoing ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-900'} rounded-lg px-4 py-2">
+                            <p class="text-sm">${message.content}</p>
+                            <p class="text-xs ${isOutgoing ? 'text-blue-100' : 'text-gray-500'} mt-1">${formatTime(message.created_at)}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function handleSendReply(e) {
+            e.preventDefault();
+            
+            if (!currentConversation) return;
+            
+            const content = document.getElementById('messageInput').value.trim();
+            if (!content) return;
+            
+            try {
+                await api.communications.sendMessage(currentConversation, { content });
+                document.getElementById('messageInput').value = '';
+                await loadMessages(currentConversation);
+                await loadConversations(); // Refresh conversations list
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showToast('Failed to send message', 'error');
+            }
+        }
+
+        async function handleSendMessage(e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('recipientSelect').value;
+            const subject = document.getElementById('messageSubject').value;
+            const content = document.getElementById('messageContent').value;
+            
+            if (!studentId || !content) {
+                showToast('Please select a recipient and enter a message', 'error');
+                return;
+            }
+            
+            try {
+                showLoading();
+                const response = await api.communications.createConversation({
+                    student_id: studentId,
+                    subject,
+                    content
+                });
+                
+                hideLoading();
+                hideComposeModal();
+                showToast('Message sent successfully', 'success');
+                
+                // Refresh conversations and select the new one
+                await loadConversations();
+                setTimeout(() => selectConversation(response.data.id), 500);
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                hideLoading();
+                showToast('Failed to send message', 'error');
+            }
+        }
+
+        function filterConversations() {
+            const searchTerm = document.getElementById('conversationSearch').value.toLowerCase();
+            const conversations = document.querySelectorAll('.conversation-item');
+            
+            conversations.forEach(conv => {
+                const text = conv.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    conv.style.display = 'block';
+                } else {
+                    conv.style.display = 'none';
+                }
+            });
+        }
+
+        function startMessagesPolling() {
+            if (messagesPolling) {
+                clearInterval(messagesPolling);
+            }
+            
+            messagesPolling = setInterval(async () => {
+                if (currentConversation) {
+                    await loadMessages(currentConversation);
+                }
+            }, 5000); // Poll every 5 seconds
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('messagesList');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showComposeModal() {
+            document.getElementById('composeModal').classList.remove('hidden');
+        }
+
+        function hideComposeModal() {
+            document.getElementById('composeModal').classList.add('hidden');
+            document.getElementById('composeForm').reset();
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        // Utility functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function formatTime(dateString) {
+            if (!dateString) return '';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        // Cleanup polling on page unload
+        window.addEventListener('beforeunload', () => {
+            if (messagesPolling) {
+                clearInterval(messagesPolling);
+            }
+        });
+    </script>
+</body>
+</html>

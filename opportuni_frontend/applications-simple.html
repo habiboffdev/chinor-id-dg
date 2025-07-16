@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications - Opportuni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="dashboard.html" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Opportuni</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="opportunities.html" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-search mr-1"></i>Browse Opportunities
+                    </a>
+                    
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <span id="userName" class="text-gray-700 font-medium">Student</span>
+                            <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">My Applications</h1>
+                    <p class="text-gray-600">Track and manage your opportunity applications</p>
+                </div>
+                <div class="flex space-x-3">
+                    <select id="statusFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="under_review">Under Review</option>
+                        <option value="interview_scheduled">Interview Scheduled</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="withdrawn">Withdrawn</option>
+                    </select>
+                    <a href="opportunities.html" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200">
+                        <i class="fas fa-plus mr-2"></i>Apply to More
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Total Applications</p>
+                        <p id="totalApplications" class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-file-alt text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Pending</p>
+                        <p id="pendingApplications" class="text-2xl font-bold text-yellow-600">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Under Review</p>
+                        <p id="reviewingApplications" class="text-2xl font-bold text-orange-600">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-search text-orange-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm">Accepted</p>
+                        <p id="acceptedApplications" class="text-2xl font-bold text-green-600">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-check text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications List -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Applications</h3>
+            </div>
+            
+            <div id="applicationsContainer" class="divide-y divide-gray-200">
+                <div class="p-12 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-spinner fa-spin text-gray-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Loading applications...</h3>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script>
+        // Simple, non-recursive applications page
+        let currentPage = 1;
+        let isInitialized = false;
+
+        function initPage() {
+            if (isInitialized) {
+                console.log('Page already initialized, skipping...');
+                return;
+            }
+            isInitialized = true;
+
+            console.log('Initializing applications page...');
+            
+            // Simple auth check
+            if (!auth.isLoggedIn()) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Load data once
+            loadApplicationsData();
+            
+            // Add event listeners once
+            const statusFilter = document.getElementById('statusFilter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', function() {
+                    console.log('Status filter changed');
+                    loadApplicationsData();
+                });
+            }
+        }
+
+        async function loadApplicationsData() {
+            console.log('Loading applications data...');
+            
+            try {
+                // Load stats
+                const statsResponse = await window.api.students.getApplicationStats();
+                document.getElementById('totalApplications').textContent = statsResponse.total || 0;
+                document.getElementById('pendingApplications').textContent = statsResponse.pending || 0;
+                document.getElementById('reviewingApplications').textContent = statsResponse.under_review || 0;
+                document.getElementById('acceptedApplications').textContent = statsResponse.accepted || 0;
+                
+                // Load applications
+                const filters = { page: 1 };
+                const statusValue = document.getElementById('statusFilter').value;
+                if (statusValue) {
+                    filters.status = statusValue;
+                }
+                
+                const appsResponse = await window.api.applications.getList(filters);
+                renderApplications(appsResponse.results || []);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('applicationsContainer').innerHTML = `
+                    <div class="p-12 text-center">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Error loading applications</h3>
+                        <p class="text-gray-600">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderApplications(applications) {
+            const container = document.getElementById('applicationsContainer');
+            
+            if (applications.length === 0) {
+                container.innerHTML = `
+                    <div class="p-12 text-center">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-file-alt text-gray-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No applications yet</h3>
+                        <p class="text-gray-600 mb-6">Start applying to opportunities to see them here</p>
+                        <a href="opportunities.html" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200">
+                            <i class="fas fa-search mr-2"></i>Browse Opportunities
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = applications.map(app => `
+                <div class="p-6 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-building text-white"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-1">${app.opportunity_title || 'Opportunity'}</h3>
+                                    <p class="text-gray-600 mb-2">${app.organization_name || 'Organization'}</p>
+                                    <div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
+                                        <span><i class="fas fa-calendar mr-1"></i>Applied ${new Date(app.applied_at).toLocaleDateString()}</span>
+                                        <span><i class="fas fa-clock mr-1"></i>${app.opportunity?.opportunity_type || 'Unknown'}</span>
+                                        <span><i class="fas fa-map-marker-alt mr-1"></i>${app.opportunity?.location || 'Remote'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ml-6 flex flex-col items-end space-y-3">
+                            <span class="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-full font-medium">${app.status || 'Pending'}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Wait for everything to load, then initialize once
+        document.addEventListener('DOMContentLoaded', function() {
+            // Give scripts time to load
+            setTimeout(() => {
+                if (window.api && window.api.applications) {
+                    initPage();
+                } else {
+                    console.error('API not available');
+                    document.getElementById('applicationsContainer').innerHTML = `
+                        <div class="p-12 text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">API not available</h3>
+                            <p class="text-gray-600">Please refresh the page</p>
+                        </div>
+                    `;
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

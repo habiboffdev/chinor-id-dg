@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Opportuni</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        secondary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                        Opportuni
+                    </a>
+                </div>
+                
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/dashboard.html" class="text-primary-600 font-medium">Dashboard</a>
+                    <a href="/opportunities.html" class="text-gray-700 hover:text-primary-600 transition-colors duration-200">Opportunities</a>
+                    <a href="/applications.html" class="text-gray-700 hover:text-primary-600 transition-colors duration-200">My Applications</a>
+                    <a href="/profile.html" class="text-gray-700 hover:text-primary-600 transition-colors duration-200">Profile</a>
+                </div>
+                
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button class="p-2 text-gray-600 hover:text-primary-600 transition-colors duration-200" onclick="toggleNotifications()">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" id="notification-count">3</span>
+                        </button>
+                        
+                        <!-- Notifications Dropdown -->
+                        <div id="notifications-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                            <div class="p-4 border-b">
+                                <h3 class="font-semibold text-gray-900">Notifications</h3>
+                            </div>
+                            <div class="max-h-96 overflow-y-auto">
+                                <!-- Notifications will be loaded here -->
+                            </div>
+                            <div class="p-3 border-t">
+                                <a href="/notifications.html" class="text-primary-600 text-sm hover:text-primary-700">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- User Avatar -->
+                    <div class="relative">
+                        <button class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200" onclick="toggleUserMenu()">
+                            <img class="user-avatar h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Student&background=3b82f6&color=ffffff" alt="User Avatar">
+                            <span class="user-name font-medium text-gray-900 hidden md:block">Student</span>
+                            <i class="fas fa-chevron-down text-gray-600"></i>
+                        </button>
+                        
+                        <!-- User Dropdown -->
+                        <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                            <div class="py-1">
+                                <a href="/profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i>Profile
+                                </a>
+                                <a href="/settings.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-cog mr-2"></i>Settings
+                                </a>
+                                <hr class="my-1">
+                                <button onclick="auth.logout()" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, <span class="user-name">Student</span>!</h1>
+            <p class="text-gray-600">Here's what's happening with your opportunities today.</p>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div id="dashboard-stats" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Stats will be loaded here -->
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-pulse">
+                <div class="flex items-center">
+                    <div class="p-3 bg-gray-200 rounded-full w-12 h-12"></div>
+                    <div class="ml-4 flex-1">
+                        <div class="h-6 bg-gray-200 rounded mb-2"></div>
+                        <div class="h-4 bg-gray-200 rounded w-20"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-pulse">
+                <div class="flex items-center">
+                    <div class="p-3 bg-gray-200 rounded-full w-12 h-12"></div>
+                    <div class="ml-4 flex-1">
+                        <div class="h-6 bg-gray-200 rounded mb-2"></div>
+                        <div class="h-4 bg-gray-200 rounded w-20"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-pulse">
+                <div class="flex items-center">
+                    <div class="p-3 bg-gray-200 rounded-full w-12 h-12"></div>
+                    <div class="ml-4 flex-1">
+                        <div class="h-6 bg-gray-200 rounded mb-2"></div>
+                        <div class="h-4 bg-gray-200 rounded w-20"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-pulse">
+                <div class="flex items-center">
+                    <div class="p-3 bg-gray-200 rounded-full w-12 h-12"></div>
+                    <div class="ml-4 flex-1">
+                        <div class="h-6 bg-gray-200 rounded mb-2"></div>
+                        <div class="h-4 bg-gray-200 rounded w-20"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Recent Applications -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">Recent Applications</h2>
+                        <a href="/applications.html" class="text-primary-600 hover:text-primary-700 text-sm font-medium">View all</a>
+                    </div>
+                    
+                    <div id="recent-applications" class="space-y-4">
+                        <!-- Applications will be loaded here -->
+                        <div class="animate-pulse">
+                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-gray-200 rounded-lg"></div>
+                                    <div>
+                                        <div class="h-4 bg-gray-200 rounded w-32 mb-2"></div>
+                                        <div class="h-3 bg-gray-200 rounded w-24"></div>
+                                    </div>
+                                </div>
+                                <div class="h-6 bg-gray-200 rounded w-16"></div>
+                            </div>
+                        </div>
+                        <div class="animate-pulse">
+                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-gray-200 rounded-lg"></div>
+                                    <div>
+                                        <div class="h-4 bg-gray-200 rounded w-32 mb-2"></div>
+                                        <div class="h-3 bg-gray-200 rounded w-24"></div>
+                                    </div>
+                                </div>
+                                <div class="h-6 bg-gray-200 rounded w-16"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions & Recommended -->
+            <div class="space-y-6">
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+                    <div class="space-y-3">
+                        <a href="/opportunities.html" class="flex items-center p-3 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-all duration-200">
+                            <div class="p-2 bg-primary-100 rounded-lg mr-3">
+                                <i class="fas fa-search text-primary-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">Browse Opportunities</div>
+                                <div class="text-sm text-gray-600">Find new opportunities</div>
+                            </div>
+                        </a>
+                        
+                        <a href="/profile.html" class="flex items-center p-3 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-all duration-200">
+                            <div class="p-2 bg-secondary-100 rounded-lg mr-3">
+                                <i class="fas fa-user-edit text-secondary-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">Update Profile</div>
+                                <div class="text-sm text-gray-600">Keep your profile current</div>
+                            </div>
+                        </a>
+                        
+                        <button onclick="showResumeUpload()" class="w-full flex items-center p-3 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-all duration-200">
+                            <div class="p-2 bg-green-100 rounded-lg mr-3">
+                                <i class="fas fa-file-upload text-green-600"></i>
+                            </div>
+                            <div class="text-left">
+                                <div class="font-medium text-gray-900">Upload Resume</div>
+                                <div class="text-sm text-gray-600">Update your resume</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Recommended Opportunities -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Recommended for You</h2>
+                    <div id="recommended-opportunities" class="space-y-4">
+                        <!-- Recommendations will be loaded here -->
+                        <div class="animate-pulse">
+                            <div class="p-4 border border-gray-200 rounded-lg">
+                                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                                <div class="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                                <div class="h-6 bg-gray-200 rounded w-16"></div>
+                            </div>
+                        </div>
+                        <div class="animate-pulse">
+                            <div class="p-4 border border-gray-200 rounded-lg">
+                                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                                <div class="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                                <div class="h-6 bg-gray-200 rounded w-16"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Completion -->
+                <div class="bg-gradient-to-br from-primary-50 to-secondary-50 rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Profile Completion</h2>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-600">Progress</span>
+                            <span class="font-medium" id="profile-completion-percent">75%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-primary-600 to-secondary-600 h-2 rounded-full" style="width: 75%" id="profile-completion-bar"></div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">Complete your profile to get better opportunity matches!</p>
+                    <a href="/profile.html" class="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium text-sm">
+                        Complete Profile <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume Upload Modal -->
+    <div id="resume-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Upload Resume</h3>
+                <button onclick="closeResumeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-500 transition-colors duration-200" id="resume-drop-zone">
+                    <input type="file" id="resume-file" class="hidden" accept=".pdf,.doc,.docx">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                    <p class="text-gray-600 mb-2">Click to upload or drag and drop</p>
+                    <p class="text-sm text-gray-500">PDF, DOC, DOCX up to 10MB</p>
+                </div>
+                <div id="resume-file-info" class="hidden mt-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-file-alt text-primary-600 mr-2"></i>
+                            <span id="resume-file-name" class="text-gray-900"></span>
+                        </div>
+                        <button onclick="removeResumeFile()" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeResumeModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button onclick="uploadResume()" class="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-6 py-2 rounded-lg font-semibold" disabled id="upload-resume-btn">
+                    Upload
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 flex flex-col items-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+            <p class="text-gray-700">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2"></div>
+
+    <!-- Scripts -->
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

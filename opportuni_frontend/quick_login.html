@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Login - Opportuni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h2 class="text-2xl font-bold text-center mb-6">Quick Login</h2>
+        
+        <form id="loginForm">
+            <div class="mb-4">
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" id="email" name="email" required 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <input type="password" id="password" name="password" required 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <button type="submit" 
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                Login
+            </button>
+        </form>
+        
+        <div id="message" class="mt-4 text-center"></div>
+        
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-600">
+                Don't have an account? 
+                <a href="signup.html" class="text-blue-600 hover:text-blue-800">Sign up</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script>
+        const api = new API();
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const email = formData.get('email');
+            const password = formData.get('password');
+            
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '<p class="text-blue-600">Logging in...</p>';
+            
+            try {
+                const response = await api.auth.login(email, password);
+                console.log('Login response:', response);
+                
+                if (response.access) {
+                    // Store the token
+                    api.setToken(response.access);
+                    
+                    // Initialize auth
+                    if (window.auth) {
+                        auth.setTokens(response.access, response.refresh);
+                    }
+                    
+                    messageDiv.innerHTML = '<p class="text-green-600">Login successful! Redirecting...</p>';
+                    
+                    // Redirect to profile page
+                    setTimeout(() => {
+                        window.location.href = 'profile.html';
+                    }, 1000);
+                } else {
+                    messageDiv.innerHTML = '<p class="text-red-600">Login failed: Invalid response</p>';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                messageDiv.innerHTML = `<p class="text-red-600">Login failed: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunity Details - Opportuni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="dashboard.html" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Opportuni</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="opportunities.html" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-arrow-left mr-1"></i>Back to Opportunities
+                    </a>
+                    
+                    <button id="notificationBtn" class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                    
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <span id="userName" class="text-gray-700 font-medium">Student</span>
+                            <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
+                        </button>
+                        <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-10">
+                            <a href="profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="dashboard.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                                <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                            </a>
+                            <a href="applications.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                                <i class="fas fa-file-alt mr-2"></i>Applications
+                            </a>
+                            <a href="settings.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </a>
+                            <button onclick="handleLogout()" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="min-h-screen bg-gray-50">
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-20">
+            <div class="inline-flex items-center justify-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <span class="ml-3 text-gray-600 text-lg">Loading opportunity details...</span>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="hidden text-center py-20">
+            <div class="text-red-600 mb-4">
+                <i class="fas fa-exclamation-triangle text-6xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Opportunity Not Found</h2>
+            <p class="text-gray-600 mb-6">The opportunity you're looking for doesn't exist or has been removed.</p>
+            <a href="opportunities.html" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Opportunities
+            </a>
+        </div>
+
+        <!-- Content Container -->
+        <div id="contentContainer" class="hidden">
+            <!-- Cover Image Section -->
+            <div id="coverImageContainer" class="relative h-80 md:h-96 bg-gradient-to-r from-blue-600 to-purple-600 overflow-hidden">
+                <img id="coverImage" class="w-full h-full object-cover hidden" alt="Opportunity Cover">
+                <div id="defaultCover" class="w-full h-full flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <i id="coverIcon" class="fas fa-briefcase text-8xl mb-6 opacity-80"></i>
+                        <h2 id="coverTitle" class="text-5xl font-bold mb-4">Loading...</h2>
+                        <p id="coverOrganization" class="text-2xl opacity-90">Loading...</p>
+                    </div>
+                </div>
+                <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+                
+                <!-- Quick Actions Overlay -->
+                <div class="absolute bottom-6 right-6 flex gap-3">
+                    <button id="quickApplyButton" class="hidden px-6 py-3 bg-white bg-opacity-90 hover:bg-white text-gray-900 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 flex items-center">
+                        <i class="fas fa-paper-plane mr-2"></i>Quick Apply
+                    </button>
+                    <button id="loginToApplyButton" class="hidden px-6 py-3 bg-white bg-opacity-90 hover:bg-white text-gray-900 rounded-lg font-semibold transition-all duration-200 flex items-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login to Apply
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Main Content Grid -->
+            <div class="max-w-full px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Opportunity Summary Banner -->
+                <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8 mb-8 -mt-16 relative z-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        <div class="lg:col-span-3">
+                            <div class="flex items-start gap-4 mb-6">
+                                <div class="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                                    <i id="opportunityIcon" class="fas fa-briefcase text-white text-3xl"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h1 id="opportunityTitle" class="text-4xl font-bold text-gray-900 mb-3">Loading...</h1>
+                                    <p id="organizationName" class="text-2xl text-gray-600 mb-4">Loading...</p>
+                                    <div id="opportunityType" class="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                                        Loading...
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                                <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                    <i class="fas fa-map-marker-alt mr-3 text-blue-600 text-lg"></i>
+                                    <div>
+                                        <p class="text-gray-500 text-xs">Location</p>
+                                        <p id="opportunityLocation" class="font-semibold text-gray-900">Loading...</p>
+                                        <span id="remoteLabel" class="hidden text-green-600 text-xs">Remote Available</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                    <i class="fas fa-calendar mr-3 text-red-600 text-lg"></i>
+                                    <div>
+                                        <p class="text-gray-500 text-xs">Application Deadline</p>
+                                        <p id="applicationDeadline" class="font-semibold text-gray-900">Loading...</p>
+                                        <span id="urgentLabel" class="hidden text-red-600 text-xs">Urgent - Apply Soon!</span>
+                                        <span id="expiredLabel" class="hidden text-red-600 text-xs">Deadline Passed</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                                    <i class="fas fa-clock mr-3 text-gray-600 text-lg"></i>
+                                    <div>
+                                        <p class="text-gray-500 text-xs">Posted</p>
+                                        <p id="postedTime" class="font-semibold text-gray-900">Loading...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Stats -->
+                        <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">Quick Stats</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Applications</span>
+                                    <span id="applicationCount" class="font-semibold">0</span>
+                                </div>
+                                <div id="maxApplicationsRow" class="hidden flex justify-between">
+                                    <span class="text-gray-600">Max Applicants</span>
+                                    <span id="maxApplications" class="font-semibold">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Start Date</span>
+                                    <span id="startDate" class="font-semibold">Loading...</span>
+                                </div>
+                                <div id="endDateRow" class="hidden flex justify-between">
+                                    <span class="text-gray-600">End Date</span>
+                                    <span id="endDate" class="font-semibold">-</span>
+                                </div>
+                                <div id="compensationRow" class="hidden">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Compensation</span>
+                                        <span id="compensation" class="font-semibold">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two Column Layout -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    <!-- Left Column - Details (2/3 width) -->
+                    <div class="xl:col-span-2 space-y-8">
+                        <!-- Description -->
+                        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                                <i class="fas fa-file-text mr-3 text-blue-600"></i>About This Opportunity
+                            </h2>
+                            <div id="opportunityDescription" class="prose prose-lg prose-gray max-w-none">
+                                Loading description...
+                            </div>
+                        </div>
+
+                        <!-- Requirements -->
+                        <div id="requirementsSection" class="hidden bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                                <i class="fas fa-list-check mr-3 text-red-600"></i>Requirements & Qualifications
+                            </h2>
+                            <div id="opportunityRequirements" class="space-y-4">
+                                <!-- Requirements will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Skills -->
+                        <div id="skillsSection" class="hidden bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                                <i class="fas fa-cogs mr-3 text-green-600"></i>Required Skills & Expertise
+                            </h2>
+                            <div id="requiredSkills" class="flex flex-wrap gap-3">
+                                <!-- Skills will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Benefits -->
+                        <div id="benefitsSection" class="hidden bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                                <i class="fas fa-gift mr-3 text-purple-600"></i>Benefits & Perks
+                            </h2>
+                            <div id="opportunityBenefits" class="prose prose-lg prose-gray max-w-none">
+                                <!-- Benefits will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Application Form (1/3 width) -->
+                    <div class="space-y-8">
+                        <!-- Application Form -->
+                        <div id="applicationSection" class="hidden bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                            <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+                                <h3 class="text-2xl font-bold text-white mb-2 flex items-center">
+                                    <i class="fas fa-paper-plane mr-3"></i>Apply Now
+                                </h3>
+                                <p class="text-blue-100">Submit your application for this opportunity</p>
+                            </div>
+                            
+                            <div class="p-8">
+                                <form id="applicationForm" class="space-y-8">
+                                    <!-- Dynamic Questions Container -->
+                                    <div id="dynamicQuestions" class="space-y-6">
+                                        <!-- All questions will be loaded dynamically here -->
+                                    </div>
+                                    
+                                    <!-- Additional Documents Section -->
+                                    <div class="space-y-4 pt-6 border-t border-gray-200">
+                                        <h4 class="text-lg font-semibold text-gray-900 flex items-center">
+                                            <i class="fas fa-file-upload mr-2 text-blue-600"></i>
+                                            Additional Documents (Optional)
+                                        </h4>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                Upload Supporting Documents
+                                            </label>
+                                            <input type="file" 
+                                                   id="additionalDocuments" 
+                                                   name="additionalDocuments" 
+                                                   multiple 
+                                                   accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                Accepted formats: PDF, DOC, DOCX, TXT, JPG, PNG (Max 10MB each)
+                                            </p>
+                                            <div id="uploadedFilesList" class="mt-3 space-y-2">
+                                                <!-- Uploaded files will appear here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Additional Notes Section -->
+                                    <div class="space-y-4 pt-6 border-t border-gray-200">
+                                        <h4 class="text-lg font-semibold text-gray-900 flex items-center">
+                                            <i class="fas fa-sticky-note mr-2 text-blue-600"></i>
+                                            Additional Notes (Optional)
+                                        </h4>
+                                        <div>
+                                            <label for="applicationNotes" class="block text-sm font-medium text-gray-700 mb-2">
+                                                Additional Information
+                                            </label>
+                                            <textarea id="applicationNotes" 
+                                                      name="applicationNotes" 
+                                                      rows="4" 
+                                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                                      placeholder="Share any additional information about your background, motivation, or specific qualifications for this opportunity..."></textarea>
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                Optional: Provide any additional context that might strengthen your application
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Terms and Submit -->
+                                    <div class="space-y-6 pt-6 border-t border-gray-200">
+                                        <div class="flex items-start">
+                                            <input type="checkbox" id="termsAccepted" name="termsAccepted" required
+                                                   class="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                            <label for="termsAccepted" class="ml-3 text-sm text-gray-700">
+                                                I confirm that all information provided is accurate and I agree to the 
+                                                <a href="#" class="text-blue-600 hover:underline">terms and conditions</a> 
+                                                of this application.
+                                            </label>
+                                        </div>
+                                        
+                                        <button type="submit" class="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg">
+                                            <i class="fas fa-paper-plane mr-3"></i>Submit Application
+                                        </button>
+                                        
+                                        <p class="text-xs text-gray-500 text-center">
+                                            Your application will be reviewed within 3-5 business days. You'll receive email updates on your application status.
+                                        </p>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Already Applied -->
+                        <div id="alreadyAppliedSection" class="hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200 p-8">
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <i class="fas fa-check text-3xl text-green-600"></i>
+                                </div>
+                                <h3 class="text-2xl font-bold text-green-900 mb-3">Application Submitted Successfully!</h3>
+                                <p class="text-green-700 mb-6">You have already applied for this opportunity. Your application is being reviewed.</p>
+                                <a href="applications.html" class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-semibold">
+                                    <i class="fas fa-eye mr-2"></i>View Application Status
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Login Required -->
+                        <div id="loginRequiredSection" class="hidden bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 p-8">
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <i class="fas fa-user text-3xl text-blue-600"></i>
+                                </div>
+                                <h3 class="text-2xl font-bold text-blue-900 mb-3">Login Required</h3>
+                                <p class="text-blue-700 mb-6">Please log in to your account to apply for this opportunity.</p>
+                                <button onclick="showLoginModal()" class="inline-flex items-center px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold">
+                                    <i class="fas fa-sign-in-alt mr-2"></i>Login to Apply
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
+            <div class="flex items-center space-x-3">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span class="text-gray-700">Processing...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+
+    <script>
+        let opportunityData = null;
+        let opportunityId = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Opportunity details page loaded');
+            
+            // Get opportunity ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            opportunityId = urlParams.get('id');
+            
+            if (!opportunityId) {
+                showError();
+                return;
+            }
+            
+            // Setup UI interactions
+            setupUIInteractions();
+            
+            // Setup file upload handling
+            setupFileUpload();
+            
+            // Load opportunity details
+            await loadOpportunityDetails();
+        });
+
+        // Load opportunity details
+        async function loadOpportunityDetails() {
+            try {
+                showLoading();
+                
+                console.log('Loading opportunity with ID:', opportunityId);
+                console.log('API base URL:', API_BASE_URL);
+                
+                // Load opportunity data
+                opportunityData = await api.opportunities.getById(opportunityId);
+                
+                console.log('Received opportunity data:', opportunityData);
+                
+                if (!opportunityData) {
+                    throw new Error('Opportunity not found - API returned null/undefined');
+                }
+                
+                // Populate the page
+                populateOpportunityDetails();
+                
+                // Check authentication and application status
+                await checkApplicationStatus();
+                
+                hideLoading();
+                
+            } catch (error) {
+                console.error('Error loading opportunity:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    status: error.status,
+                    response: error.response
+                });
+                hideLoading();
+                showError();
+            }
+        }
+
+        // Populate opportunity details
+        function populateOpportunityDetails() {
+            // Cover Image
+            const coverImageElement = document.getElementById('coverImage');
+            const defaultCoverElement = document.getElementById('defaultCover');
+            const coverTitleElement = document.getElementById('coverTitle');
+            const coverOrganizationElement = document.getElementById('coverOrganization');
+            const coverIconElement = document.getElementById('coverIcon');
+            
+            if (opportunityData.cover_image) {
+                coverImageElement.src = opportunityData.cover_image;
+                coverImageElement.classList.remove('hidden');
+                defaultCoverElement.classList.add('hidden');
+            } else {
+                // Set up default cover with opportunity info
+                coverTitleElement.textContent = opportunityData.title;
+                coverOrganizationElement.textContent = opportunityData.organization_name || opportunityData.organization?.name || 'Organization';
+                
+                const typeIcons = {
+                    'internship': 'fa-briefcase',
+                    'scholarship': 'fa-graduation-cap', 
+                    'competition': 'fa-trophy',
+                    'volunteer': 'fa-heart',
+                    'job': 'fa-suitcase',
+                    'workshop': 'fa-chalkboard-teacher',
+                    'conference': 'fa-users'
+                };
+                coverIconElement.className = `fas ${typeIcons[opportunityData.opportunity_type] || 'fa-briefcase'} text-6xl mb-4 opacity-80`;
+            }
+            
+            // Basic info
+            document.getElementById('opportunityTitle').textContent = opportunityData.title;
+            document.getElementById('organizationName').textContent = opportunityData.organization_name || opportunityData.organization?.name || 'Organization';
+            document.getElementById('opportunityLocation').textContent = opportunityData.location || 'Location not specified';
+            
+            // Remote label
+            if (opportunityData.is_remote) {
+                document.getElementById('remoteLabel').classList.remove('hidden');
+            }
+            
+            // Deadline and urgency
+            const deadline = new Date(opportunityData.application_deadline);
+            const now = new Date();
+            const isUrgent = (deadline - now) < 7 * 24 * 60 * 60 * 1000;
+            const isPastDeadline = deadline < now;
+            
+            document.getElementById('applicationDeadline').textContent = Utils.formatDate(opportunityData.application_deadline);
+            
+            if (isUrgent && !isPastDeadline) {
+                document.getElementById('urgentLabel').classList.remove('hidden');
+            }
+            if (isPastDeadline) {
+                document.getElementById('expiredLabel').classList.remove('hidden');
+            }
+            
+            // Posted time
+            document.getElementById('postedTime').textContent = Utils.getRelativeTime(opportunityData.created_at);
+            
+            // Type badge
+            const typeElement = document.getElementById('opportunityType');
+            typeElement.textContent = opportunityData.opportunity_type ? 
+                opportunityData.opportunity_type.charAt(0).toUpperCase() + opportunityData.opportunity_type.slice(1) : 
+                'Opportunity';
+            
+            // Set appropriate icon
+            const iconElement = document.getElementById('opportunityIcon');
+            const typeIcons = {
+                'internship': 'fa-briefcase',
+                'scholarship': 'fa-graduation-cap', 
+                'competition': 'fa-trophy',
+                'volunteer': 'fa-heart',
+                'job': 'fa-suitcase',
+                'workshop': 'fa-chalkboard-teacher',
+                'conference': 'fa-users'
+            };
+            iconElement.className = `fas ${typeIcons[opportunityData.opportunity_type] || 'fa-briefcase'} text-white text-2xl`;
+            
+            // Description
+            document.getElementById('opportunityDescription').innerHTML = 
+                opportunityData.description ? 
+                opportunityData.description.replace(/\n/g, '<br>') : 
+                'No detailed description provided for this opportunity.';
+            
+            // Quick info
+            document.getElementById('startDate').textContent = Utils.formatDate(opportunityData.start_date);
+            
+            if (opportunityData.end_date) {
+                document.getElementById('endDateRow').classList.remove('hidden');
+                document.getElementById('endDate').textContent = Utils.formatDate(opportunityData.end_date);
+            }
+            
+            if (opportunityData.compensation) {
+                document.getElementById('compensationRow').classList.remove('hidden');
+                document.getElementById('compensation').textContent = opportunityData.compensation;
+            }
+            
+            document.getElementById('applicationCount').textContent = opportunityData.application_count || '0';
+            
+            if (opportunityData.max_applications) {
+                document.getElementById('maxApplicationsRow').classList.remove('hidden');
+                document.getElementById('maxApplications').textContent = opportunityData.max_applications;
+            }
+            
+            // Requirements
+            if (opportunityData.requirements && opportunityData.requirements.length > 0) {
+                document.getElementById('requirementsSection').classList.remove('hidden');
+                const requirementsContainer = document.getElementById('opportunityRequirements');
+                requirementsContainer.innerHTML = '';
+                
+                opportunityData.requirements.forEach(req => {
+                    const reqElement = document.createElement('div');
+                    reqElement.className = `flex items-start space-x-2 p-3 rounded-lg ${req.is_mandatory ? 'bg-red-50 border border-red-200' : 'bg-gray-50'}`;
+                    reqElement.innerHTML = `
+                        <i class="fas ${req.is_mandatory ? 'fa-exclamation-circle text-red-600' : 'fa-check-circle text-green-600'} mt-1"></i>
+                        <div class="flex-1">
+                            <p class="${req.is_mandatory ? 'font-semibold text-red-900' : 'text-gray-700'}">${req.requirement}</p>
+                            ${req.is_mandatory ? '<span class="text-xs text-red-600">Required</span>' : ''}
+                        </div>
+                    `;
+                    requirementsContainer.appendChild(reqElement);
+                });
+            }
+            
+            // Skills
+            if (opportunityData.required_skills && opportunityData.required_skills.length > 0) {
+                document.getElementById('skillsSection').classList.remove('hidden');
+                const skillsContainer = document.getElementById('requiredSkills');
+                skillsContainer.innerHTML = '';
+                
+                opportunityData.required_skills.forEach(skill => {
+                    const skillName = typeof skill === 'string' ? skill : (skill.name || skill.skill_name || '');
+                    if (skillName) {
+                        const skillElement = document.createElement('span');
+                        skillElement.className = 'px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full';
+                        skillElement.textContent = skillName;
+                        skillsContainer.appendChild(skillElement);
+                    }
+                });
+            }
+            
+            // Benefits
+            if (opportunityData.benefits) {
+                document.getElementById('benefitsSection').classList.remove('hidden');
+                document.getElementById('opportunityBenefits').innerHTML = 
+                    opportunityData.benefits.replace(/\n/g, '<br>');
+            }
+            
+            // Show content
+            document.getElementById('contentContainer').classList.remove('hidden');
+        }
+
+        // Check application status
+        async function checkApplicationStatus() {
+            const quickApplyButton = document.getElementById('quickApplyButton');
+            const loginToApplyButton = document.getElementById('loginToApplyButton');
+            const applicationSection = document.getElementById('applicationSection');
+            
+            if (!auth.isLoggedIn()) {
+                // Show login button, hide apply button
+                if (loginToApplyButton) loginToApplyButton.classList.remove('hidden');
+                if (quickApplyButton) quickApplyButton.classList.add('hidden');
+                return;
+            }
+            
+            const user = auth.getCurrentUser();
+            if (user.user_type !== 'student') {
+                // Hide both buttons for non-students
+                if (quickApplyButton) quickApplyButton.classList.add('hidden');
+                if (loginToApplyButton) loginToApplyButton.classList.add('hidden');
+                return;
+            }
+            
+            try {
+                // Check if already applied
+                const applications = await api.applications.getList({ opportunity: opportunityId });
+                const hasApplied = applications.results && applications.results.length > 0;
+                
+                if (hasApplied) {
+                    // User has already applied - show already applied section
+                    if (quickApplyButton) quickApplyButton.classList.add('hidden');
+                    if (loginToApplyButton) loginToApplyButton.classList.add('hidden');
+                    if (applicationSection) applicationSection.classList.add('hidden');
+                    
+                    // Show already applied section
+                    const alreadyAppliedSection = document.getElementById('alreadyAppliedSection');
+                    if (alreadyAppliedSection) {
+                        alreadyAppliedSection.classList.remove('hidden');
+                    }
+                    
+                    console.log('User has already applied to this opportunity');
+                    return;
+                } else {
+                    // Check if deadline has passed
+                    const deadline = new Date(opportunityData.application_deadline);
+                    if (deadline < new Date()) {
+                        // Don't show application form for expired opportunities
+                        if (quickApplyButton) quickApplyButton.classList.add('hidden');
+                        if (loginToApplyButton) loginToApplyButton.classList.add('hidden');
+                        if (applicationSection) applicationSection.classList.add('hidden');
+                        return;
+                    }
+                    
+                    // Show application form and apply button
+                    if (applicationSection) applicationSection.classList.remove('hidden');
+                    if (quickApplyButton) quickApplyButton.classList.remove('hidden');
+                    if (loginToApplyButton) loginToApplyButton.classList.add('hidden');
+                    setupApplicationForm();
+                }
+                
+            } catch (error) {
+                console.error('Error checking application status:', error);
+                // Show application form by default if we can't check
+                if (applicationSection) applicationSection.classList.remove('hidden');
+                if (quickApplyButton) quickApplyButton.classList.remove('hidden');
+                if (loginToApplyButton) loginToApplyButton.classList.add('hidden');
+                setupApplicationForm();
+            }
+        }
+
+        // Setup application form
+        function setupApplicationForm() {
+            const form = document.getElementById('applicationForm');
+            
+            // Form submission
+            if (form) {
+                form.addEventListener('submit', handleApplicationSubmit);
+            }
+            
+            // Load all questions dynamically
+            loadAdditionalQuestions();
+        }
+
+        // Load additional questions
+        function loadAdditionalQuestions() {
+            // Load ALL questions for this opportunity, not just additional_questions
+            const questions = opportunityData.additional_questions || [];
+            
+            if (questions.length === 0) {
+                console.log('No questions found for this opportunity');
+                return;
+            }
+            
+            const container = document.getElementById('dynamicQuestions');
+            container.innerHTML = ''; // Clear any existing content
+            
+            // Sort questions by order to ensure proper display
+            const sortedQuestions = questions.sort((a, b) => a.order - b.order);
+            
+            sortedQuestions.forEach((question) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'space-y-3';
+                
+                let inputHtml = '';
+                let charCountHtml = '';
+                
+                // Handle different question types
+                if (question.question_type === 'textarea') {
+                    inputHtml = `<textarea id="question_${question.id}" name="question_${question.id}" rows="6" 
+                                 ${question.is_required ? 'required' : ''}
+                                 ${question.min_length ? `data-min-length="${question.min_length}"` : ''}
+                                 class="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                                 placeholder="${question.placeholder || ''}"></textarea>`;
+                    
+                    // Add character counter for fields with min_length
+                    if (question.min_length && question.min_length > 0) {
+                        charCountHtml = `
+                            <div class="mt-2 flex items-center justify-between">
+                                <p class="text-xs text-gray-500">Minimum ${question.min_length} characters required</p>
+                                <p id="charCount_${question.id}" class="text-xs text-gray-400">0/${question.min_length}</p>
+                            </div>`;
+                    }
+                } else if (question.question_type === 'select' && question.options) {
+                    inputHtml = `<select id="question_${question.id}" name="question_${question.id}" 
+                                 ${question.is_required ? 'required' : ''}
+                                 class="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                                 <option value="">Please select...</option>`;
+                    question.options.forEach(option => {
+                        inputHtml += `<option value="${option}">${option}</option>`;
+                    });
+                    inputHtml += `</select>`;
+                } else {
+                    inputHtml = `<input type="${question.question_type || 'text'}" 
+                                 id="question_${question.id}" name="question_${question.id}" 
+                                 ${question.is_required ? 'required' : ''}
+                                 class="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                 placeholder="${question.placeholder || ''}">`; 
+                }
+                
+                questionElement.innerHTML = `
+                    <label for="question_${question.id}" class="block text-sm font-medium text-gray-700 mb-3">
+                        ${question.question} ${question.is_required ? '<span class="text-red-500">*</span>' : ''}
+                    </label>
+                    ${inputHtml}
+                    ${charCountHtml}
+                    ${question.help_text ? `<p class="text-sm text-gray-500 mt-1">${question.help_text}</p>` : ''}
+                `;
+                container.appendChild(questionElement);
+                
+                // Add character counting for fields with min_length
+                if (question.question_type === 'textarea' && question.min_length) {
+                    const textarea = document.getElementById(`question_${question.id}`);
+                    const charCounter = document.getElementById(`charCount_${question.id}`);
+                    
+                    if (textarea && charCounter) {
+                        function updateCharCount() {
+                            const length = textarea.value.length;
+                            charCounter.textContent = `${length}/${question.min_length}`;
+                            
+                            if (length < question.min_length) {
+                                charCounter.className = 'text-xs text-red-500';
+                            } else {
+                                charCounter.className = 'text-xs text-green-500';
+                            }
+                        }
+                        
+                        textarea.addEventListener('input', updateCharCount);
+                        updateCharCount(); // Initial call
+                    }
+                }
+            });
+            
+            console.log(`✅ Loaded ${sortedQuestions.length} dynamic questions`);
+        }
+
+        // Handle application submission
+        async function handleApplicationSubmit(e) {
+            e.preventDefault();
+            
+            try {
+                showLoading(true);
+                
+                const formData = new FormData(e.target);
+                
+                // Validate terms acceptance
+                if (!formData.get('termsAccepted')) {
+                    showToast('Please accept the terms and conditions', 'error');
+                    return;
+                }
+                
+                // Validate all required questions
+                const questions = opportunityData.additional_questions || [];
+                for (const question of questions) {
+                    if (question.is_required) {
+                        const answer = formData.get(`question_${question.id}`);
+                        if (!answer || answer.trim() === '') {
+                            showToast(`Please answer: ${question.question}`, 'error');
+                            return;
+                        }
+                        
+                        // Validate minimum length for textarea fields
+                        if (question.question_type === 'textarea' && question.min_length) {
+                            if (answer.length < question.min_length) {
+                                showToast(`Answer to "${question.question}" must be at least ${question.min_length} characters long`, 'error');
+                                return;
+                            }
+                        }
+                    }
+                }
+                
+                // Prepare application data with just the opportunity ID
+                const applicationData = {
+                    opportunity: opportunityId,
+                    additional_documents: [],
+                    notes: formData.get('applicationNotes') || ''
+                };
+                
+                console.log('Initial notes from form:', formData.get('applicationNotes'));
+                
+                // Handle file uploads first
+                const filesInput = document.getElementById('additionalDocuments');
+                if (filesInput && filesInput.files.length > 0) {
+                    showToast('Uploading documents...', 'info');
+                    console.log('Files to upload:', filesInput.files.length);
+                    
+                    for (const file of filesInput.files) {
+                        try {
+                            console.log('Uploading file:', file.name, 'Size:', file.size);
+                            const uploadResult = await api.applications.uploadDocument(file);
+                            console.log('Upload result:', uploadResult);
+                            
+                            // Make sure we get the correct URL from the response
+                            const fileUrl = uploadResult.file_url || uploadResult.url;
+                            if (fileUrl) {
+                                applicationData.additional_documents.push(fileUrl);
+                                console.log('Added file URL:', fileUrl);
+                            } else {
+                                console.error('No file URL in upload result:', uploadResult);
+                            }
+                        } catch (uploadError) {
+                            console.error('File upload error:', uploadError);
+                            showToast(`Failed to upload ${file.name}. Please try again.`, 'error');
+                            return;
+                        }
+                    }
+                    
+                    console.log('All files uploaded. Total URLs:', applicationData.additional_documents.length);
+                    console.log('File URLs:', applicationData.additional_documents);
+                }
+                
+                console.log('Final application data before submission:', applicationData);
+                
+                // Add all question answers as separate fields
+                questions.forEach((question) => {
+                    const answer = formData.get(`question_${question.id}`);
+                    if (answer) {
+                        applicationData[`question_${question.id}`] = answer;
+                    }
+                });
+                
+                console.log('Submitting application data:', applicationData);
+                
+                // Submit application
+                const response = await api.applications.submit(applicationData);
+                console.log('Application submission response:', response);
+                
+                showToast('Application submitted successfully!', 'success');
+                
+                // Refresh page to show applied state
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error submitting application:', error);
+                showToast('Failed to submit application: ' + (error.message || 'Unknown error'), 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Handle file selection display
+        function setupFileUpload() {
+            const fileInput = document.getElementById('additionalDocuments');
+            const filesList = document.getElementById('uploadedFilesList');
+            
+            if (fileInput && filesList) {
+                fileInput.addEventListener('change', function(e) {
+                    filesList.innerHTML = '';
+                    
+                    if (e.target.files.length > 0) {
+                        Array.from(e.target.files).forEach((file, index) => {
+                            const fileDiv = document.createElement('div');
+                            fileDiv.className = 'flex items-center justify-between bg-gray-50 rounded-lg p-3 border';
+                            
+                            const fileInfo = document.createElement('div');
+                            fileInfo.className = 'flex items-center';
+                            fileInfo.innerHTML = `
+                                <i class="fas fa-file text-gray-400 mr-2"></i>
+                                <span class="text-sm text-gray-700">${file.name}</span>
+                                <span class="text-xs text-gray-500 ml-2">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                            `;
+                            
+                            const removeBtn = document.createElement('button');
+                            removeBtn.type = 'button';
+                            removeBtn.className = 'text-red-500 hover:text-red-700 text-sm';
+                            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                            removeBtn.onclick = function() {
+                                // Create new FileList without this file
+                                const dt = new DataTransfer();
+                                Array.from(fileInput.files).forEach((f, i) => {
+                                    if (i !== index) dt.items.add(f);
+                                });
+                                fileInput.files = dt.files;
+                                
+                                // Trigger change event to update display
+                                fileInput.dispatchEvent(new Event('change'));
+                            };
+                            
+                            fileDiv.appendChild(fileInfo);
+                            fileDiv.appendChild(removeBtn);
+                            filesList.appendChild(fileDiv);
+                        });
+                    }
+                });
+            }
+        }
+
+        // Setup UI interactions
+        function setupUIInteractions() {
+            // User menu toggle
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            if (userMenuBtn) {
+                userMenuBtn.addEventListener('click', function() {
+                    document.getElementById('userMenu').classList.toggle('hidden');
+                });
+            }
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#userMenuBtn')) {
+                    const userMenu = document.getElementById('userMenu');
+                    if (userMenu) {
+                        userMenu.classList.add('hidden');
+                    }
+                }
+            });
+            
+            // Quick Apply button click (in cover image)
+            const quickApplyButton = document.getElementById('quickApplyButton');
+            if (quickApplyButton) {
+                quickApplyButton.addEventListener('click', function() {
+                    document.getElementById('applicationSection').scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+            
+            // Login to apply button
+            const loginToApplyButton = document.getElementById('loginToApplyButton');
+            if (loginToApplyButton) {
+                loginToApplyButton.addEventListener('click', function() {
+                    showLoginModal();
+                });
+            }
+        }
+
+        // Utility functions
+        function showLoading() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('contentContainer').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingState').classList.add('hidden');
+        }
+
+        function showError() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('contentContainer').classList.add('hidden');
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                auth.logout();
+            }
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg text-white z-50 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+            }`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 5000);
+        }
+
+        // Make functions globally available
+        window.handleLogout = handleLogout;
+    </script>
+</body>
+</html>
