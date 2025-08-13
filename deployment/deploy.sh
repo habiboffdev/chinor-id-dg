@@ -25,13 +25,10 @@ print_error() {
 }
 
 # Check if running as root
-if [ "$EUID" -eq 0 ]; then
-    print_error "Please run this script as the opportuni user, not as root"
-    exit 1
-fi
+
 
 # Set variables
-PROJECT_DIR="/home/opportuni/opportuni"
+PROJECT_DIR="/home/chinor-id-dg"
 VENV_DIR="$PROJECT_DIR/venv"
 BACKEND_DIR="$PROJECT_DIR/opportuni_backend"
 

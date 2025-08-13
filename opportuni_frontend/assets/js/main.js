@@ -356,8 +356,11 @@ async function searchOpportunities(query) {
             }
         }
         
-        // Fallback to original search if opportunities.js not loaded
-        const response = await api.opportunities.search(query);
+        // Fallback: if user is authenticated, use dedicated search endpoint; otherwise use list with q param
+        const isAuthenticated = !!Utils.storage.get('auth_token');
+        const response = isAuthenticated 
+            ? await api.opportunities.search(query)
+            : await api.opportunities.getList({ q: query });
         let opportunities;
         
         // Handle different response formats

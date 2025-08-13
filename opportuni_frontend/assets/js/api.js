@@ -4,20 +4,21 @@ class API {
     constructor() {
         this.baseURL = API_BASE_URL;
         this.token = Utils.storage.get('auth_token');
+    this.debug = Boolean(window.DEBUG);
     }
 
     // Set authentication token
     setToken(token) {
         this.token = token;
         Utils.storage.set('auth_token', token);
-        console.log('API token set:', token ? 'Token exists (not shown for security)' : 'No token');
+    if (this.debug) console.log('API token set:', token ? '[redacted]' : 'No token');
     }
 
     // Remove authentication token
     removeToken() {
         this.token = null;
         Utils.storage.remove('auth_token');
-        console.log('API token removed');
+    if (this.debug) console.log('API token removed');
     }
     
     // Check if token exists
@@ -44,17 +45,22 @@ class API {
     // Generic HTTP request method
     async request(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
+        const baseHeaders = this.getHeaders(options.contentType);
         const config = {
-            headers: this.getHeaders(options.contentType),
             ...options,
+            headers: { ...(options.headers || {}), ...baseHeaders },
         };
 
-        console.log('API Request:', {
-            url: url,
-            method: config.method || 'GET',
-            headers: config.headers,
-            hasToken: !!this.token
-        });
+        if (this.debug) {
+            const safeHeaders = { ...config.headers };
+            if (safeHeaders.Authorization) safeHeaders.Authorization = 'Bearer [redacted]';
+            console.log('API Request:', {
+                url: url,
+                method: config.method || 'GET',
+                headers: safeHeaders,
+                hasToken: !!this.token
+            });
+        }
 
         try {
             const response = await fetch(url, config);
@@ -71,14 +77,15 @@ class API {
 
             if (!response.ok) {
                 // Log detailed error information for debugging
-                console.error('API Error Details:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    url: url,
-                    method: config.method || 'GET',
-                    requestData: config.body,
-                    responseData: data
-                });
+                if (this.debug) {
+                    console.error('API Error Details:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        url: url,
+                        method: config.method || 'GET',
+                        responseData: data
+                    });
+                }
                 
                 // Try to extract meaningful error message
                 let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
@@ -104,7 +111,7 @@ class API {
 
             return data;
         } catch (error) {
-            console.error('API Request Error:', error);
+            if (this.debug) console.error('API Request Error:', error);
             throw error;
         }
     }
@@ -132,18 +139,11 @@ class API {
     // PUT request
     async put(endpoint, data = {}) {
         const isFormData = data instanceof FormData;
-        console.log('PUT method called:');
-        console.log('- endpoint:', endpoint);
-        console.log('- data type:', typeof data);
-        console.log('- isFormData:', isFormData);
-        console.log('- data instanceof FormData:', data instanceof FormData);
-        
-        if (isFormData) {
-            console.log('FormData contents:');
-            for (let [key, value] of data.entries()) {
-                console.log(`- ${key}:`, value);
-            }
+        if (this.debug) {
+            console.log('PUT method called:', { endpoint, isFormData });
         }
+        
+    // Do not log FormData contents to avoid leaking PII
         
         const requestOptions = {
             method: 'PUT',
@@ -151,7 +151,7 @@ class API {
             contentType: isFormData ? null : 'application/json',
         };
         
-        console.log('Request options:', requestOptions);
+    if (this.debug) console.log('Request options:', { method: requestOptions.method, contentType: requestOptions.contentType });
         return this.request(endpoint, requestOptions);
     }
 
@@ -217,12 +217,13 @@ class API {
         },
 
         // Refresh token
-        refresh: async (refreshToken) => {
-            const response = await this.post('/auth/refresh/', {
-                refresh: refreshToken
-            });
-            if (response.access) {
-                this.setToken(response.access);
+        refresh: async (refreshTokenParam) => {
+            const currentRefresh = refreshTokenParam || Utils.storage.get('refresh_token');
+            const response = await this.post('/auth/refresh/', { refresh: currentRefresh });
+            if (response.access) this.setToken(response.access);
+            if (response.refresh) {
+                // Token rotation support
+                Utils.storage.set('refresh_token', response.refresh);
             }
             return response;
         },

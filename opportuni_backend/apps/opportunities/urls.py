@@ -1,4 +1,5 @@
 from django.urls import path
+from django.conf import settings
 from . import views
 
 urlpatterns = [
@@ -19,7 +20,10 @@ urlpatterns = [
     
     # Statistics
     path('stats/', views.opportunity_stats, name='opportunity-stats'),
-    
-    # Debug endpoint
-    path('debug/', views.debug_opportunities, name='debug-opportunities'),
 ]
+
+# Debug endpoint only in development
+if settings.DEBUG:
+    urlpatterns += [
+        path('debug/', views.debug_opportunities, name='debug-opportunities'),
+    ]

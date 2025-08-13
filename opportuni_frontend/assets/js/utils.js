@@ -1,9 +1,12 @@
 // Utility functions for Opportuni Platform
 
 // API Base URL - automatically detects environment
-const API_BASE_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:8000/api'  // Development
-    : '/api';  // Production (same domain)
+const host = window.location.hostname;
+const isLocalHost = host === 'localhost' || host === '127.0.0.1';
+const API_BASE_URL = isLocalHost ? 'http://localhost:8000/api' : '/api';
+
+// Global debug flag (set to true in dev HTML if needed)
+window.DEBUG = window.DEBUG ?? isLocalHost;
 
 // Utility functions
 const Utils = {

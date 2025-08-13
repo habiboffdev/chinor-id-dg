@@ -1,4 +1,4 @@
-# Opportuni - Student Opportunity Management Platform
+	# Opportuni - Student Opportunity Management Platform
 
 ## 📋 Project Overview
 

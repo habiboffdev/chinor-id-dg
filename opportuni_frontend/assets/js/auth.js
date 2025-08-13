@@ -96,13 +96,13 @@ class AuthManager {
             
             // Make sure token is set in API instance
             api.setToken(response.access);
-            console.log('Token set after login:', response.access);
+            if (window.DEBUG) console.log('Token set after login');
             
             // Load user profile with a small delay to ensure token is properly set
-            setTimeout(async () => {
+        setTimeout(async () => {
                 try {
                     this.currentUser = await api.auth.getProfile();
-                    console.log('Profile loaded:', this.currentUser);
+            if (window.DEBUG) console.log('Profile loaded');
                     
                     // Update UI
                     this.updateUIForLoggedInUser();
@@ -226,9 +226,7 @@ class AuthManager {
 
     // Redirect to appropriate dashboard
     redirectToDashboard() {
-        console.log('redirectToDashboard called - DISABLED for debugging');
-        console.trace('Redirect called from:');
-        return; // DISABLED
+    if (window.DEBUG) console.log('redirectToDashboard called');
         
         if (!this.currentUser) {
             console.error('Cannot redirect: currentUser is null');
@@ -237,7 +235,7 @@ class AuthManager {
             // Try to load user and then redirect
             this.waitForUser().then(user => {
                 if (user) {
-                    console.log('User loaded, now redirecting...');
+            if (window.DEBUG) console.log('User loaded, now redirecting...');
                     this.redirectToDashboard();
                 } else {
                     console.error('Failed to load user for redirect');
@@ -246,7 +244,7 @@ class AuthManager {
             return;
         }
         
-        console.log('Redirecting user type:', this.currentUser.user_type);
+    if (window.DEBUG) console.log('Redirecting user type:', this.currentUser.user_type);
         
         // Use a small delay to ensure any pending operations complete
         setTimeout(() => {

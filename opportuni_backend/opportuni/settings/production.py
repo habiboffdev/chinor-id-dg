@@ -1,41 +1,32 @@
-import os
 from .base import *
+from decouple import config
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-change-this-in-production')
+SECRET_KEY = config('SECRET_KEY')
 
 # Allowed hosts for production
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.opportuni.com',  # Replace with your domain
-    '.digitalocean.com',
-    os.environ.get('DOMAIN_NAME', ''),
-    os.environ.get('DROPLET_IP', ''),
-]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 # Database configuration for production (PostgreSQL)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'opportuni_db'),
-        'USER': os.environ.get('DB_USER', 'opportuni_user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-        'OPTIONS': {
-            'MAX_CONNS': 20,
-            'CONN_MAX_AGE': 600,
-        }
+        'NAME': config('DB_NAME', default='opportuni_db'),
+        'USER': config('DB_USER', default='opportuni_user'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
+        'CONN_MAX_AGE': 600,
     }
 }
 
 # Static files configuration for production
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 # Media files configuration for production
 MEDIA_URL = '/media/'
@@ -71,4 +62,25 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 
 # Logging
-LOGGING['handlers']['file']['filename'] = '/var/log/opportuni/django.log'
+# Ensure a file handler exists and is wired without raising on missing keys
+log_file = os.environ.get('DJANGO_LOG_FILE', str(BASE_DIR / 'logs' / 'django.log'))
+
+# Handlers
+LOGGING.setdefault('handlers', {})
+LOGGING['handlers']['file'] = {
+    'level': 'INFO',
+    'class': 'logging.FileHandler',
+    'formatter': 'verbose',
+    'filename': log_file,
+}
+
+# Attach file handler to root and common loggers
+LOGGING.setdefault('root', {}).setdefault('handlers', [])
+if 'file' not in LOGGING['root']['handlers']:
+    LOGGING['root']['handlers'].append('file')
+
+LOGGING.setdefault('loggers', {})
+for name in ('django', 'opportuni'):
+    LOGGING['loggers'].setdefault(name, {}).setdefault('handlers', [])
+    if 'file' not in LOGGING['loggers'][name]['handlers']:
+        LOGGING['loggers'][name]['handlers'].append('file')
