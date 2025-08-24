@@ -11,14 +11,14 @@ class API {
     setToken(token) {
         this.token = token;
         Utils.storage.set('auth_token', token);
-    if (this.debug) console.log('API token set:', token ? '[redacted]' : 'No token');
+    if (this.debug && window.Logger) Logger.info('API token set');
     }
 
     // Remove authentication token
     removeToken() {
         this.token = null;
         Utils.storage.remove('auth_token');
-    if (this.debug) console.log('API token removed');
+    if (this.debug && window.Logger) Logger.info('API token removed');
     }
     
     // Check if token exists
@@ -54,12 +54,7 @@ class API {
         if (this.debug) {
             const safeHeaders = { ...config.headers };
             if (safeHeaders.Authorization) safeHeaders.Authorization = 'Bearer [redacted]';
-            console.log('API Request:', {
-                url: url,
-                method: config.method || 'GET',
-                headers: safeHeaders,
-                hasToken: !!this.token
-            });
+            if (window.Logger) Logger.info('API Request', { url, method: config.method || 'GET', headers: safeHeaders, hasToken: !!this.token });
         }
 
         try {
@@ -77,14 +72,8 @@ class API {
 
             if (!response.ok) {
                 // Log detailed error information for debugging
-                if (this.debug) {
-                    console.error('API Error Details:', {
-                        status: response.status,
-                        statusText: response.statusText,
-                        url: url,
-                        method: config.method || 'GET',
-                        responseData: data
-                    });
+                if (this.debug && window.Logger) {
+                    Logger.error('API Error', new Error(`HTTP ${response.status} ${response.statusText}`));
                 }
                 
                 // Try to extract meaningful error message
@@ -111,7 +100,7 @@ class API {
 
             return data;
         } catch (error) {
-            if (this.debug) console.error('API Request Error:', error);
+            if (this.debug && window.Logger) Logger.error('API Request Error', error);
             throw error;
         }
     }
@@ -139,8 +128,8 @@ class API {
     // PUT request
     async put(endpoint, data = {}) {
         const isFormData = data instanceof FormData;
-        if (this.debug) {
-            console.log('PUT method called:', { endpoint, isFormData });
+        if (this.debug && window.Logger) {
+            Logger.info('PUT method called', { endpoint, isFormData });
         }
         
     // Do not log FormData contents to avoid leaking PII
@@ -151,7 +140,7 @@ class API {
             contentType: isFormData ? null : 'application/json',
         };
         
-    if (this.debug) console.log('Request options:', { method: requestOptions.method, contentType: requestOptions.contentType });
+    if (this.debug && window.Logger) Logger.info('Request options', { method: requestOptions.method, contentType: requestOptions.contentType });
         return this.request(endpoint, requestOptions);
     }
 
@@ -199,10 +188,10 @@ class API {
         login: async (credentials) => {
             const response = await this.post('/auth/login/', credentials);
             if (response.access) {
-                console.log('Login successful, setting token');
+                if (this.debug && window.Logger) Logger.info('Login successful, setting token');
                 this.setToken(response.access);
             } else {
-                console.error('Login response missing access token:', response);
+                if (window.Logger) Logger.error('Login response missing access token');
             }
             return response;
         },
@@ -284,8 +273,7 @@ class API {
         },
 
         addExperience: async (experienceData) => {
-            console.log('API: Adding experience with data:', experienceData);
-            console.log('API: Current token exists:', this.hasToken());
+            if (this.debug && window.Logger) Logger.info('API: Adding experience', { hasToken: this.hasToken() });
             return this.post('/students/experience/', experienceData);
         },
 

@@ -6,6 +6,8 @@
     <title>Student Profile - Opportuni</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     
     <!-- Custom Styles for Enhanced Profile Design -->
@@ -48,29 +50,15 @@
             left: 0.75rem;
             top: 0.75rem;
             pointer-events: none;
-            background: linear-gradient(to bottom, transparent 50%, white 50%);
+            background: rgba(255, 255, 255, 1);
             padding: 0 0.25rem;
             z-index: 1;
         }
         
-        /* Enhanced Gradient Backgrounds */
-        .gradient-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.9) 100%);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .gradient-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            transition: all 0.3s ease;
-            transform: translateY(0);
-        }
-        
-        .gradient-btn:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-        }
+    /* Remove gradient helpers */
+    .gradient-card { background: #ffffff; border: 1px solid rgba(229,231,235,1); }
+    .gradient-btn { background: #2563eb; }
+    .gradient-btn:hover { background: #1d4ed8; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2); }
         
         /* Success States */
         .input-success {
@@ -122,7 +110,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            background: #3b82f6;
             border-radius: 2px 2px 0 0;
         }
         
@@ -138,11 +126,7 @@
         }
         
         /* Loading States */
-        .loading-shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
+    .loading-shimmer { background: #f3f4f6; }
         
         @keyframes shimmer {
             0% { background-position: -200% 0; }
@@ -161,63 +145,12 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
-    <!-- Navigation -->
-    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
-        <div class="px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <a href="dashboard.html" class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-graduation-cap text-white text-sm"></i>
-                        </div>
-                        <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Opportuni</span>
-                    </a>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <a href="opportunities.html" class="text-gray-600 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-search mr-1"></i>Browse Opportunities
-                    </a>
-                    
-                    <button id="notificationBtn" class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-bell text-lg"></i>
-                        <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
-                    </button>
-                    
-                    <div class="relative">
-                        <button id="userMenuBtn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-white text-sm"></i>
-                            </div>
-                            <span id="userName" class="text-gray-700 font-medium">Student</span>
-                            <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
-                        </button>
-                        <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-10">
-                            <a href="profile.html" class="block px-4 py-2 text-blue-600 bg-blue-50 border-b border-gray-100">
-                                <i class="fas fa-user mr-2"></i>Profile
-                            </a>
-                            <a href="dashboard.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
-                                <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
-                            </a>
-                            <a href="applications.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
-                                <i class="fas fa-file-alt mr-2"></i>Applications
-                            </a>
-                            <a href="settings.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
-                                <i class="fas fa-cog mr-2"></i>Settings
-                            </a>
-                            <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Student Navbar (shared component) -->
+    <div id="student-navbar-root"></div>
 
     <!-- Main Content -->
-    <main class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <main class="min-h-screen bg-gray-50">
         <!-- Header -->
         <div class="bg-white border-b border-gray-200">
             <div class="px-4 sm:px-6 lg:px-8 py-6">
@@ -269,7 +202,7 @@
                 <div class="flex items-center space-x-6">
                     <!-- Enhanced Profile Picture -->
                     <div class="relative flex-shrink-0 group">
-                        <div id="profilePictureContainer" class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold profile-picture-container cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105">
+                        <div id="profilePictureContainer" class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold profile-picture-container cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105">
                             <i class="fas fa-user"></i>
                         </div>
                         
@@ -282,7 +215,7 @@
                         </div>
                         
                         <!-- Camera Button -->
-                        <button id="changePictureBtn" class="absolute bottom-0 right-0 w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-110 shadow-lg">
+                        <button id="changePictureBtn" class="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-300 transform hover:scale-110 shadow-lg">
                             <i class="fas fa-camera text-xs"></i>
                         </button>
                         
@@ -467,7 +400,7 @@
                                         Cancel
                                     </button>
                                     <button type="submit" 
-                                            class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center">
+                                            class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center">
                                         <span>Save Changes</span>
                                         <i class="fas fa-save ml-2"></i>
                                     </button>
@@ -632,7 +565,7 @@
                                         Cancel
                                     </button>
                                     <button type="submit" 
-                                            class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center">
+                                            class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center">
                                         <span>Save Preferences</span>
                                         <i class="fas fa-save ml-2"></i>
                                     </button>
@@ -669,6 +602,7 @@
     <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/components.js"></script>
+    <script src="assets/js/navbar.js"></script>
     <script>
         // Global state
         let currentProfileData = null;
@@ -906,9 +840,11 @@
                 window.location.href = 'opportunities.html';
             });
 
-            // User menu
-            document.getElementById('userMenuBtn').addEventListener('click', toggleUserMenu);
-            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            // User menu (guard for shared navbar)
+            const _userMenuBtn = document.getElementById('userMenuBtn');
+            if (_userMenuBtn) _userMenuBtn.addEventListener('click', toggleUserMenu);
+            const _logoutBtn = document.getElementById('logoutBtn');
+            if (_logoutBtn) _logoutBtn.addEventListener('click', handleLogout);
 
             // Close modal on overlay click
             document.getElementById('modalOverlay').addEventListener('click', (e) => {
@@ -921,7 +857,7 @@
             document.addEventListener('click', function(event) {
                 const userMenu = document.getElementById('userMenu');
                 const userMenuBtn = document.getElementById('userMenuBtn');
-                
+                if (!userMenu || !userMenuBtn) return; // handled by shared navbar
                 if (!userMenuBtn.contains(event.target) && !userMenu.contains(event.target)) {
                     userMenu.classList.add('hidden');
                 }
@@ -1090,12 +1026,13 @@
                 } else {
                     container.innerHTML = '<i class="fas fa-user text-gray-400 text-2xl"></i>';
                 }
-                container.className = 'w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center profile-picture-container relative';
+                container.className = 'w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center profile-picture-container relative';
             }
             
             document.getElementById('profileName').textContent = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Student Name';
             document.getElementById('profileEmail').textContent = profile.email || 'student@email.com';
-            document.getElementById('userName').textContent = profile.first_name || 'Student';
+            const _userName = document.getElementById('userName');
+            if (_userName) _userName.textContent = profile.first_name || 'Student';
         }
 
         // Populate personal form
@@ -1139,13 +1076,13 @@
                 
                 // Dynamic color based on completion
                 if (percentage >= 90) {
-                    barElement.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    barElement.style.background = '#10b981';
                 } else if (percentage >= 70) {
-                    barElement.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)';
+                    barElement.style.background = '#3b82f6';
                 } else if (percentage >= 50) {
-                    barElement.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+                    barElement.style.background = '#f59e0b';
                 } else {
-                    barElement.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                    barElement.style.background = '#ef4444';
                 }
             }
             
@@ -1170,7 +1107,7 @@
                 badgeElement.className = `flex items-center space-x-3 px-4 py-2 rounded-lg border ${message.class}`;
                 badgeElement.innerHTML = `
                     <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                             <i class="fas fa-chart-pie text-blue-600 text-sm"></i>
                         </div>
                         <div>
@@ -1534,7 +1471,7 @@
                     } else {
                         container.innerHTML = '<i class="fas fa-user text-white text-2xl"></i>';
                     }
-                    container.className = 'w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center profile-picture-container cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105';
+                    container.className = 'w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center profile-picture-container cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105';
                 }
                 
                 let errorMessage = 'Failed to upload profile picture. Please try again. 😞';

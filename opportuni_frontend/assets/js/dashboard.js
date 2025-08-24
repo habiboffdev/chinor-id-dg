@@ -1,24 +1,27 @@
 // Dashboard-specific JavaScript for Opportuni Platform
 
+// Prevent duplicate initialization
+let DASHBOARD_INIT_STARTED = false;
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize dashboard
+    if (DASHBOARD_INIT_STARTED) return;
+    DASHBOARD_INIT_STARTED = true;
     initializeDashboard();
 });
 
 // Initialize dashboard functionality
 async function initializeDashboard() {
-    console.log('Initializing dashboard...');
+    if (window.DEBUG && window.Logger) Logger.info('Initializing dashboard');
     
     // Case 1: No token at all, redirect to login immediately 
     const token = Utils.storage.get('auth_token');
     if (!token) {
-        console.log('No auth token found, redirecting to login');
+        if (window.DEBUG && window.Logger) Logger.info('No auth token found, redirecting to login');
         window.location.href = '/login.html';
         return;
     }
     
     // Case 2: Token exists, but check if it's invalid
-    console.log('Auth token found, checking validity...');
+    if (window.DEBUG && window.Logger) Logger.info('Auth token found, checking validity');
     
     // Set the token on the API instance explicitly
     api.setToken(token); 
@@ -27,23 +30,23 @@ async function initializeDashboard() {
     try {
         // First see if we already have a user object
         if (auth.getCurrentUser()) {
-            console.log('User already loaded in memory, proceeding with dashboard');
+            if (window.DEBUG && window.Logger) Logger.info('User already loaded in memory, proceeding with dashboard');
             continueInitialization();
             return;
         }
         
         // If not, try loading the profile to validate the token
-        console.log('Attempting to load user profile');
+        if (window.DEBUG && window.Logger) Logger.info('Attempting to load user profile');
         const userProfile = await api.auth.getProfile();
         
         // If we get here, the profile loaded successfully
-        console.log('Profile loaded successfully:', userProfile);
+        if (window.DEBUG && window.Logger) Logger.info('Profile loaded successfully');
         auth.currentUser = userProfile; // Set the user directly
         auth.updateUIForLoggedInUser(); // Update UI
         continueInitialization();
     } catch (error) {
-        console.error('Failed to validate token:', error);
-        console.log('Redirecting to login page');
+        if (window.Logger) Logger.error('Failed to validate token', error);
+        if (window.DEBUG && window.Logger) Logger.info('Redirecting to login page');
         window.location.href = '/login.html';
     }
 }
@@ -51,7 +54,7 @@ async function initializeDashboard() {
 async function continueInitialization() {
     // Check if user is a student
     const user = auth.getCurrentUser();
-    console.log('Current user:', user);
+    if (window.DEBUG && window.Logger) Logger.info('Current user present', { present: !!user, type: user?.user_type });
     
     if (!user) {
         console.error('User object is null but auth check passed');
@@ -79,9 +82,9 @@ async function continueInitialization() {
         setupDashboardInteractions();
         setupResumeUpload();
         
-        console.log('Dashboard fully loaded successfully');
+    if (window.DEBUG && window.Logger) Logger.info('Dashboard fully loaded successfully');
     } catch (error) {
-        console.error('Dashboard initialization error:', error);
+    if (window.Logger) Logger.error('Dashboard initialization error', error);
         showToast('Some dashboard data could not be loaded. Please refresh the page.', 'warning');
     }
 }
@@ -92,7 +95,7 @@ async function loadDashboardData() {
         const stats = await api.students.getDashboardStats();
         updateDashboardStats(stats);
     } catch (error) {
-        console.error('Failed to load dashboard stats:', error);
+        if (window.Logger) Logger.error('Failed to load dashboard stats', error);
         // Show default stats if API fails
         updateDashboardStats({
             total_applications: 0,
@@ -165,7 +168,7 @@ async function loadRecentApplications() {
         const applications = await api.applications.getList({ limit: 5, ordering: '-created_at' });
         displayRecentApplications(applications.results || applications);
     } catch (error) {
-        console.error('Failed to load recent applications:', error);
+        if (window.Logger) Logger.error('Failed to load recent applications', error);
         displayRecentApplications([]);
     }
 }
@@ -181,7 +184,7 @@ function displayRecentApplications(applications) {
                 <i class="fas fa-file-alt text-4xl text-gray-300 mb-4"></i>
                 <h3 class="text-lg font-medium text-gray-900 mb-2">No applications yet</h3>
                 <p class="text-gray-600 mb-4">Start by browsing available opportunities</p>
-                <a href="/opportunities.html" class="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                <a href="/opportunities.html" class="text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105" style="background: var(--brand-primary);">
                     Browse Opportunities
                 </a>
             </div>
@@ -189,26 +192,26 @@ function displayRecentApplications(applications) {
         return;
     }
     
-    container.innerHTML = applications.map(application => `
+    container.innerHTML = Utils.sanitizeHTML(applications.map(application => `
         <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all duration-200">
             <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(124,131,255,0.15);">
                     <i class="fas fa-briefcase text-primary-600"></i>
                 </div>
                 <div>
-                    <h4 class="font-medium text-gray-900">${application.opportunity_title || 'Opportunity'}</h4>
-                    <p class="text-sm text-gray-600">${application.organization_name || 'Organization'}</p>
+                    <h4 class="font-medium text-gray-900">${Utils.escapeHTML(application.opportunity_title || 'Opportunity')}</h4>
+                    <p class="text-sm text-gray-600">${Utils.escapeHTML(application.organization_name || 'Organization')}</p>
                     <p class="text-xs text-gray-500">Applied ${Utils.getRelativeTime(application.created_at)}</p>
                 </div>
             </div>
             <div class="flex items-center space-x-3">
                 ${getStatusBadge(application.status)}
-                <button onclick="viewApplication('${application.id}')" class="text-primary-600 hover:text-primary-700">
+                <button onclick="viewApplication('${Utils.escapeHTML(String(application.id))}')" class="text-primary-600 hover:text-primary-700">
                     <i class="fas fa-external-link-alt"></i>
                 </button>
             </div>
         </div>
-    `).join('');
+    `).join(''));
 }
 
 // Get status badge for application
@@ -229,7 +232,7 @@ async function loadRecommendedOpportunities() {
         const opportunities = await api.opportunities.getList({ limit: 3, featured: true });
         displayRecommendedOpportunities(opportunities.results || opportunities);
     } catch (error) {
-        console.error('Failed to load recommended opportunities:', error);
+        if (window.Logger) Logger.error('Failed to load recommended opportunities', error);
         displayRecommendedOpportunities([]);
     }
 }
@@ -250,11 +253,11 @@ function displayRecommendedOpportunities(opportunities) {
     }
     
     container.innerHTML = opportunities.map(opportunity => `
-        <div class="p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 cursor-pointer" onclick="viewOpportunity('${opportunity.id}')">
-            <h4 class="font-medium text-gray-900 mb-1">${Utils.truncate(opportunity.title, 40)}</h4>
-            <p class="text-sm text-gray-600 mb-2">${opportunity.organization_name}</p>
+        <div class="p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 cursor-pointer" onclick="viewOpportunity('${Utils.escapeHTML(String(opportunity.id))}')">
+            <h4 class="font-medium text-gray-900 mb-1">${Utils.escapeHTML(Utils.truncate(opportunity.title, 40))}</h4>
+            <p class="text-sm text-gray-600 mb-2">${Utils.escapeHTML(opportunity.organization_name)}</p>
             <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full">
-                ${opportunity.opportunity_type}
+                ${Utils.escapeHTML(opportunity.opportunity_type)}
             </span>
         </div>
     `).join('');
@@ -267,7 +270,7 @@ async function loadNotifications() {
         displayNotifications(notifications.results || notifications);
         updateNotificationCount(notifications.length || 0);
     } catch (error) {
-        console.error('Failed to load notifications:', error);
+        if (window.Logger) Logger.error('Failed to load notifications', error);
         displayNotifications([]);
         updateNotificationCount(0);
     }
@@ -288,18 +291,18 @@ function displayNotifications(notifications) {
         return;
     }
     
-    dropdown.innerHTML = notifications.map(notification => `
-        <div class="p-3 hover:bg-gray-50 border-b border-gray-100 cursor-pointer" onclick="markNotificationAsRead('${notification.id}')">
+    dropdown.innerHTML = Utils.sanitizeHTML(notifications.map(notification => `
+        <div class="p-3 hover:bg-gray-50 border-b border-gray-100 cursor-pointer" onclick="markNotificationAsRead('${Utils.escapeHTML(String(notification.id))}')">
             <div class="flex items-start space-x-3">
                 <div class="w-2 h-2 bg-primary-600 rounded-full mt-2 flex-shrink-0"></div>
                 <div class="flex-1">
-                    <p class="text-sm text-gray-900 font-medium">${notification.title}</p>
-                    <p class="text-xs text-gray-600 mt-1">${Utils.truncate(notification.message, 80)}</p>
+                    <p class="text-sm text-gray-900 font-medium">${Utils.escapeHTML(notification.title)}</p>
+                    <p class="text-xs text-gray-600 mt-1">${Utils.escapeHTML(Utils.truncate(notification.message, 80))}</p>
                     <p class="text-xs text-gray-500 mt-1">${Utils.getRelativeTime(notification.created_at)}</p>
                 </div>
             </div>
         </div>
-    `).join('');
+    `).join(''));
 }
 
 // Update notification count
@@ -503,12 +506,12 @@ function showApplicationModal(application) {
     const modal = createModal({
         title: 'Application Details',
         size: 'lg',
-        content: `
+    content: `
             <div class="space-y-6">
                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div>
-                        <h4 class="font-semibold text-gray-900">${application.opportunity_title}</h4>
-                        <p class="text-gray-600">${application.organization_name}</p>
+            <h4 class="font-semibold text-gray-900">${Utils.escapeHTML(application.opportunity_title)}</h4>
+            <p class="text-gray-600">${Utils.escapeHTML(application.organization_name)}</p>
                     </div>
                     ${getStatusBadge(application.status)}
                 </div>
@@ -524,17 +527,17 @@ function showApplicationModal(application) {
                     </div>
                 </div>
                 
-                ${application.cover_letter ? `
+        ${application.cover_letter ? `
                     <div>
                         <h5 class="font-semibold text-gray-900 mb-2">Cover Letter</h5>
-                        <p class="text-gray-700">${application.cover_letter}</p>
+            <p class="text-gray-700">${Utils.escapeHTML(application.cover_letter)}</p>
                     </div>
                 ` : ''}
                 
-                ${application.notes ? `
+        ${application.notes ? `
                     <div>
                         <h5 class="font-semibold text-gray-900 mb-2">Notes</h5>
-                        <p class="text-gray-700">${application.notes}</p>
+            <p class="text-gray-700">${Utils.escapeHTML(application.notes)}</p>
                     </div>
                 ` : ''}
             </div>

@@ -10,22 +10,22 @@ function showToast(message, type = 'info', duration = 5000) {
 
     const toast = Utils.createElement('div', `toast-enter bg-white border-l-4 p-4 rounded-lg shadow-lg max-w-sm ${getToastStyles(type)}`);
     
-    toast.innerHTML = `
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="fas ${getToastIcon(type)} text-lg"></i>
-            </div>
-            <div class="ml-3 flex-1">
-                <p class="text-sm text-gray-900">${message}</p>
-            </div>
-            <div class="ml-4 flex-shrink-0">
-                <button onclick="removeToast(this.parentElement.parentElement)" 
-                        class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-    `;
+    const row = Utils.createElement('div', 'flex items-center');
+    const iconWrap = Utils.createElement('div', 'flex-shrink-0');
+    iconWrap.innerHTML = `<i class="fas ${getToastIcon(type)} text-lg"></i>`;
+    const textWrap = Utils.createElement('div', 'ml-3 flex-1');
+    const textP = Utils.createElement('p', 'text-sm text-gray-900');
+    textP.textContent = String(message);
+    textWrap.appendChild(textP);
+    const closeWrap = Utils.createElement('div', 'ml-4 flex-shrink-0');
+    const btn = Utils.createElement('button', 'text-gray-400 hover:text-gray-600 focus:outline-none');
+    btn.addEventListener('click', () => removeToast(toast));
+    btn.innerHTML = '<i class="fas fa-times"></i>';
+    closeWrap.appendChild(btn);
+    row.appendChild(iconWrap);
+    row.appendChild(textWrap);
+    row.appendChild(closeWrap);
+    toast.appendChild(row);
     
     toastContainer.appendChild(toast);
     
@@ -152,7 +152,7 @@ function createButton(options = {}) {
     };
     
     const typeClasses = {
-        primary: 'bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white',
+        primary: 'text-white',
         secondary: 'bg-white border border-gray-300 hover:bg-gray-50 text-gray-700',
         success: 'bg-green-600 hover:bg-green-700 text-white',
         warning: 'bg-yellow-600 hover:bg-yellow-700 text-white',
@@ -163,6 +163,7 @@ function createButton(options = {}) {
         'button',
         `btn-ripple font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${sizeClasses[size]} ${typeClasses[type]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`
     );
+    if (type === 'primary') button.style.background = 'var(--brand-primary)';
     
     button.innerHTML = `
         ${icon ? `<i class="fas ${icon} ${text ? 'mr-2' : ''}"></i>` : ''}

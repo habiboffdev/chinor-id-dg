@@ -205,7 +205,79 @@ function initializePage() {
 function initializeHomePage() {
     // Add any home page specific functionality
     console.log('Home page initialized');
+    tryRenderShortlist();
+    setupOrgFeatureRotator();
 }
+
+async function tryRenderShortlist() {
+    const listEl = Utils.$('#shortlist-list');
+    if (!listEl) return;
+    
+    // Fetch featured or recent opportunities; fall back to general list
+    let items = [];
+    try {
+        const featured = await api.opportunities.getFeatured();
+        items = Array.isArray(featured?.results) ? featured.results : (Array.isArray(featured) ? featured : []);
+    } catch (e) {
+        Logger.warn('Featured fetch failed, falling back to list');
+    }
+    
+    if (!items.length) {
+        try {
+            const list = await api.opportunities.getList({ limit: 3, ordering: '-created_at' });
+            items = Array.isArray(list?.results) ? list.results : (Array.isArray(list) ? list : []);
+        } catch (e) {
+            Logger.error('List fetch failed', e);
+        }
+    }
+
+    renderShortlist(listEl, items.slice(0, 3));
+}
+
+function renderShortlist(container, items) {
+    // Normalize
+    const arr = Array.isArray(items) ? items : [];
+
+    const cardRow = (title, subtitle, id) => {
+        const safeTitle = Utils.escapeHTML(title || 'Untitled opportunity');
+        const safeSubtitle = Utils.escapeHTML(subtitle || 'Details coming soon');
+        const viewBtn = id ? `<a href="/opportunity-details.html?id=${Utils.escapeHTML(String(id))}" class="btn btn--ghost">View</a>` : `<span class="btn btn--ghost" style="opacity:.6; cursor:not-allowed;">Soon</span>`;
+        return `
+          <div class="card card--hover" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:600;">${safeTitle}</div>
+              <div class="text-muted" style="font-size:14px;">${safeSubtitle}</div>
+            </div>
+            ${viewBtn}
+          </div>`;
+    };
+
+    // If none, show three graceful placeholders
+    if (arr.length === 0) {
+        container.innerHTML = [
+          cardRow('New matches arrive weekly', 'Check back soon or join early access to get personalized matches', null),
+          cardRow('Organizations onboarding', 'Verified partners are publishing new roles', null),
+          cardRow('Your profile boosts matches', 'Create a profile to improve your shortlist quality', null),
+        ].join('');
+        return;
+    }
+
+    // If 1-2 items, fill the rest with placeholders
+    const rows = arr.map(item => {
+        const org = item.organization_name || item.organization || item.org_name || '—';
+        const subtitle = item.deadline ? `Deadline: ${Utils.formatDate(item.deadline)}` : (item.required_skills?.length ? `Matches your skills: ${Utils.escapeHTML(item.required_skills.slice(0,2).join(', '))}` : 'Opportuni pick');
+        return cardRow(`${item.title || 'Opportunity'} — ${org}`, subtitle, item.id);
+    });
+
+    while (rows.length < 3) {
+        rows.push(cardRow('More coming soon', 'We’re curating high-quality opportunities for you', null));
+    }
+
+    container.innerHTML = rows.join('');
+}
+
+// Expose for debugging
+window.tryRenderShortlist = tryRenderShortlist;
 
 // Initialize dashboard
 function initializeDashboard() {
@@ -438,19 +510,19 @@ function displayOpportunitiesMain(opportunities) {
         <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 mb-6">
             <div class="flex justify-between items-start mb-4">
                 <div class="flex-1">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">${opportunity.title}</h3>
-                    <p class="text-gray-600 mb-2">${opportunity.organization_name}</p>
-                    <p class="text-gray-700 mb-4">${Utils.truncate(opportunity.description, 150)}</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">${Utils.escapeHTML(opportunity.title)}</h3>
+                    <p class="text-gray-600 mb-2">${Utils.escapeHTML(opportunity.organization_name)}</p>
+                    <p class="text-gray-700 mb-4">${Utils.escapeHTML(Utils.truncate(opportunity.description, 150))}</p>
                 </div>
                 <div class="ml-4">
-                    ${createBadge(opportunity.opportunity_type, 'primary').outerHTML}
+                    ${createBadge(Utils.escapeHTML(opportunity.opportunity_type), 'primary').outerHTML}
                 </div>
             </div>
             
             <div class="flex items-center justify-between text-sm text-gray-600 mb-4">
                 <div class="flex items-center">
                     <i class="fas fa-map-marker-alt mr-1"></i>
-                    ${opportunity.location}
+                    ${Utils.escapeHTML(opportunity.location)}
                 </div>
                 <div class="flex items-center">
                     <i class="fas fa-calendar mr-1"></i>
@@ -461,11 +533,11 @@ function displayOpportunitiesMain(opportunities) {
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2">
                     ${opportunity.required_skills?.slice(0, 3).map(skill => 
-                        createBadge(skill, 'gray', 'sm').outerHTML
+                        createBadge(Utils.escapeHTML(skill), 'gray', 'sm').outerHTML
                     ).join('') || ''}
                 </div>
-                <button onclick="viewOpportunity('${opportunity.id}')" 
-                        class="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+        <button onclick="viewOpportunity('${Utils.escapeHTML(String(opportunity.id))}')" 
+            class="text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105" style="background: var(--brand-primary);">
                     View Details
                 </button>
             </div>
@@ -552,3 +624,90 @@ window.applyToOpportunity = applyToOpportunity;
 
 // Initialize page-specific functionality when DOM is ready
 document.addEventListener('DOMContentLoaded', initializePage);
+
+// Orgs section: rotate emphasis across features
+function setupOrgFeatureRotator(){
+    const container = document.querySelector('#orgs .org-features');
+    if(!container) return;
+    const items = Array.from(container.querySelectorAll('.org-feature'));
+    if(items.length === 0) return;
+    let i = 0, id;
+
+    const stage = document.querySelector('#orgs .orgs-stage');
+    const dots = Array.from(document.querySelectorAll('#orgs .stage-controls .dot'));
+    const prevBtn = document.querySelector('#orgs .stage-prev');
+    const nextBtn = document.querySelector('#orgs .stage-next');
+    const setActive = (index)=>{
+        items.forEach((el, idx)=>{
+            el.style.outline = idx===index ? '1px solid var(--accent-2)' : '1px solid var(--slate-400)';
+            el.style.boxShadow = idx===index ? '0 0 0 3px rgba(139,92,246,.15)' : 'none';
+        });
+
+        if(stage){
+            const key = items[index]?.dataset?.key;
+            stage.querySelectorAll('.stage').forEach(s=>{
+                const show = s.dataset.key === key;
+                s.style.display = show ? 'block' : 'none';
+                s.setAttribute('aria-hidden', show ? 'false' : 'true');
+                if(show){
+                    // Restart CSS/SVG animations by cloning the SVG node
+                    const svg = s.querySelector('.adv');
+                    if(svg){
+                        const clone = svg.cloneNode(true);
+                        svg.replaceWith(clone);
+                        if(clone.classList.contains('adv--viz')){
+                            // Randomize bar heights for variation
+                            const bars = clone.querySelectorAll('.bars rect');
+                            bars.forEach((b,i)=>{
+                                const h = 40 + Math.floor(Math.random()*70);
+                                b.style.setProperty('--h', h+'px');
+                            });
+                        }
+                    }
+                }
+            });
+        }
+    };
+
+    const step = ()=>{
+        setActive(i);
+        i = (i+1) % items.length;
+    };
+
+    // Start once in view
+    const io = new IntersectionObserver((entries)=>{
+        if(entries.some(e=>e.isIntersecting)){
+            step();
+            if(id) clearInterval(id);
+            id = setInterval(step, 2800);
+            io.disconnect();
+        }
+    }, {threshold:.2});
+    io.observe(container);
+
+    // Pause on hover for UX polish
+    container.addEventListener('mouseenter', ()=> id && clearInterval(id));
+    container.addEventListener('mouseleave', ()=> { id = setInterval(step, 2800); });
+
+        // Controls
+        dots.forEach((d,idx)=>{
+            d.addEventListener('click', ()=>{
+                if(id) clearInterval(id);
+                setActive(idx);
+                // update dots
+                dots.forEach((x,i)=> x.classList.toggle('is-active', i===idx));
+                // resume loop
+                id = setInterval(step, 2800);
+                // realign index to next
+                i = (idx+1) % items.length;
+            });
+        });
+        const nav = (dir)=>{
+            if(id) clearInterval(id);
+            i = (i + (dir===1?0:items.length-2)) % items.length; // adjust so step() shows correct next
+            step();
+            id = setInterval(step, 2800);
+        };
+        prevBtn && prevBtn.addEventListener('click', ()=> nav(-1));
+        nextBtn && nextBtn.addEventListener('click', ()=> nav(1));
+}

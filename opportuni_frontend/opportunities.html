@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opportunities - Opportuni</title>
+    <title>Opportunities — Opportuni</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -44,332 +44,168 @@
         }
     </script>
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.cdnfonts.com" />
+    <link href="https://fonts.cdnfonts.com/css/general-sans" rel="stylesheet" />
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Custom styles -->
+    <!-- Brand theme + components -->
+    <link rel="stylesheet" href="assets/css/theme.css?v=20250817-1" />
+    <link rel="stylesheet" href="assets/css/components.css?v=20250817-1" />
     <link rel="stylesheet" href="assets/css/styles.css">
     
     <style>
-        /* Enhanced Filter Styles */
+        /* Brand-aligned chips and inputs */
         .filter-quick-btn {
-            padding: 0.5rem 1rem;
-            background-color: #f3f4f6;
-            color: #374151;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-            font-weight: 500;
-            border: 1px solid transparent;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.04);
+            color: var(--mist-200);
+            border-radius: 12px;
+            transition: 150ms ease-out;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid var(--slate-400);
             cursor: pointer;
         }
-        
-        .filter-quick-btn:hover {
-            background-color: #dbeafe;
-            color: #1d4ed8;
-        }
-        
-        .filter-quick-btn.active {
-            background-color: #dbeafe;
-            color: #1d4ed8;
-            border-color: #bfdbfe;
-        }
-        
-        .active-filter-tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            background-color: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #bfdbfe;
-        }
-        
-        .active-filter-tag button {
-            margin-left: 0.5rem;
-            color: #2563eb;
-            transition: color 0.2s;
-        }
-        
-        .active-filter-tag button:hover {
-            color: #1e40af;
-        }
-        
-        .search-suggestion-item {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-            color: #374151;
-            cursor: pointer;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        
-        .search-suggestion-item:last-child {
-            border-bottom: none;
-        }
-        
-        .search-suggestion-item:hover {
-            background-color: #eff6ff;
-            color: #1e40af;
-        }
-        
-        .recent-search-tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            background-color: #f3f4f6;
-            color: #374151;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .recent-search-tag:hover {
-            background-color: #e5e7eb;
-        }
-        
-        .skill-tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            background-color: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #bfdbfe;
-        }
-        
-        .skill-tag button {
-            margin-left: 0.5rem;
-            color: #2563eb;
-            transition: color 0.2s;
-        }
-        
-        .skill-tag button:hover {
-            color: #1e40af;
-        }
-        
-        .skill-suggestion {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.875rem;
-            color: #374151;
-            cursor: pointer;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        
-        .skill-suggestion:last-child {
-            border-bottom: none;
-        }
-        
-        .skill-suggestion:hover {
-            background-color: #eff6ff;
-        }
-        
-        .filter-section-loading {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-            background-color: #e5e7eb;
-            height: 2.5rem;
-            border-radius: 0.5rem;
-        }
-        
-        .opportunities-grid, .opportunities-list {
-            transition: all 0.3s;
-        }
-        
-        /* Mobile responsiveness improvements */
-        @media (max-width: 640px) {
-            .filter-quick-btn {
-                padding: 0.5rem 0.75rem;
-                font-size: 0.75rem;
-            }
-            
-            .active-filter-tag {
-                font-size: 0.75rem;
-                padding: 0.25rem 0.5rem;
-            }
-        }
-        
-        /* Animation for filter transitions */
-        .filter-transition {
-            transition: all 0.3s ease-in-out;
-        }
-        
-        /* Loading states */
-        .filter-loading {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        
-        /* Focus indicators for accessibility */
-        .opportunity-filter:focus,
-        #opportunity-search:focus,
-        #skills-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px #3b82f6;
-            border-color: #3b82f6;
-        }
-        
-        /* Custom scrollbar for suggestions */
-        .suggestions-container {
-            scrollbar-width: thin;
-            scrollbar-color: #e5e7eb #f9fafb;
-        }
-        
-        .suggestions-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .suggestions-container::-webkit-scrollbar-track {
-            background: #f9fafb;
-        }
-        
-        .suggestions-container::-webkit-scrollbar-thumb {
-            background: #e5e7eb;
-            border-radius: 3px;
-        }
-        
-        .suggestions-container::-webkit-scrollbar-thumb:hover {
-            background: #d1d5db;
-        }
-        
+        .filter-quick-btn:hover { background: rgba(255,255,255,0.07); border-color: var(--mist-300); }
+        .filter-quick-btn.active { background: rgba(108,99,255,0.18); color: var(--accent-2); border-color: rgba(108,99,255,0.45); }
+
+        .active-filter-tag { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(108,99,255,0.18); color: var(--accent-2); border: 1px solid rgba(108,99,255,0.35); }
+        .active-filter-tag button { margin-left: 6px; color: var(--accent-2); }
+        .active-filter-tag button:hover { filter: brightness(1.1); }
+
+        .search-suggestion-item { padding: 8px 12px; font-size: 0.9rem; color: var(--mist-200); cursor: pointer; border-bottom: 1px solid var(--slate-400); }
+        .search-suggestion-item:last-child { border-bottom: none; }
+        .search-suggestion-item:hover { background: var(--ink-800); color: var(--white-0); }
+
+        .recent-search-tag { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 12px; background: rgba(255,255,255,0.06); color: var(--mist-200); border: 1px solid var(--slate-400); cursor: pointer; }
+        .recent-search-tag:hover { background: rgba(255,255,255,0.08); }
+
+        .skill-tag { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(108,99,255,0.18); color: var(--accent-2); border: 1px solid rgba(108,99,255,0.35); }
+        .skill-tag button { margin-left: 6px; color: var(--accent-2); }
+        .skill-tag button:hover { filter: brightness(1.1); }
+
+        .skill-suggestion { padding: 8px 10px; font-size: 0.9rem; color: var(--mist-200); cursor: pointer; border-bottom: 1px solid var(--slate-400); }
+        .skill-suggestion:last-child { border-bottom: none; }
+        .skill-suggestion:hover { background: var(--ink-800); }
+
+        .filter-section-loading { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; background: var(--ink-800); height: 40px; border-radius: 12px; }
+        .opportunities-grid, .opportunities-list { transition: all 0.25s ease; }
+
+    /* Compact search */
+    .search-input { height: 44px; padding-left: 52px; padding-right: 52px; }
+    .search-icon { left: 0; color: var(--mist-300); z-index: 1; }
+    .search-tools { right: 12px; color: var(--mist-300); z-index: 1; }
+
+        /* Toolbar layout */
+        .results-toolbar { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+    .toolbar-left { display: grid; gap: 10px; }
+    .toolbar-left > .relative { margin-bottom: 6px; }
+        .toolbar-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .toolbar-right { display: flex; gap: 16px; align-items: center; justify-content: flex-end; }
+    #results-count { padding-right: 2px; }
+    .view-toggle { display: inline-flex; gap: 8px; }
+    .view-toggle button { border: 1px solid var(--slate-400); border-radius: 10px; width: 36px; height: 36px; display: grid; place-items: center; color: var(--mist-300); }
+        .view-toggle button.active { background: rgba(108,99,255,0.18); color: var(--accent-2); border-color: rgba(108,99,255,0.45); }
+
+        /* Suggestions scrollbars */
+        .suggestions-container { scrollbar-width: thin; scrollbar-color: var(--slate-400) var(--ink-900); }
+        .suggestions-container::-webkit-scrollbar { width: 6px; }
+        .suggestions-container::-webkit-scrollbar-track { background: var(--ink-900); }
+        .suggestions-container::-webkit-scrollbar-thumb { background: var(--slate-400); border-radius: 3px; }
+    /* Ensure input text sits above background but below tools/icons */
+    .search-input { position: relative; z-index: 3; }
+    /* Suggestions appear over everything else in the search group */
+    #search-suggestions { z-index: 30; }
+
+    /* Ensure dropdowns aren't clipped by nav containers */
+    .brand-nav { position: relative; z-index: 60; overflow: visible; background: var(--ink-900); isolation: isolate; }
+    /* Specificity bump to override global body.theme-opportuni .brand-nav z-index */
+    body.theme-opportuni .brand-nav { z-index: 60 !important; }
+    .nav-inner { position: relative; z-index: 70; }
+    .brand-nav .user-menu { overflow: visible; }
+    .brand-nav .user-menu > .relative { overflow: visible; }
+    /* Explicitly anchor dropdowns below trigger; remove extra margin offsets */
+    .brand-nav .user-menu > .relative > #user-dropdown,
+    .brand-nav .user-menu > .relative > #notifications-dropdown {
+        top: calc(100% + 8px);
+        margin-top: 0 !important;
+    }
+
+        /* Focus ring */
+        .opportunity-filter:focus, #opportunity-search:focus, #skills-input:focus { outline: none; box-shadow: var(--focus-ring); border-color: var(--accent-2); }
+
         /* Pulse animation */
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: .5;
-            }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .toolbar-right { justify-content: stretch; }
+            .results-toolbar { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                        Opportuni
-                    </a>
-                </div>
-                
-                <!-- Navigation Links -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="/dashboard.html" class="text-gray-700 hover:text-primary-600 transition-colors duration-200">Dashboard</a>
-                    <a href="/opportunities.html" class="text-primary-600 font-medium">Opportunities</a>
-                    <a href="/applications.html" class="text-gray-700 hover:text-primary-600 transition-colors duration-200">My Applications</a>
-                    <a href="/profile.html" class="text-gray-700 hover:text-primary-600 transition-colors duration-200">Profile</a>
-                </div>
-                
-                <!-- User Menu -->
-                <div class="flex items-center space-x-4">
-                    <div class="relative">
-                        <button class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200" onclick="toggleUserMenu()">
-                            <img class="user-avatar h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Student&background=3b82f6&color=ffffff" alt="User Avatar">
-                            <span class="user-name font-medium text-gray-900 hidden md:block">Student</span>
-                            <i class="fas fa-chevron-down text-gray-600"></i>
-                        </button>
-                        
-                        <!-- User Dropdown -->
-                        <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                            <div class="py-1">
-                                <a href="/profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-user mr-2"></i>Profile
-                                </a>
-                                <a href="/settings.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-cog mr-2"></i>Settings
-                                </a>
-                                <hr class="my-1">
-                                <button onclick="auth.logout()" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                    <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="theme-opportuni">
+    <!-- Student Navbar (shared component) -->
+    <div id="student-navbar-root"></div>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Discover Opportunities</h1>
-            <p class="text-gray-600">Find internships, scholarships, competitions, and more tailored to your interests.</p>
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold mb-1" style="font-family: var(--font-display);">Opportunities</h1>
+            <p class="text-muted">Search and filter to find your next move.</p>
         </div>
-        
-        <!-- Search and Filters -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <!-- Search Bar with Enhanced Features -->
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Search Opportunities</label>
-                <div class="relative">
-                    <input type="text" 
-                           id="opportunity-search" 
-                           placeholder="Search by title, organization, keywords, skills..." 
-                           class="w-full pl-12 pr-12 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg"
-                           autocomplete="off">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i class="fas fa-search text-gray-400 text-lg"></i>
+
+        <!-- Search + Toolbar (compact) -->
+        <div class="card card--soft p-4 mb-6">
+            <div class="results-toolbar">
+                <div class="toolbar-left">
+                    <div class="relative">
+                        <input type="text" id="opportunity-search" placeholder="Search by title, organization, keywords, skills..." class="w-full input input--line search-input" autocomplete="off" style="padding-left:56px; padding-right:56px;">
+                        <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none search-icon" style="width:40px; justify-content:center;"><i class="fas fa-search"></i></div>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center space-x-2 search-tools">
+                            <button id="advanced-search-btn" onclick="toggleAdvancedFilters()" title="Advanced Filters" class="hover:opacity-90"><i class="fas fa-sliders-h"></i></button>
+                            <button id="clear-search" class="hidden hover:opacity-90" onclick="clearSearch()"><i class="fas fa-times"></i></button>
+                        </div>
+                        <!-- Suggestions -->
+                        <div id="search-suggestions" class="hidden absolute top-full left-0 right-0 rounded-lg shadow-lg mt-1 z-10 max-h-64 overflow-y-auto suggestions-container" style="background: var(--ink-900); border:1px solid var(--slate-400);"></div>
                     </div>
-                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center space-x-2">
-                        <button id="advanced-search-btn" onclick="showAdvancedSearchBuilder()" class="text-gray-400 hover:text-primary-600 transition-colors" title="Advanced Search">
-                            <i class="fas fa-cog"></i>
-                        </button>
-                        <button id="clear-search" class="hidden text-gray-400 hover:text-gray-600 transition-colors" onclick="clearSearch()">
-                            <i class="fas fa-times"></i>
-                        </button>
+                    <div id="recent-searches" class="hidden">
+                        <label class="block text-xs mb-1" style="color: var(--mist-300);">Recent</label>
+                        <div class="toolbar-chips" id="recent-searches-list"></div>
                     </div>
-                    
-                    <!-- Search Suggestions -->
-                    <div id="search-suggestions" class="hidden absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 z-10 max-h-64 overflow-y-auto">
-                        <!-- Dynamic suggestions will be loaded here -->
+                    <div class="toolbar-chips">
+                        <button class="filter-quick-btn" data-filter="deadline" data-value="week" onclick="applyQuickFilter('deadline','week')"><i class="fas fa-clock mr-2"></i>This Week</button>
+                        <button class="filter-quick-btn" data-filter="opportunity_type" data-value="internship" onclick="applyQuickFilter('opportunity_type','internship')"><i class="fas fa-briefcase mr-2"></i>Internships</button>
+                        <button class="filter-quick-btn" data-filter="opportunity_type" data-value="scholarship" onclick="applyQuickFilter('opportunity_type','scholarship')"><i class="fas fa-graduation-cap mr-2"></i>Scholarships</button>
+                        <button class="filter-quick-btn" data-filter="location" data-value="remote" onclick="applyQuickFilter('location','remote')"><i class="fas fa-home mr-2"></i>Remote</button>
+                        <button class="filter-quick-btn" data-filter="featured" data-value="true" onclick="applyQuickFilter('featured','true')"><i class="fas fa-star mr-2"></i>Featured</button>
+                        <button class="filter-quick-btn" onclick="clearAllFilters()"><i class="fas fa-filter mr-2"></i>Clear All</button>
                     </div>
                 </div>
-                
-                <!-- Recent Searches -->
-                <div id="recent-searches" class="hidden mt-3">
-                    <label class="block text-xs font-medium text-gray-500 mb-2">Recent Searches</label>
-                    <div class="flex flex-wrap gap-2" id="recent-searches-list">
-                        <!-- Recent searches will be displayed here -->
+                <div class="toolbar-right">
+                    <span id="results-count" class="text-sm" style="color: var(--mist-300);">Loading…</span>
+                    <div class="view-toggle">
+                        <button onclick="setViewMode('grid')" id="grid-view-btn" class="active"><i class="fas fa-th-large"></i></button>
+                        <button onclick="setViewMode('list')" id="list-view-btn"><i class="fas fa-list"></i></button>
                     </div>
                 </div>
             </div>
-            
-            <!-- Quick Filters -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-                <button class="filter-quick-btn" data-filter="deadline" data-value="week" onclick="applyQuickFilter('deadline', 'week')">
-                    <i class="fas fa-clock mr-2"></i>This Week
-                </button>
-                <button class="filter-quick-btn" data-filter="opportunity_type" data-value="internship" onclick="applyQuickFilter('opportunity_type', 'internship')">
-                    <i class="fas fa-briefcase mr-2"></i>Internships
-                </button>
-                <button class="filter-quick-btn" data-filter="opportunity_type" data-value="scholarship" onclick="applyQuickFilter('opportunity_type', 'scholarship')">
-                    <i class="fas fa-graduation-cap mr-2"></i>Scholarships
-                </button>
-                <button class="filter-quick-btn" data-filter="location" data-value="remote" onclick="applyQuickFilter('location', 'remote')">
-                    <i class="fas fa-home mr-2"></i>Remote
-                </button>
-                <button class="filter-quick-btn" data-filter="featured" data-value="true" onclick="applyQuickFilter('featured', 'true')">
-                    <i class="fas fa-star mr-2"></i>Featured
-                </button>
-                <button class="filter-quick-btn" data-filter="" data-value="" onclick="clearAllFilters()">
-                    <i class="fas fa-filter mr-2"></i>Clear All
-                </button>
-            </div>
-            
-            <!-- Main Filters Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        </div>
+
+        <!-- Filters Panel (lightweight) -->
+        <div class="card card--soft p-4 mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <!-- Type Filter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                    <select name="opportunity_type" class="opportunity-filter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    <label class="block text-sm font-medium mb-2">Type</label>
+                    <select name="opportunity_type" class="opportunity-filter w-full input input--line">
                         <option value="">All Types</option>
                         <option value="internship">Internship</option>
                         <option value="scholarship">Scholarship</option>
@@ -383,17 +219,17 @@
                 
                 <!-- Location Filter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                    <label class="block text-sm font-medium mb-2">Location</label>
                     <input type="text" 
                            name="location" 
                            placeholder="Enter location (e.g., ddd, remote, online)" 
-                           class="opportunity-filter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                           class="opportunity-filter w-full input input--line">
                 </div>
                 
                 <!-- Deadline Filter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Application Deadline</label>
-                    <select name="deadline" class="opportunity-filter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    <label class="block text-sm font-medium mb-2">Application Deadline</label>
+                    <select name="deadline" class="opportunity-filter w-full input input--line">
                         <option value="">Any Time</option>
                         <option value="week">This Week</option>
                         <option value="month">This Month</option>
@@ -403,8 +239,8 @@
                 
                 <!-- Sort Filter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
-                    <select name="sort" class="opportunity-filter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    <label class="block text-sm font-medium mb-2">Sort By</label>
+                    <select name="sort" class="opportunity-filter w-full input input--line">
                         <option value="-created_at">Newest First</option>
                         <option value="application_deadline">Deadline (Earliest)</option>
                         <option value="-application_deadline">Deadline (Latest)</option>
@@ -414,27 +250,23 @@
                     </select>
                 </div>
             </div>
-            
-            <!-- Advanced Filters Toggle -->
-            <div class="border-t border-gray-200 pt-6">
-                <button onclick="toggleAdvancedFilters()" class="flex items-center text-primary-600 hover:text-primary-700 font-medium transition-colors">
+            <div class="border-t mt-4 pt-4" style="border-color: var(--slate-400);">
+                <button id="toggle-advanced-btn" onclick="toggleAdvancedFilters()" class="flex items-center font-medium" style="color: var(--accent-3);">
                     <span id="advanced-filters-text">Show Advanced Filters</span>
                     <i id="advanced-filters-icon" class="fas fa-chevron-down ml-2 transition-transform"></i>
                 </button>
-                
-                <!-- Advanced Filters -->
-                <div id="advanced-filters" class="hidden mt-6 space-y-6">
+                <div id="advanced-filters" class="hidden mt-4 space-y-6">
                     <!-- Skills and Requirements -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Required Skills</label>
+                            <label class="block text-sm font-medium mb-2">Required Skills</label>
                             <div class="relative">
                                 <input type="text" 
                                        name="skills" 
                                        id="skills-input"
                                        placeholder="Type skills (e.g., JavaScript, Python, Design...)" 
-                                       class="opportunity-filter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                <div id="skills-suggestions" class="hidden absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 z-10 max-h-32 overflow-y-auto">
+                                       class="opportunity-filter w-full input input--line">
+                                <div id="skills-suggestions" class="hidden absolute top-full left-0 right-0 rounded-lg shadow-lg mt-1 z-10 max-h-32 overflow-y-auto suggestions-container" style="background: var(--ink-900); border:1px solid var(--slate-400);">
                                     <!-- Skills suggestions -->
                                 </div>
                             </div>
@@ -444,8 +276,8 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Organization Type</label>
-                            <select name="organization_type" class="opportunity-filter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <label class="block text-sm font-medium mb-2">Organization Type</label>
+                            <select name="organization_type" class="opportunity-filter w-full input input--line">
                                 <option value="">Any Organization</option>
                                 <option value="startup">Startup</option>
                                 <option value="corporation">Corporation</option>
@@ -457,10 +289,10 @@
                     </div>
                     
                     <!-- Additional Filters -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Minimum GPA</label>
-                            <select name="min_gpa" class="opportunity-filter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <label class="block text-sm font-medium mb-2">Minimum GPA</label>
+                            <select name="min_gpa" class="opportunity-filter w-full input input--line">
                                 <option value="">No Requirement</option>
                                 <option value="2.0">2.0+</option>
                                 <option value="2.5">2.5+</option>
@@ -471,8 +303,8 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Duration</label>
-                            <select name="duration" class="opportunity-filter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <label class="block text-sm font-medium mb-2">Duration</label>
+                            <select name="duration" class="opportunity-filter w-full input input--line">
                                 <option value="">Any Duration</option>
                                 <option value="short">Short-term (< 3 months)</option>
                                 <option value="medium">Medium-term (3-6 months)</option>
@@ -481,8 +313,8 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Compensation</label>
-                            <select name="compensation" class="opportunity-filter w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <label class="block text-sm font-medium mb-2">Compensation</label>
+                            <select name="compensation" class="opportunity-filter w-full input input--line">
                                 <option value="">Any</option>
                                 <option value="paid">Paid</option>
                                 <option value="unpaid">Unpaid</option>
@@ -493,53 +325,22 @@
                     
                     <!-- Saved Filters -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Saved Filter Sets</label>
+                        <label class="block text-sm font-medium mb-2">Saved Filter Sets</label>
                         <div class="flex items-center space-x-4">
-                            <select id="saved-filters" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <select id="saved-filters" class="flex-1 input input--line">
                                 <option value="">Select a saved filter set...</option>
                                 <!-- Saved filters will be loaded here -->
                             </select>
-                            <button onclick="saveCurrentFilters()" class="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                            <button onclick="saveCurrentFilters()" class="btn btn--outline">
                                 <i class="fas fa-save mr-2"></i>Save Current
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Filter Actions and Results -->
-            <div class="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="flex flex-wrap items-center gap-4">
-                    <!-- Active Filters Display -->
-                    <div id="active-filters" class="flex flex-wrap gap-2">
-                        <!-- Active filters will be displayed here -->
-                    </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        <button onclick="clearAllFilters()" class="text-gray-600 hover:text-gray-800 font-medium transition-colors">
-                            <i class="fas fa-times mr-1"></i>Clear All Filters
-                        </button>
-                        <button onclick="debugOpportunities()" class="text-xs text-gray-400 hover:text-primary-600 transition-colors" title="Debug Opportunities">
-                            <i class="fas fa-bug mr-1"></i> Debug
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <!-- Results Count -->
-                    <div class="flex items-center space-x-4">
-                        <span id="results-count" class="text-sm text-gray-600 whitespace-nowrap">Loading...</span>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-sm text-gray-600">View:</span>
-                            <button onclick="setViewMode('grid')" id="grid-view-btn" class="p-2 rounded-lg bg-primary-100 text-primary-600 transition-colors">
-                                <i class="fas fa-th-large"></i>
-                            </button>
-                            <button onclick="setViewMode('list')" id="list-view-btn" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-list"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <!-- Active filters row -->
+            <div class="mt-4">
+                <div id="active-filters" class="flex flex-wrap gap-2"></div>
             </div>
         </div>
         
@@ -547,58 +348,58 @@
         <div id="opportunities-container" class="opportunities-grid">
             <!-- Loading skeleton -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="loading-skeleton">
-                <div class="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+                <div class="card card--soft animate-pulse">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex-1">
-                            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                            <div class="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-                            <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
-                            <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+                            <div class="h-4 rounded w-3/4 mb-2" style="background: var(--ink-800);"></div>
+                            <div class="h-3 rounded w-1/2 mb-4" style="background: var(--ink-800);"></div>
+                            <div class="h-3 rounded w-full mb-2" style="background: var(--ink-800);"></div>
+                            <div class="h-3 rounded w-2/3" style="background: var(--ink-800);"></div>
                         </div>
-                        <div class="w-16 h-6 bg-gray-200 rounded-full"></div>
+                        <div class="w-16 h-6 rounded-full" style="background: var(--ink-800);"></div>
                     </div>
                     <div class="flex justify-between items-center">
                         <div class="flex space-x-2">
-                            <div class="w-12 h-5 bg-gray-200 rounded-full"></div>
-                            <div class="w-16 h-5 bg-gray-200 rounded-full"></div>
+                            <div class="w-12 h-5 rounded-full" style="background: var(--ink-800);"></div>
+                            <div class="w-16 h-5 rounded-full" style="background: var(--ink-800);"></div>
                         </div>
-                        <div class="w-20 h-8 bg-gray-200 rounded"></div>
+                        <div class="w-20 h-8 rounded" style="background: var(--ink-800);"></div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+                <div class="card card--soft animate-pulse">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex-1">
-                            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                            <div class="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-                            <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
-                            <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+                            <div class="h-4 rounded w-3/4 mb-2" style="background: var(--ink-800);"></div>
+                            <div class="h-3 rounded w-1/2 mb-4" style="background: var(--ink-800);"></div>
+                            <div class="h-3 rounded w-full mb-2" style="background: var(--ink-800);"></div>
+                            <div class="h-3 rounded w-2/3" style="background: var(--ink-800);"></div>
                         </div>
-                        <div class="w-16 h-6 bg-gray-200 rounded-full"></div>
+                        <div class="w-16 h-6 rounded-full" style="background: var(--ink-800);"></div>
                     </div>
                     <div class="flex justify-between items-center">
                         <div class="flex space-x-2">
-                            <div class="w-12 h-5 bg-gray-200 rounded-full"></div>
-                            <div class="w-16 h-5 bg-gray-200 rounded-full"></div>
+                            <div class="w-12 h-5 rounded-full" style="background: var(--ink-800);"></div>
+                            <div class="w-16 h-5 rounded-full" style="background: var(--ink-800);"></div>
                         </div>
-                        <div class="w-20 h-8 bg-gray-200 rounded"></div>
+                        <div class="w-20 h-8 rounded" style="background: var(--ink-800);"></div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+                <div class="card card--soft animate-pulse">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex-1">
-                            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                            <div class="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-                            <div class="h-3 bg-gray-200 rounded w-full mb-2"></div>
-                            <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+                            <div class="h-4 rounded w-3/4 mb-2" style="background: var(--ink-800);"></div>
+                            <div class="h-3 rounded w-1/2 mb-4" style="background: var(--ink-800);"></div>
+                            <div class="h-3 rounded w-full mb-2" style="background: var(--ink-800);"></div>
+                            <div class="h-3 rounded w-2/3" style="background: var(--ink-800);"></div>
                         </div>
-                        <div class="w-16 h-6 bg-gray-200 rounded-full"></div>
+                        <div class="w-16 h-6 rounded-full" style="background: var(--ink-800);"></div>
                     </div>
                     <div class="flex justify-between items-center">
                         <div class="flex space-x-2">
-                            <div class="w-12 h-5 bg-gray-200 rounded-full"></div>
-                            <div class="w-16 h-5 bg-gray-200 rounded-full"></div>
+                            <div class="w-12 h-5 rounded-full" style="background: var(--ink-800);"></div>
+                            <div class="w-16 h-5 rounded-full" style="background: var(--ink-800);"></div>
                         </div>
-                        <div class="w-20 h-8 bg-gray-200 rounded"></div>
+                        <div class="w-20 h-8 rounded" style="background: var(--ink-800);"></div>
                     </div>
                 </div>
             </div>
@@ -688,6 +489,7 @@
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/components.js"></script>
     <script src="assets/js/main.js"></script>
+    <script src="assets/js/navbar.js"></script>
     <script src="assets/js/opportunities.js"></script>
 </body>
 </html>

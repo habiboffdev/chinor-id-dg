@@ -8,17 +8,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+<body class="min-h-screen" style="background: var(--ink-900);">
     <!-- Navigation -->
     <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <a href="dashboard.html" class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--brand-primary);">
                             <i class="fas fa-graduation-cap text-white text-sm"></i>
                         </div>
-                        <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Opportuni</span>
+                        <span class="text-xl font-bold" style="color: var(--accent-2);">Opportuni</span>
                     </a>
                 </div>
                 
@@ -30,7 +30,7 @@
                     
                     <div class="relative">
                         <button id="userMenuBtn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: var(--brand-primary);">
                                 <i class="fas fa-building text-white text-sm"></i>
                             </div>
                             <span id="orgName" class="text-gray-700 font-medium">Organization</span>
@@ -70,7 +70,7 @@
         <!-- Profile Form -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <!-- Form Header -->
-            <div class="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200" style="background: var(--ink-800);">
                 <h2 class="text-lg font-semibold text-gray-900">Organization Information</h2>
                 <p class="text-sm text-gray-600 mt-1">Update your organization details and preferences</p>
             </div>
@@ -201,7 +201,7 @@
                         Cancel
                     </button>
                     <button type="submit" id="saveBtn" 
-                            class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center">
+                            class="px-6 py-2 text-white rounded-lg transition-all duration-200 flex items-center" style="background: var(--brand-primary);">
                         <span>Save Changes</span>
                         <i class="fas fa-save ml-2"></i>
                     </button>

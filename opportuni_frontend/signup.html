@@ -71,106 +71,125 @@
         };
     </script>
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- Brand theme & components -->
+        <link rel="stylesheet" href="assets/css/theme.css?v=20250816-1" />
+        <link rel="stylesheet" href="assets/css/components.css?v=20250816-1" />
+    <link rel="stylesheet" href="assets/css/styles.css?v=20250817-1" />
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
-    <!-- Header -->
-    <header class="bg-white shadow-md">
-        <div class="container mx-auto flex justify-between items-center py-4 px-6">
-            <a href="index.html" class="flex items-center gap-2">
-                <img src="assets/images/logo.png" alt="Opportuni Logo" class="h-10">
-                <span class="text-2xl font-bold text-primary-600">Opportuni</span>
-            </a>
-            <nav>
-                <ul class="flex items-center space-x-6">
-                    <li><a href="index.html" class="text-gray-600 hover:text-primary-600 transition-colors duration-200">Home</a></li>
-                    <li><a href="login.html" class="text-white bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-md transition-colors duration-200">Sign In</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="flex-grow flex items-center justify-center py-12 px-6">
-        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-8 animate-fade-in">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">Create Your Account</h1>
-                <p class="text-gray-600">Join the Opportuni community</p>
+<body class="theme-opportuni overflow-x-hidden">
+        <!-- Header (brand) -->
+        <header class="brand-nav fixed w-full top-0 z-50">
+            <div class="container nav">
+                <a class="text-2xl font-bold brand-wordmark" href="index.html">Opportuni</a>
+                <nav class="hidden md:flex nav-links gap-2">
+                    <a href="index.html#features">Features</a>
+                    <a href="index.html#how">How it works</a>
+                    <a href="signup.html?type=organization">For organizations</a>
+                </nav>
+                <div class="hidden md:flex nav-ctas gap-2">
+                    <a href="login.html" class="btn btn--ghost">Sign in</a>
+                </div>
+                <button class="md:hidden btn btn--ghost" onclick="toggleMobileMenu()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
             </div>
-            
-            <div class="mb-8 flex justify-center">
-                <div class="inline-flex rounded-md shadow-sm" role="group">
-                    <button type="button" onclick="switchUserType('student')" id="btn-student"
-                            class="px-6 py-3 text-sm font-medium rounded-l-lg bg-primary-600 text-white hover:bg-primary-700 focus:z-10 focus:ring-2 focus:ring-primary-500">
-                        Student
-                    </button>
-                    <button type="button" onclick="switchUserType('organization')" id="btn-organization"
-                            class="px-6 py-3 text-sm font-medium rounded-r-lg bg-gray-200 text-gray-700 hover:bg-gray-300 focus:z-10 focus:ring-2 focus:ring-primary-500">
-                        Organization
-                    </button>
+            <div id="mobile-menu" class="md:hidden hidden" style="border-top:1px solid var(--slate-400); background: var(--ink-900);">
+                <div class="container py-3" style="display:grid; gap:8px;">
+                    <a href="index.html#features">Features</a>
+                    <a href="index.html#how">How it works</a>
+                    <a href="signup.html?type=organization">For organizations</a>
+                    <div style="display:flex; gap:8px; margin-top:8px;">
+                        <a href="login.html" class="btn btn--ghost" style="flex:1;">Sign in</a>
+                    </div>
                 </div>
             </div>
-            
-            <form id="signup-form" class="space-y-6" data-user-type="student">
-                <div id="student-fields" class="space-y-6">
-                    <div class="form-group">
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                        <input type="text" id="name" name="name" required 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+        </header>
+
+        <!-- Layout -->
+        <main class="auth-shell">
+          <div class="container auth-center">
+            <section style="width:100%; max-width:560px;">
+                <div class="card">
+                <h2 class="mb-2">Create your account</h2>
+                    <p class="text-muted mb-6">Choose your account type and fill in the details.</p>
+
+                    <div class="mb-6 segmented">
+                        <button type="button" onclick="switchUserType('student')" id="btn-student" class="btn btn--secondary">Student</button>
+                        <button type="button" onclick="switchUserType('organization')" id="btn-organization" class="btn btn--ghost">Organization</button>
                     </div>
+
+                <form id="signup-form" class="space-y-5" data-user-type="student">
+                                                <div id="student-fields" class="space-y-6">
+                                                        <div class="field float">
+                                                                <div class="with-icon float-wrap">
+                                                                    <i class="icon fas fa-user"></i>
+                                                                    <input type="text" id="name" name="name" required class="input input--line" placeholder=" ">
+                                                                    <label for="name" class="float-label">Full Name</label>
+                                                                </div>
+                                                        </div>
                     
-                    <div class="form-group">
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input type="email" id="email" name="email" required 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                    </div>
+                                                        <div class="field float">
+                                                                <div class="with-icon float-wrap">
+                                                                    <i class="icon fas fa-envelope"></i>
+                                                                    <input type="email" id="email" name="email" required class="input input--line" placeholder=" " autocomplete="email">
+                                                                    <label for="email" class="float-label">Email</label>
+                                                                </div>
+                                                        </div>
                 </div>
                 
                 <div id="organization-fields" class="space-y-6 hidden">
-                    <div class="form-group">
-                        <label for="org-name" class="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>
-                        <input type="text" id="org-name" name="org_name" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                    </div>
+                                                            <div class="field float">
+                                                                    <div class="with-icon float-wrap">
+                                                                        <i class="icon fas fa-building"></i>
+                                                                        <input type="text" id="org-name" name="org_name" class="input input--line" placeholder=" ">
+                                                                        <label for="org-name" class="float-label">Organization Name</label>
+                                                                    </div>
+                                                            </div>
                     
-                    <div class="form-group">
-                        <label for="org-email" class="block text-sm font-medium text-gray-700 mb-2">Organization Email</label>
-                        <input type="email" id="org-email" name="org_email" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                    </div>
+                                                            <div class="field float">
+                                                                    <div class="with-icon float-wrap">
+                                                                        <i class="icon fas fa-at"></i>
+                                                                        <input type="email" id="org-email" name="org_email" class="input input--line" placeholder=" ">
+                                                                        <label for="org-email" class="float-label">Organization Email</label>
+                                                                    </div>
+                                                            </div>
                     
-                    <div class="form-group">
-                        <label for="org-type" class="block text-sm font-medium text-gray-700 mb-2">Organization Type</label>
-                        <select id="org-type" name="org_type" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                            <option value="">Select Organization Type</option>
+                                        <div class="field float">
+                                                <div class="select-wrap with-icon float-wrap">
+                                                    <i class="icon fas fa-layer-group"></i>
+                                                    <select id="org-type" name="org_type" class="input input--line" data-has-value="false" onchange="this.setAttribute('data-has-value', this.value ? 'true' : 'false')" oninput="this.setAttribute('data-has-value', this.value ? 'true' : 'false')">
+                                                        <option value="" disabled hidden selected>Select Organization Type</option>
                             <option value="university">University</option>
                             <option value="company">Company</option>
                             <option value="non-profit">Non-Profit Organization</option>
                             <option value="government">Government Agency</option>
                             <option value="other">Other</option>
-                        </select>
-                    </div>
+                                                    </select>
+                                                    <span class="select-chevron"><i class="fas fa-chevron-down"></i></span>
+                                                    <label for="org-type" class="float-label">Organization Type</label>
+                                                </div>
+                                        </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                    <div class="relative">
-                        <input type="password" id="password" name="password" required 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <div class="field float">
+                    <div class="relative float-wrap">
+                        <input type="password" id="password" name="password" required class="input input--line" placeholder=" ">
+                        <label for="password" class="float-label">Password</label>
                         <button type="button" onclick="togglePassword(this)" 
                                 class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
+                    <div class="strength" id="pwdStrength" aria-hidden="true">
+                      <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+                    </div>
+                    <div class="strength-label" id="pwdStrengthLabel"></div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-                    <div class="relative">
-                        <input type="password" id="confirm-password" name="confirm_password" required 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <div class="field float">
+                    <div class="relative float-wrap">
+                        <input type="password" id="confirm-password" name="confirm_password" required class="input input--line" placeholder=" ">
+                        <label for="confirm-password" class="float-label">Confirm Password</label>
                         <button type="button" onclick="togglePassword(this)" 
                                 class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
                             <i class="fas fa-eye"></i>
@@ -180,51 +199,43 @@
                 
                 <div class="flex items-start">
                     <div class="flex items-center h-5">
-                        <input type="checkbox" id="terms" name="terms" required class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        <input type="checkbox" id="terms" name="terms" required class="checkbox">
                     </div>
-                    <label for="terms" class="ml-2 text-sm text-gray-600">
-                        I agree to the <a href="#" class="text-primary-600 hover:text-primary-500">Terms of Service</a> and 
-                        <a href="#" class="text-primary-600 hover:text-primary-500">Privacy Policy</a>
+                    <label for="terms" class="ml-2 text-sm" style="color: var(--mist-200);">
+                        I agree to the <a href="#" style="color: var(--accent-2);">Terms of Service</a> and 
+                        <a href="#" style="color: var(--accent-2);">Privacy Policy</a>
                     </label>
                 </div>
-                
-                <button type="submit" 
-                        class="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
-                    Create Account
-                </button>
-            </form>
-            
-            <div class="mt-6 text-center">
-                <p class="text-gray-600">
-                    Already have an account? 
-                    <a href="login.html" class="text-primary-600 hover:text-primary-500 font-semibold">
-                        Sign in
-                    </a>
-                </p>
+                    <button type="submit" class="btn btn--secondary btn--lg w-full">Create Account</button>
+                </form>
+                                <div class="auth-divider" style="color: var(--mist-300);">or</div>
+                                <p class="text-center" style="color: var(--mist-200);">Already have an account? <a href="login.html" style="color: var(--accent-2); font-weight:600;">Sign in</a></p>
             </div>
-        </div>
-    </main>
+                </section>
+            </div>
+        </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8">
-        <div class="container mx-auto px-6">
-            <div class="text-center">
-                <p class="text-gray-400 text-sm">
-                    © 2025 Opportuni. All rights reserved.
-                </p>
-                <div class="mt-4 flex justify-center space-x-6">
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Privacy Policy</a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Terms of Service</a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Contact Us</a>
+        <!-- Footer -->
+        <footer class="footer section">
+            <div class="container">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-sm">© 2025 Opportuni. All rights reserved.</p>
+                    <div class="text-sm mt-2 md:mt-0" style="display:flex; gap:16px;">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Contact</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </footer>
+        </footer>
 
-    <!-- Toast Notifications Container -->
+        <!-- Toast Notifications Container -->
     <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2"></div>
 
     <!-- Scripts -->
+        <script>
+            function toggleMobileMenu(){var m=document.getElementById('mobile-menu'); if(!m) return; m.classList.toggle('hidden');}
+        </script>
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
@@ -234,6 +245,19 @@
             // Set up the signup form
             const signupForm = document.getElementById('signup-form');
             if (signupForm) {
+                // Select placeholder/value color handling
+                const orgTypeEl = document.getElementById('org-type');
+                if (orgTypeEl) {
+                    const updateSelectState = () => orgTypeEl.setAttribute('data-has-value', orgTypeEl.value ? 'true' : 'false');
+                    // Initial paint
+                    updateSelectState();
+                    // Keep state synced across browsers
+                    orgTypeEl.addEventListener('change', updateSelectState);
+                    orgTypeEl.addEventListener('input', updateSelectState);
+                    orgTypeEl.addEventListener('blur', updateSelectState);
+                    // Expose for other handlers
+                    window.__updateOrgTypeState = updateSelectState;
+                }
                 signupForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     
@@ -312,6 +336,31 @@
                         submitBtn.innerHTML = originalBtnText;
                     }
                 });
+
+                // Password strength meter
+                const pwd = document.getElementById('password');
+                const strength = document.getElementById('pwdStrength');
+                const strengthLabel = document.getElementById('pwdStrengthLabel');
+                if (pwd && strength && strengthLabel) {
+                    const segs = Array.from(strength.querySelectorAll('.seg'));
+                    const calc = (v) => {
+                        let s = 0;
+                        if (v.length >= 8) s++;
+                        if (/[A-Z]/.test(v)) s++;
+                        if (/[0-9]/.test(v)) s++;
+                        if (/[^A-Za-z0-9]/.test(v)) s++;
+                        return s;
+                    };
+                    const label = (s) => ['Very weak','Weak','Good','Strong'][Math.max(s-1,0)] || '';
+                    const paint = (s) => {
+                        segs.forEach((seg,i)=>{
+                            seg.className = 'seg' + (i===0 && s>=1?' active-1':'') + (i===1 && s>=2?' active-2':'') + (i===2 && s>=3?' active-3':'') + (i===3 && s>=4?' active-4':'');
+                        });
+                        strengthLabel.textContent = s?label(s):'';
+                        strength.setAttribute('aria-hidden', s? 'false':'true');
+                    };
+                    pwd.addEventListener('input', e => paint(calc(e.target.value)));
+                }
             }
         });
 
@@ -330,7 +379,7 @@
         }
         
         // User type switcher
-        function switchUserType(type) {
+    function switchUserType(type) {
             const form = document.getElementById('signup-form');
             const studentFields = document.getElementById('student-fields');
             const orgFields = document.getElementById('organization-fields');
@@ -341,10 +390,10 @@
                 form.setAttribute('data-user-type', 'student');
                 studentFields.classList.remove('hidden');
                 orgFields.classList.add('hidden');
-                studentBtn.classList.remove('bg-gray-200', 'text-gray-700');
-                studentBtn.classList.add('bg-primary-600', 'text-white');
-                orgBtn.classList.remove('bg-primary-600', 'text-white');
-                orgBtn.classList.add('bg-gray-200', 'text-gray-700');
+        studentBtn.classList.add('btn--secondary');
+        studentBtn.classList.remove('btn--ghost');
+        orgBtn.classList.remove('btn--secondary');
+        orgBtn.classList.add('btn--ghost');
                 
                 // Toggle required attributes
                 document.getElementById('name').required = true;
@@ -356,17 +405,20 @@
                 form.setAttribute('data-user-type', 'organization');
                 studentFields.classList.add('hidden');
                 orgFields.classList.remove('hidden');
-                studentBtn.classList.remove('bg-primary-600', 'text-white');
-                studentBtn.classList.add('bg-gray-200', 'text-gray-700');
-                orgBtn.classList.remove('bg-gray-200', 'text-gray-700');
-                orgBtn.classList.add('bg-primary-600', 'text-white');
+        studentBtn.classList.remove('btn--secondary');
+        studentBtn.classList.add('btn--ghost');
+        orgBtn.classList.remove('btn--ghost');
+        orgBtn.classList.add('btn--secondary');
                 
                 // Toggle required attributes
                 document.getElementById('name').required = false;
                 document.getElementById('email').required = false;
                 document.getElementById('org-name').required = true;
                 document.getElementById('org-email').required = true;
-                document.getElementById('org-type').required = true;
+                const s = document.getElementById('org-type');
+                s.required = true;
+                // Refresh select state so text color shows correctly when switching
+                if (window.__updateOrgTypeState) window.__updateOrgTypeState();
             }
         }
         

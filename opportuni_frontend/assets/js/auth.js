@@ -28,20 +28,26 @@ class AuthManager {
             try {
                 // Make sure the token is set in the API instance first
                 api.setToken(token);
-                this.currentUser = await api.auth.getProfile();
-                this.updateUIForLoggedInUser();
-                console.log('Successfully loaded user profile:', this.currentUser);
+        this.currentUser = await api.auth.getProfile();
+        this.updateUIForLoggedInUser();
+        Logger.info('Successfully loaded user profile');
             } catch (error) {
-                console.error('Failed to load user profile:', error, error.stack);
+        Logger.error('Failed to load user profile', error);
                 // Don't log out immediately, retry once more after a small delay
                 setTimeout(async () => {
                     try {
                         this.currentUser = await api.auth.getProfile();
                         this.updateUIForLoggedInUser();
-                        console.log('Successfully loaded user profile on retry:', this.currentUser);
+            Logger.info('Successfully loaded user profile on retry');
                     } catch (retryError) {
-                        console.error('Failed to load user profile after retry:', retryError);
-                        this.logout();
+            Logger.error('Failed to load user profile after retry', retryError);
+                        // Do NOT force logout here. Keep tokens and allow
+                        // protected pages to gate via requireAuth(). This avoids
+                        // logging the user out when the profile endpoint is
+                        // temporarily unavailable or slow on the landing page.
+                        this.currentUser = null;
+                        // Optionally flag a stale profile state for later UI use
+                        try { Utils.storage.set('auth_profile_stale', true); } catch {}
                     }
                 }, 1000);
             }
@@ -57,7 +63,7 @@ class AuthManager {
                 try {
                     await api.auth.refresh(refreshToken);
                 } catch (error) {
-                    console.error('Token refresh failed:', error);
+                    Logger.error('Token refresh failed', error);
                     this.logout();
                 }
             }, 14 * 60 * 1000);
@@ -69,9 +75,8 @@ class AuthManager {
         // Check for token first - this is the primary indicator of being logged in
         const hasToken = Utils.storage.get('auth_token') !== null;
         
-        // Log both conditions to help debug
-        console.log('isLoggedIn check - hasToken:', hasToken);
-        console.log('isLoggedIn check - hasCurrentUser:', this.currentUser !== null);
+    // Log both conditions to help debug
+    if (window.DEBUG) Logger.info('isLoggedIn check', { hasToken, hasCurrentUser: this.currentUser !== null });
         
         // Return true if we have a token, don't require currentUser to be loaded yet
         // This fixes the circular dependency where we need isLoggedIn to load the profile
@@ -96,13 +101,13 @@ class AuthManager {
             
             // Make sure token is set in API instance
             api.setToken(response.access);
-            if (window.DEBUG) console.log('Token set after login');
+            if (window.DEBUG) Logger.info('Token set after login');
             
             // Load user profile with a small delay to ensure token is properly set
         setTimeout(async () => {
                 try {
-                    this.currentUser = await api.auth.getProfile();
-            if (window.DEBUG) console.log('Profile loaded');
+            this.currentUser = await api.auth.getProfile();
+        if (window.DEBUG) Logger.info('Profile loaded');
                     
                     // Update UI
                     this.updateUIForLoggedInUser();
@@ -110,14 +115,14 @@ class AuthManager {
                     // Redirect to appropriate dashboard
                     this.redirectToDashboard();
                 } catch (profileError) {
-                    console.error('Failed to load profile after login:', profileError);
+                    Logger.error('Failed to load profile after login', profileError);
                     showToast('Login successful, but failed to load profile. Please refresh the page.', 'warning');
                 }
             }, 300);
             
             showToast('Welcome back!', 'success');
             return response;
-        } catch (error) {
+    } catch (error) {
             showToast(error.message || 'Login failed. Please try again.', 'error');
             throw error;
         } finally {
@@ -155,7 +160,7 @@ class AuthManager {
         try {
             await api.auth.logout();
         } catch (error) {
-            console.error('Logout API call failed:', error);
+            Logger.error('Logout API call failed', error);
         } finally {
             // Clear local data
             this.currentUser = null;
@@ -226,25 +231,25 @@ class AuthManager {
 
     // Redirect to appropriate dashboard
     redirectToDashboard() {
-    if (window.DEBUG) console.log('redirectToDashboard called');
+    if (window.DEBUG) Logger.info('redirectToDashboard called');
         
         if (!this.currentUser) {
-            console.error('Cannot redirect: currentUser is null');
-            console.log('Will attempt to load user first...');
+            Logger.error('Cannot redirect: currentUser is null');
+            if (window.DEBUG) Logger.info('Will attempt to load user first...');
             
             // Try to load user and then redirect
             this.waitForUser().then(user => {
                 if (user) {
-            if (window.DEBUG) console.log('User loaded, now redirecting...');
+            if (window.DEBUG) Logger.info('User loaded, now redirecting...');
                     this.redirectToDashboard();
                 } else {
-                    console.error('Failed to load user for redirect');
+                    Logger.error('Failed to load user for redirect');
                 }
             });
             return;
         }
         
-    if (window.DEBUG) console.log('Redirecting user type:', this.currentUser.user_type);
+    if (window.DEBUG) Logger.info('Redirecting user type', { user_type: this.currentUser.user_type });
         
         // Use a small delay to ensure any pending operations complete
         setTimeout(() => {
@@ -272,8 +277,7 @@ class AuthManager {
 
     // Require authentication for certain pages
     requireAuth() {
-        console.log('requireAuth check - isLoggedIn:', this.isLoggedIn());
-        console.log('Current user from requireAuth:', this.currentUser);
+    if (window.DEBUG) Logger.info('requireAuth check', { isLoggedIn: this.isLoggedIn(), hasUser: !!this.currentUser });
         
         if (!this.isLoggedIn()) {
             // Store the current page for redirect after login
@@ -352,14 +356,14 @@ function showLoginModal() {
         // Add a debugging message
         modal.setAttribute('data-debug', 'Login modal added: ' + new Date().toISOString());
     } catch (error) {
-        console.error('Error in showLoginModal:', error);
+        Logger.error('Error in showLoginModal', error);
         const errorModal = document.createElement('div');
         errorModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
-        errorModal.innerHTML = `
+    errorModal.innerHTML = `
             <div class="bg-white rounded-lg p-6 max-w-md w-full">
                 <h3 class="text-xl font-bold text-red-600">Error Loading Modal</h3>
-                <p class="my-4">${error.message}</p>
-                <pre class="bg-gray-100 p-2 text-xs overflow-auto max-h-60">${error.stack}</pre>
+        <p class="my-4">${Utils.escapeHTML(error.message)}</p>
+        <pre class="bg-gray-100 p-2 text-xs overflow-auto max-h-60">${Utils.escapeHTML(String(error.stack || ''))}</pre>
                 <button onclick="this.closest('.fixed').remove()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Close</button>
             </div>
         `;
@@ -374,14 +378,14 @@ function showRegisterModal(userType = null) {
         // Add a debugging message
         modal.setAttribute('data-debug', 'Register modal added: ' + new Date().toISOString());
     } catch (error) {
-        console.error('Error in showRegisterModal:', error);
+        Logger.error('Error in showRegisterModal', error);
         const errorModal = document.createElement('div');
         errorModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
-        errorModal.innerHTML = `
+    errorModal.innerHTML = `
             <div class="bg-white rounded-lg p-6 max-w-md w-full">
                 <h3 class="text-xl font-bold text-red-600">Error Loading Modal</h3>
-                <p class="my-4">${error.message}</p>
-                <pre class="bg-gray-100 p-2 text-xs overflow-auto max-h-60">${error.stack}</pre>
+        <p class="my-4">${Utils.escapeHTML(error.message)}</p>
+        <pre class="bg-gray-100 p-2 text-xs overflow-auto max-h-60">${Utils.escapeHTML(String(error.stack || ''))}</pre>
                 <button onclick="this.closest('.fixed').remove()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Close</button>
             </div>
         `;
@@ -401,24 +405,24 @@ function createModal(type, options = {}) {
         
         let modalContent = '';
         
-        // Add debug info
-        console.log(`Creating modal of type: ${type}`);
+    // Add debug info
+    if (window.DEBUG) Logger.info('Creating modal', { type });
         
         switch (type) {
             case 'login':
                 modalContent = createLoginModal();
-                console.log(`Login modal content length: ${modalContent ? modalContent.length : 'undefined'}`);
+                if (window.DEBUG) Logger.info('Login modal content length', { length: modalContent ? modalContent.length : 0 });
                 break;
             case 'register':
                 modalContent = createRegisterModal(options.userType);
-                console.log(`Register modal content length: ${modalContent ? modalContent.length : 'undefined'}`);
+                if (window.DEBUG) Logger.info('Register modal content length', { length: modalContent ? modalContent.length : 0 });
                 break;
             case 'forgot-password':
                 modalContent = createForgotPasswordModal();
-                console.log(`Forgot password modal content length: ${modalContent ? modalContent.length : 'undefined'}`);
+                if (window.DEBUG) Logger.info('Forgot password modal content length', { length: modalContent ? modalContent.length : 0 });
                 break;
             default:
-                console.error(`Unknown modal type: ${type}`);
+                Logger.error('Unknown modal type', { type });
                 modalContent = '<div class="bg-white p-6 rounded-lg">Unknown modal type</div>';
         }
         
@@ -427,10 +431,11 @@ function createModal(type, options = {}) {
             throw new Error(`Modal content for type "${type}" is empty or undefined`);
         }
         
-        // This is where we set the innerHTML - add debug info
-        console.log(`Setting innerHTML with content (first 50 chars): ${modalContent.substring(0, 50)}...`);
-        modalContainer.innerHTML = modalContent;
-        console.log(`Modal innerHTML length after setting: ${modalContainer.innerHTML.length}`);
+    // This is where we set the innerHTML - add debug info
+        if (window.DEBUG) Logger.info('Setting modal innerHTML snippet', { snippet: modalContent.substring(0, 50) });
+    // Sanitize the assembled HTML before injecting
+    modalContainer.innerHTML = Utils.sanitizeHTML(modalContent);
+    if (window.DEBUG) Logger.info('Modal innerHTML length after setting', { length: modalContainer.innerHTML.length });
         
         // Close modal on backdrop click
         modalContainer.addEventListener('click', (e) => {
@@ -439,26 +444,26 @@ function createModal(type, options = {}) {
             }
         });
         
+        // Setup form handlers after DOM is injected
+        setTimeout(() => setupModalHandlers(modalContainer, type), 0);
+        
         return modalContainer;
     } catch (error) {
-        console.error('Error creating modal:', error);
+        Logger.error('Error creating modal', error);
         
         // Return an error modal instead
         const errorModal = Utils.createElement('div', 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4');
-        errorModal.innerHTML = `
+    errorModal.innerHTML = `
             <div class="bg-white rounded-lg p-6 max-w-md w-full">
                 <h3 class="text-xl font-bold text-red-600">Error Creating Modal</h3>
-                <p class="my-4">${error.message}</p>
+        <p class="my-4">${Utils.escapeHTML(error.message)}</p>
                 <button onclick="this.closest('.fixed').remove()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Close</button>
             </div>
         `;
         return errorModal;
     }
     
-    // Setup form handlers
-    setTimeout(() => setupModalHandlers(modalContainer, type), 0);
-    
-    return modalContainer;
+    // unreachable in normal flow
 }
 
 function createLoginModal() {
@@ -504,7 +509,7 @@ function createLoginModal() {
                 </div>
                 
                 <button type="submit" 
-                        class="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                        class="w-full text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105" style="background: var(--brand-primary);">
                     Sign In
                 </button>
             </form>
@@ -592,7 +597,7 @@ function createRegisterModal(userType) {
                 </div>
                 
                 <button type="submit" 
-                        class="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                        class="w-full text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105" style="background: var(--brand-primary);">
                     Create Account
                 </button>
             </form>
@@ -630,7 +635,7 @@ function createForgotPasswordModal() {
                 </div>
                 
                 <button type="submit" 
-                        class="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                        class="w-full text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105" style="background: var(--brand-primary);">
                     Send Reset Link
                 </button>
             </form>
@@ -681,7 +686,7 @@ function setupModalHandlers(modal, type) {
                     break;
             }
         } catch (error) {
-            console.error('Form submission error:', error);
+            Logger.error('Form submission error', error);
         }
     });
 }

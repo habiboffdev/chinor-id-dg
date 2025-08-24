@@ -14,6 +14,7 @@ let skillSuggestions = ['JavaScript', 'Python', 'React', 'Node.js', 'SQL', 'Git'
 let selectedSkills = [];
 let searchTimeout = null;
 let filterHistory = [];
+let currentApplicationOpportunityId = null;
 
 // Performance optimization: Cache filter results
 const filterCache = new Map();
@@ -138,6 +139,7 @@ function initializeOpportunitiesPage() {
     setTimeout(() => {
         console.log('🚀 Starting initial opportunities load...');
         loadOpportunities();
+        updateViewModeButtons();
     }, 100);
     
     // Setup user dropdown
@@ -161,6 +163,9 @@ function initializeOpportunitiesPage() {
     
     // Initialize saved filters dropdown
     updateSavedFiltersDropdown();
+
+    // Wire up application modal handlers once
+    setupApplicationModalHandlers();
 }
 
 // Enhanced search functionality
@@ -223,12 +228,22 @@ function showSearchSuggestions(query) {
         return;
     }
     
-    suggestionsContainer.innerHTML = suggestions.map(suggestion => 
-        `<div class="search-suggestion-item" onclick="selectSearchSuggestion('${suggestion}')">
-            <i class="fas fa-search mr-2 text-gray-400"></i>
+    suggestionsContainer.innerHTML = Utils.sanitizeHTML(suggestions.map(suggestion => 
+        `<div class=\"search-suggestion-item\" data-suggestion=\"${encodeURIComponent(suggestion)}\">
+            <i class=\"fas fa-search mr-2 text-gray-400\"></i>
             ${highlightSearchTerm(suggestion, query)}
         </div>`
-    ).join('');
+    ).join(''));
+    // Delegate click handling to avoid inline handlers removed by sanitizer
+    suggestionsContainer.onclick = (e) => {
+        const item = e.target.closest('.search-suggestion-item');
+        if (item && suggestionsContainer.contains(item)) {
+            const val = item.getAttribute('data-suggestion');
+            if (val != null) {
+                selectSearchSuggestion(decodeURIComponent(val));
+            }
+        }
+    };
     
     suggestionsContainer.classList.remove('hidden');
 }
@@ -266,8 +281,15 @@ function generateSearchSuggestions(query) {
 
 // Highlight search term in suggestions
 function highlightSearchTerm(text, query) {
-    const regex = new RegExp(`(${query})`, 'gi');
-    return text.replace(regex, '<strong class="text-primary-600">$1</strong>');
+    // Escape regex special characters in query to avoid errors/injection
+    const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const safeQuery = esc(query);
+    try {
+        const regex = new RegExp(`(${safeQuery})`, 'gi');
+        return Utils.escapeHTML(text).replace(regex, '<strong class="text-primary-600">$1</strong>');
+    } catch {
+        return Utils.escapeHTML(text);
+    }
 }
 
 // Show recent searches
@@ -278,11 +300,19 @@ function showRecentSearches() {
         if (recentContainer) {
             const recentList = Utils.$('#recent-searches-list');
             if (recentList) {
-                recentList.innerHTML = recentSearches.slice(0, 5).map(search => 
-                    `<span class="recent-search-tag" onclick="applyRecentSearch('${search}')">
-                        ${search}
-                    </span>`
-                ).join('');
+                recentList.innerHTML = Utils.sanitizeHTML(recentSearches.slice(0, 5).map(search => 
+                    `<span class=\"recent-search-tag\" data-search=\"${encodeURIComponent(search)}\">${Utils.escapeHTML(search)}</span>`
+                ).join(''));
+                // Click handler delegation
+                recentList.onclick = (e) => {
+                    const tag = e.target.closest('.recent-search-tag');
+                    if (tag && recentList.contains(tag)) {
+                        const val = tag.getAttribute('data-search');
+                        if (val != null) {
+                            applyRecentSearch(decodeURIComponent(val));
+                        }
+                    }
+                };
                 recentContainer.classList.remove('hidden');
             }
         }
@@ -373,7 +403,8 @@ function handleSearchKeyNavigation(e) {
 function toggleAdvancedFilters() {
     const advancedFilters = Utils.$('#advanced-filters');
     const toggleButton = Utils.$('#toggle-advanced-btn');
-    const toggleIcon = toggleButton?.querySelector('i');
+    const label = Utils.$('#advanced-filters-text');
+    const toggleIcon = Utils.$('#advanced-filters-icon') || toggleButton?.querySelector('i');
     
     if (!advancedFilters) return;
     
@@ -383,7 +414,7 @@ function toggleAdvancedFilters() {
         // Show advanced filters
         advancedFilters.style.display = 'block';
         advancedFilters.classList.remove('hidden');
-        if (toggleButton) toggleButton.textContent = 'Hide Advanced Filters';
+        if (label) label.textContent = 'Hide Advanced Filters';
         if (toggleIcon) {
             toggleIcon.classList.remove('fa-chevron-down');
             toggleIcon.classList.add('fa-chevron-up');
@@ -392,7 +423,7 @@ function toggleAdvancedFilters() {
         // Hide advanced filters
         advancedFilters.style.display = 'none';
         advancedFilters.classList.add('hidden');
-        if (toggleButton) toggleButton.textContent = 'Show Advanced Filters';
+        if (label) label.textContent = 'Show Advanced Filters';
         if (toggleIcon) {
             toggleIcon.classList.remove('fa-chevron-up');
             toggleIcon.classList.add('fa-chevron-down');
@@ -402,9 +433,14 @@ function toggleAdvancedFilters() {
 
 // Update quick filter buttons state
 function updateQuickFilterButtons() {
-    // This function would update the visual state of quick filter buttons
-    // For now, just log that it was called
-    console.log('🔘 updateQuickFilterButtons called');
+    const buttons = Utils.$$('.filter-quick-btn');
+    buttons.forEach(btn => {
+        const key = btn.getAttribute('data-filter');
+        const val = btn.getAttribute('data-value');
+        if (!key) { btn.classList.remove('active'); return; }
+        const active = String(currentFilters[key]) === String(val);
+        btn.classList.toggle('active', active);
+    });
 }
 
 // Initialize enhanced components (placeholder)
@@ -412,15 +448,9 @@ function initializeEnhancements() {
     console.log('🔧 initializeEnhancements called');
 }
 
-// Show recent searches (placeholder)  
-function showRecentSearches() {
-    console.log('🔍 showRecentSearches called');
-}
+// NOTE: showRecentSearches is defined earlier with rendering logic.
 
-// Update saved filters dropdown (placeholder)
-function updateSavedFiltersDropdown() {
-    console.log('💾 updateSavedFiltersDropdown called');
-}
+// (updateSavedFiltersDropdown is defined later with full implementation)
 
 // Setup event listeners
 function setupEventListeners() {
@@ -523,7 +553,7 @@ function displayLoginRequired() {
                 You need to be logged in to view opportunities. Please sign in to continue.
             </p>
             <div class="flex justify-center gap-4">
-                <a href="/login.html" class="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                <a href="/login.html" class="text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105" style="background: var(--brand-primary);">
                     Sign In
                 </a>
                 <a href="/signup.html" class="bg-white border border-primary-600 text-primary-600 hover:bg-primary-50 px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
@@ -556,7 +586,7 @@ function displayEmptyState() {
     console.log('📭 Has active filters:', hasActiveFilters);
     console.log('📭 Setting empty state HTML...');
     
-    container.innerHTML = `
+    container.innerHTML = Utils.sanitizeHTML(`
         <div class="text-center py-16">
             <div class="max-w-md mx-auto">
                 <div class="mb-6">
@@ -593,7 +623,7 @@ function displayEmptyState() {
                 `}
             </div>
         </div>
-    `;
+    `);
 }
 
 // Load opportunities from API
@@ -987,8 +1017,8 @@ function displayGridView(opportunities) {
                 ${opportunities.map(opportunity => createOpportunityCard(opportunity)).join('')}
             </div>
         `;
-        console.log('📱 Setting container innerHTML...');
-        container.innerHTML = gridHTML;
+    console.log('📱 Setting container innerHTML...');
+    container.innerHTML = gridHTML;
         console.log('✅ Grid view HTML set successfully');
     } catch (error) {
         console.error('Error rendering grid view:', error);
@@ -1021,11 +1051,12 @@ function displayListView(opportunities) {
     }
     
     try {
-        container.innerHTML = `
+        const listHTML = `
             <div class="space-y-4">
                 ${opportunities.map(opportunity => createOpportunityListItem(opportunity)).join('')}
             </div>
         `;
+        container.innerHTML = listHTML;
     } catch (error) {
         console.error('Error rendering list view:', error);
         displayEmptyState();
@@ -1034,102 +1065,57 @@ function displayListView(opportunities) {
 
 // Create opportunity card for grid view
 function createOpportunityCard(opportunity) {
-    const deadline = new Date(opportunity.application_deadline);
-    const isUrgent = deadline - new Date() < 7 * 24 * 60 * 60 * 1000; // Less than 7 days
-    
+    const title = Utils.escapeHTML(opportunity.title || 'Untitled');
+    const orgName = Utils.escapeHTML(opportunity.organization_name || opportunity.organization?.name || 'Organization');
+    const desc = Utils.escapeHTML(opportunity.description ? Utils.truncate(opportunity.description, 160) : 'No description available');
+    const deadline = opportunity.application_deadline ? new Date(opportunity.application_deadline) : null;
+    const isUrgent = deadline ? (deadline - new Date() < 7 * 24 * 60 * 60 * 1000) : false;
+    const posted = opportunity.created_at ? Utils.getRelativeTime(opportunity.created_at) : null;
+    const location = Utils.escapeHTML(opportunity.location || '—');
+    const duration = opportunity.duration ? Utils.escapeHTML(opportunity.duration) : '';
+    const compensation = opportunity.compensation || opportunity.pay || opportunity.stipend;
+    const compText = compensation ? Utils.escapeHTML(String(compensation)) : '';
+    const type = opportunity.opportunity_type;
+    const logoInitials = getInitials(orgName);
+
+    const deadlinePill = deadline ? `
+        <span class="px-2 py-1 text-xs rounded-full" style="background:${isUrgent ? 'rgba(239,68,68,.18)' : 'rgba(255,255,255,.06)'}; color:${isUrgent ? '#ef4444' : 'var(--mist-200)'}; border:1px solid ${isUrgent ? 'rgba(239,68,68,.35)' : 'var(--slate-400)'};">
+            <i class="fas fa-calendar-alt mr-1"></i> ${Utils.formatDate(opportunity.application_deadline)}
+        </span>` : '';
+
+    const remotePill = opportunity.is_remote ? `<span class="px-2 py-1 text-xs rounded-full" style="background: rgba(34,197,94,.15); color:#22c55e; border:1px solid rgba(34,197,94,.35);">Remote</span>` : '';
+
+    const compPill = compText ? `<span class="px-2 py-1 text-xs rounded-full" style="background: rgba(255,255,255,.06); color: var(--mist-200); border:1px solid var(--slate-400);"><i class="fas fa-coins mr-1"></i>${compText}</span>` : '';
+    const durationPill = duration ? `<span class="px-2 py-1 text-xs rounded-full" style="background: rgba(255,255,255,.06); color: var(--mist-200); border:1px solid var(--slate-400);"><i class="fas fa-clock mr-1"></i>${duration}</span>` : '';
+
     return `
-        <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer group" 
-             onclick="viewOpportunity('${opportunity.id}')">
-            <div class="p-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex-1">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-200">
-                            ${opportunity.title}
-                        </h3>
-                        <p class="text-gray-600 mb-2">${opportunity.organization_name || opportunity.organization?.name || 'Organization'}</p>
-                        <p class="text-gray-700 text-sm line-clamp-3">${opportunity.description ? Utils.truncate(opportunity.description, 120) : 'No description available'}</p>
-                    </div>
-                    <div class="ml-4">
-                        ${createTypeBadge(opportunity.opportunity_type)}
+        <div class="card card--hover transition-all cursor-pointer group" onclick="viewOpportunity('${Utils.escapeHTML(String(opportunity.id))}')">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-full" style="background: var(--ink-800); border:1px solid var(--slate-400); display:flex; align-items:center; justify-content:center; font-weight:700; color: var(--mist-100);">${logoInitials}</div>
+                    <div class="min-w-0">
+                        <div class="text-sm text-muted truncate">${orgName}</div>
+                        <h3 class="text-base font-semibold truncate group-hover:text-primary-400" style="color: var(--mist-100);">${title}</h3>
                     </div>
                 </div>
-                
-                <div class="space-y-2 mb-4">
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
-                        <span>${opportunity.location || 'Location not specified'}</span>
-                        ${opportunity.is_remote ? '<span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Remote</span>' : ''}
-                    </div>
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fas fa-calendar mr-2 text-gray-400"></i>
-                        <span>Deadline: ${Utils.formatDate(opportunity.application_deadline)}</span>
-                        ${isUrgent ? '<span class="ml-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Urgent</span>' : ''}
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <div class="flex flex-wrap gap-1">
-                        ${opportunity.required_skills?.slice(0, 2).map(skill => 
-                            `<span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">${skill}</span>`
-                        ).join('') || ''}
-                        ${opportunity.required_skills?.length > 2 ? 
-                            `<span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">+${opportunity.required_skills.length - 2}</span>` : ''}
-                    </div>
-                    <button class="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 transform group-hover:scale-105">
-                        View Details
-                    </button>
-                </div>
+                <div class="ml-3">${createTypeBadge(type)}</div>
             </div>
-            
-            <!-- Application Form (hidden by default) -->
-            <div id="application-form-${opportunity.id}" class="hidden border-t border-gray-200 p-6 bg-gray-50">
-                <h4 class="text-lg font-semibold text-gray-900 mb-4">Apply to ${opportunity.title}</h4>
-                <form onsubmit="submitApplication(event, '${opportunity.id}')">
-                    
-                    <!-- Dynamic Questions -->
-                    <div id="questions-${opportunity.id}" class="space-y-4 mb-6">
-                        <!-- Questions will be loaded here -->
-                    </div>
-                    
-                    <!-- Document Upload -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Additional Documents (Optional)
-                        </label>
-                        <input type="file" 
-                               id="documents-${opportunity.id}" 
-                               name="documents" 
-                               multiple 
-                               accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <p class="text-xs text-gray-500 mt-1">PDF, DOC, DOCX, TXT, JPG, PNG (Max 10MB each)</p>
-                    </div>
-                    
-                    <!-- Notes -->
-                    <div class="mb-6">
-                        <label for="notes-${opportunity.id}" class="block text-sm font-medium text-gray-700 mb-2">
-                            Additional Notes (Optional)
-                        </label>
-                        <textarea id="notes-${opportunity.id}" 
-                                  name="notes" 
-                                  rows="4" 
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                                  placeholder="Any additional information you'd like to share..."></textarea>
-                    </div>
-                    
-                    <!-- Submit Buttons -->
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" 
-                                onclick="toggleApplicationForm('${opportunity.id}')" 
-                                class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">
-                            Cancel
-                        </button>
-                        <button type="submit" 
-                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            Submit Application
-                        </button>
-                    </div>
-                </form>
+            <p class="text-sm mb-3 line-clamp-3" style="color: var(--mist-200);">${desc}</p>
+            <div class="grid grid-cols-2 gap-2 mb-4 text-xs" style="color: var(--mist-300);">
+                <div class="flex items-center gap-2"><i class="fas fa-map-marker-alt" style="color: var(--mist-400);"></i><span class="truncate">${location}</span></div>
+                ${posted ? `<div class="flex items-center gap-2"><i class="fas fa-clock" style="color: var(--mist-400);"></i><span>Posted ${posted}</span></div>` : ''}
+                <div class="flex items-center gap-2">${deadlinePill}</div>
+                <div class="flex items-center gap-2">${remotePill} ${compPill} ${durationPill}</div>
+            </div>
+            <div class="flex justify-between items-center">
+                <div class="flex flex-wrap gap-1">
+                    ${opportunity.required_skills?.slice(0, 3).map(skill => 
+                        `<span class="px-2 py-1 text-xs font-medium rounded-full" style="background: rgba(108,99,255,.18); color: var(--accent-2);">${Utils.escapeHTML(skill)}</span>`
+                    ).join('') || ''}
+                    ${opportunity.required_skills?.length > 3 ? 
+                        `<span class="px-2 py-1 text-xs font-medium rounded-full" style="background: rgba(108,99,255,.18); color: var(--accent-2);">+${opportunity.required_skills.length - 3}</span>` : ''}
+                </div>
+                <a class="btn btn--secondary btn--pill text-sm" onclick="event.stopPropagation(); viewOpportunity('${Utils.escapeHTML(String(opportunity.id))}')">View</a>
             </div>
         </div>
     `;
@@ -1137,66 +1123,61 @@ function createOpportunityCard(opportunity) {
 
 // Create opportunity list item for list view
 function createOpportunityListItem(opportunity) {
-    const deadline = new Date(opportunity.application_deadline);
-    const isUrgent = deadline - new Date() < 7 * 24 * 60 * 60 * 1000;
-    
+    const title = Utils.escapeHTML(opportunity.title || 'Untitled');
+    const orgName = Utils.escapeHTML(opportunity.organization_name || opportunity.organization?.name || 'Organization');
+    const desc = Utils.escapeHTML(opportunity.description ? Utils.truncate(opportunity.description, 240) : 'No description available');
+    const deadline = opportunity.application_deadline ? new Date(opportunity.application_deadline) : null;
+    const isUrgent = deadline ? (deadline - new Date() < 7 * 24 * 60 * 60 * 1000) : false;
+    const posted = opportunity.created_at ? Utils.getRelativeTime(opportunity.created_at) : null;
+    const location = Utils.escapeHTML(opportunity.location || '—');
+    const duration = opportunity.duration ? Utils.escapeHTML(opportunity.duration) : '';
+    const compensation = opportunity.compensation || opportunity.pay || opportunity.stipend;
+    const compText = compensation ? Utils.escapeHTML(String(compensation)) : '';
+    const type = opportunity.opportunity_type;
+    const logoInitials = getInitials(orgName);
+
+    const deadlinePill = deadline ? `
+        <span class="px-2 py-1 text-xs rounded-full" style="background:${isUrgent ? 'rgba(239,68,68,.18)' : 'rgba(255,255,255,.06)'}; color:${isUrgent ? '#ef4444' : 'var(--mist-200)'}; border:1px solid ${isUrgent ? 'rgba(239,68,68,.35)' : 'var(--slate-400)'};">
+            <i class="fas fa-calendar-alt mr-1"></i> ${Utils.formatDate(opportunity.application_deadline)}
+        </span>` : '';
+    const remotePill = opportunity.is_remote ? `<span class="px-2 py-1 text-xs rounded-full" style="background: rgba(34,197,94,.15); color:#22c55e; border:1px solid rgba(34,197,94,.35);">Remote</span>` : '';
+    const compPill = compText ? `<span class="px-2 py-1 text-xs rounded-full" style="background: rgba(255,255,255,.06); color: var(--mist-200); border:1px solid var(--slate-400);"><i class="fas fa-coins mr-1"></i>${compText}</span>` : '';
+    const durationPill = duration ? `<span class="px-2 py-1 text-xs rounded-full" style="background: rgba(255,255,255,.06); color: var(--mist-200); border:1px solid var(--slate-400);"><i class="fas fa-clock mr-1"></i>${duration}</span>` : '';
+
     return `
-        <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group" 
-             onclick="viewOpportunity('${opportunity.id}')">
-            <div class="p-6">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-3 mb-2">
-                            <h3 class="text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition-colors duration-200">
-                                ${opportunity.title}
-                            </h3>
-                            ${createTypeBadge(opportunity.opportunity_type)}
-                            ${isUrgent ? '<span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full font-medium">Urgent</span>' : ''}
+        <div class="card card--hover transition-all cursor-pointer group" onclick="viewOpportunity('${Utils.escapeHTML(String(opportunity.id))}')">
+            <div class="flex items-start justify-between">
+                <div class="flex items-start gap-4 flex-1 min-w-0">
+                    <div class="w-12 h-12 rounded-full" style="background: var(--ink-800); border:1px solid var(--slate-400); display:flex; align-items:center; justify-content:center; font-weight:700; color: var(--mist-100);">${logoInitials}</div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-3 mb-1">
+                            <h3 class="text-lg font-semibold truncate group-hover:text-primary-400" style="color: var(--mist-100);">${title}</h3>
+                            ${createTypeBadge(type)}
+                            ${isUrgent ? '<span class="px-2 py-1 text-xs rounded-full" style="background: rgba(239,68,68,.18); color:#ef4444; border:1px solid rgba(239,68,68,.35);">Urgent</span>' : ''}
                         </div>
-                        
-                        <p class="text-gray-600 mb-3">${opportunity.organization_name || opportunity.organization?.name || 'Organization'}</p>
-                        
-                        <p class="text-gray-700 mb-4">${opportunity.description ? Utils.truncate(opportunity.description, 200) : 'No description available'}</p>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div class="flex items-center text-sm text-gray-600">
-                                <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
-                                <span>${opportunity.location || 'Location not specified'}</span>
-                                ${opportunity.is_remote ? '<span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Remote</span>' : ''}
-                            </div>
-                            <div class="flex items-center text-sm text-gray-600">
-                                <i class="fas fa-calendar mr-2 text-gray-400"></i>
-                                <span>Deadline: ${Utils.formatDate(opportunity.application_deadline)}</span>
-                            </div>
-                            <div class="flex items-center text-sm text-gray-600">
-                                <i class="fas fa-clock mr-2 text-gray-400"></i>
-                                <span>Posted ${Utils.getRelativeTime(opportunity.created_at)}</span>
-                            </div>
+                        <div class="text-sm text-muted mb-2 truncate">${orgName}</div>
+                        <p class="text-sm mb-3" style="color: var(--mist-200);">${desc}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4 text-xs" style="color: var(--mist-300);">
+                            <div class="flex items-center gap-2"><i class="fas fa-map-marker-alt" style="color: var(--mist-400);"></i><span class="truncate">${location}</span></div>
+                            ${posted ? `<div class="flex items-center gap-2"><i class="fas fa-clock" style="color: var(--mist-400);"></i><span>Posted ${posted}</span></div>` : ''}
+                            <div class="flex items-center gap-2">${deadlinePill}</div>
+                            <div class="flex items-center gap-2">${remotePill} ${compPill} ${durationPill}</div>
                         </div>
-                        
                         ${opportunity.required_skills?.length ? `
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <span class="text-sm text-gray-600 mr-2">Skills:</span>
-                                ${opportunity.required_skills.slice(0, 5).map(skill => 
-                                    `<span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">${skill}</span>`
+                            <div class="flex flex-wrap gap-2">
+                                ${opportunity.required_skills.slice(0, 6).map(skill => 
+                                    `<span class=\"px-2 py-1 text-xs font-medium rounded-full\" style=\"background: rgba(108,99,255,.18); color: var(--accent-2);\">${Utils.escapeHTML(skill)}</span>`
                                 ).join('')}
-                                ${opportunity.required_skills.length > 5 ? 
-                                    `<span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">+${opportunity.required_skills.length - 5} more</span>` : ''}
+                                ${opportunity.required_skills.length > 6 ? `<span class="px-2 py-1 text-xs font-medium rounded-full" style="background: rgba(108,99,255,.18); color: var(--accent-2);">+${opportunity.required_skills.length - 6}</span>` : ''}
                             </div>
                         ` : ''}
                     </div>
-                    
-                    <div class="ml-6 flex flex-col items-end space-y-3">
-                        <button class="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform group-hover:scale-105">
-                            View Details
-                        </button>
-                        ${auth.isLoggedIn() && auth.getCurrentUser()?.user_type === 'student' ? `
-                            <button onclick="event.stopPropagation(); toggleApplicationForm('${opportunity.id}')" 
-                                    class="text-primary-600 hover:text-primary-700 font-medium text-sm">
-                                Apply Now
-                            </button>
-                        ` : ''}
-                    </div>
+                </div>
+                <div class="ml-6 flex flex-col items-end gap-2 shrink-0">
+                    <a class="btn btn--secondary btn--pill" onclick="event.stopPropagation(); viewOpportunity('${Utils.escapeHTML(String(opportunity.id))}')">View</a>
+                    ${auth.isLoggedIn() && auth.getCurrentUser()?.user_type === 'student' ? `
+                        <button onclick="event.stopPropagation(); toggleApplicationForm('${Utils.escapeHTML(String(opportunity.id))}')" class="font-medium text-sm" style="color: var(--accent-3);">Apply</button>
+                    ` : ''}
                 </div>
             </div>
         </div>
@@ -1206,29 +1187,31 @@ function createOpportunityListItem(opportunity) {
 // Create type badge for opportunities
 function createTypeBadge(type) {
     if (!type) return '';
-    
-    const typeConfig = {
-        'internship': { color: 'bg-blue-100 text-blue-800', icon: 'fas fa-user-graduate' },
-        'full-time': { color: 'bg-green-100 text-green-800', icon: 'fas fa-briefcase' },
-        'part-time': { color: 'bg-yellow-100 text-yellow-800', icon: 'fas fa-clock' },
-        'contract': { color: 'bg-purple-100 text-purple-800', icon: 'fas fa-handshake' },
-        'volunteer': { color: 'bg-pink-100 text-pink-800', icon: 'fas fa-heart' },
-        'remote': { color: 'bg-indigo-100 text-indigo-800', icon: 'fas fa-laptop' },
-        'scholarship': { color: 'bg-orange-100 text-orange-800', icon: 'fas fa-graduation-cap' },
-        'fellowship': { color: 'bg-teal-100 text-teal-800', icon: 'fas fa-award' }
+    const iconMap = {
+        'internship': 'fas fa-user-graduate',
+        'full-time': 'fas fa-briefcase',
+        'part-time': 'fas fa-clock',
+        'contract': 'fas fa-handshake',
+        'volunteer': 'fas fa-heart',
+        'remote': 'fas fa-laptop',
+        'scholarship': 'fas fa-graduation-cap',
+        'fellowship': 'fas fa-award'
     };
-    
-    const config = typeConfig[type.toLowerCase()] || { 
-        color: 'bg-gray-100 text-gray-800', 
-        icon: 'fas fa-tag' 
-    };
-    
+    const icon = iconMap[(type || '').toLowerCase()] || 'fas fa-tag';
+    const label = Utils.escapeHTML(type.charAt(0).toUpperCase() + type.slice(1));
     return `
-        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color}">
-            <i class="${config.icon}"></i>
-            ${type.charAt(0).toUpperCase() + type.slice(1)}
+        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" style="background: rgba(108,99,255,.18); color: var(--accent-2); border:1px solid rgba(108,99,255,.35);">
+            <i class="${icon}"></i>
+            ${label}
         </span>
     `;
+}
+
+// Helpers
+function getInitials(name) {
+    if (!name) return '?';
+    const parts = String(name).trim().split(/\s+/).slice(0,2);
+    return parts.map(p => p[0]?.toUpperCase() || '').join('') || '?';
 }
 
 // Missing utility functions
@@ -1299,9 +1282,9 @@ function applyQuickFilter(filterType, filterValue) {
     loadOpportunities();
     
     // Track analytics
-    trackFilterUsage('quick_filter', type);
+    trackFilterUsage('quick_filter', filterType);
     
-    Utils.showToast(`Applied ${type} filter`, 'success');
+    Utils.showToast(`Applied ${filterType} filter`, 'success');
 }
 
 function clearAllFilters() {
@@ -1357,41 +1340,30 @@ function updateFiltersUI() {
         searchInput.value = currentFilters.search || '';
     }
     
-    // Update location filter
-    const locationSelect = Utils.$('#location-filter');
-    if (locationSelect && currentFilters.location) {
-        locationSelect.value = currentFilters.location;
-    }
-    
-    // Update type filter
-    const typeSelect = Utils.$('#type-filter');
-    if (typeSelect && currentFilters.type) {
-        typeSelect.value = currentFilters.type;
-    }
-    
-    // Update remote checkbox
-    const remoteCheckbox = Utils.$('#remote-filter');
-    if (remoteCheckbox) {
-        remoteCheckbox.checked = currentFilters.isRemote || false;
-    }
-    
-    // Update deadline filter
-    const deadlineSelect = Utils.$('#deadline-filter');
-    if (deadlineSelect && currentFilters.deadline) {
-        deadlineSelect.value = currentFilters.deadline;
-    }
-    
-    // Update date range filter
-    const dateRangeSelect = Utils.$('#date-range-filter');
-    if (dateRangeSelect && currentFilters.dateRange) {
-        dateRangeSelect.value = currentFilters.dateRange;
-    }
+    // Update inputs by name
+    const inputs = Utils.$$('.opportunity-filter');
+    inputs.forEach(el => {
+        const key = el.name;
+        if (!key) return;
+        const val = currentFilters[key];
+        if (val === undefined) {
+            if (el.type === 'select-one') el.selectedIndex = 0;
+            else if (el.type === 'checkbox') el.checked = false;
+            else el.value = '';
+            return;
+        }
+        if (el.type === 'checkbox') el.checked = !!val;
+        else el.value = val;
+    });
     
     // Update skills display
     updateSkillsDisplay();
     
     // Update active filters display
     updateActiveFiltersDisplay();
+
+    // Update quick filter buttons active state
+    updateQuickFilterButtons();
 }
 
 // Update skills display
@@ -1406,15 +1378,25 @@ function updateSkillsDisplay() {
     
     const skillsHTML = currentFilters.skills.map(skill => `
         <span class="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-            ${skill}
-            <button onclick="removeSkill('${skill}')" 
-                    class="text-blue-600 hover:text-blue-800">
+            ${Utils.escapeHTML(skill)}
+            <button data-skill="${encodeURIComponent(String(skill))}" 
+                    class="remove-skill-btn text-blue-600 hover:text-blue-800">
                 <i class="fas fa-times"></i>
             </button>
         </span>
     `).join('');
     
-    skillsContainer.innerHTML = skillsHTML;
+    skillsContainer.innerHTML = Utils.sanitizeHTML(skillsHTML);
+    // Delegate click to handle removal after sanitization
+    skillsContainer.onclick = (e) => {
+        const btn = e.target.closest('.remove-skill-btn');
+        if (btn && skillsContainer.contains(btn)) {
+            const val = btn.getAttribute('data-skill');
+            if (val != null) {
+                removeSkill(decodeURIComponent(val));
+            }
+        }
+    };
 }
 
 // Update active filters display
@@ -1447,7 +1429,7 @@ function updateActiveFiltersDisplay() {
     if (displayFilters.search && displayFilters.search.trim()) {
         activeFilters.push({
             type: 'search',
-            label: `Search: "${displayFilters.search}"`,
+            label: `Search: "${Utils.escapeHTML(displayFilters.search)}"`,
             value: displayFilters.search
         });
     }
@@ -1455,7 +1437,7 @@ function updateActiveFiltersDisplay() {
     if (displayFilters.location && displayFilters.location.trim()) {
         activeFilters.push({
             type: 'location',
-            label: `Location: ${displayFilters.location}`,
+            label: `Location: ${Utils.escapeHTML(displayFilters.location)}`,
             value: displayFilters.location
         });
     }
@@ -1463,8 +1445,15 @@ function updateActiveFiltersDisplay() {
     if (displayFilters.type && displayFilters.type !== '') {
         activeFilters.push({
             type: 'type',
-            label: `Type: ${displayFilters.type}`,
+            label: `Type: ${Utils.escapeHTML(displayFilters.type)}`,
             value: displayFilters.type
+        });
+    }
+    if (displayFilters.opportunity_type && displayFilters.opportunity_type !== '') {
+        activeFilters.push({
+            type: 'opportunity_type',
+            label: `Type: ${Utils.escapeHTML(displayFilters.opportunity_type)}`,
+            value: displayFilters.opportunity_type
         });
     }
     
@@ -1477,10 +1466,10 @@ function updateActiveFiltersDisplay() {
     }
     
     if (displayFilters.skills && displayFilters.skills.length > 0) {
-        displayFilters.skills.forEach(skill => {
+    displayFilters.skills.forEach(skill => {
             activeFilters.push({
                 type: 'skill',
-                label: `Skill: ${skill}`,
+        label: `Skill: ${Utils.escapeHTML(skill)}`,
                 value: skill
             });
         });
@@ -1489,7 +1478,7 @@ function updateActiveFiltersDisplay() {
     if (displayFilters.deadline && displayFilters.deadline !== 'all' && displayFilters.deadline !== 'undefined') {
         activeFilters.push({
             type: 'deadline',
-            label: `Deadline: ${displayFilters.deadline}`,
+            label: `Deadline: ${Utils.escapeHTML(displayFilters.deadline)}`,
             value: displayFilters.deadline
         });
     }
@@ -1497,7 +1486,7 @@ function updateActiveFiltersDisplay() {
     if (displayFilters.dateRange && displayFilters.dateRange !== 'all' && displayFilters.dateRange !== 'undefined') {
         activeFilters.push({
             type: 'dateRange',
-            label: `Posted: ${displayFilters.dateRange}`,
+            label: `Posted: ${Utils.escapeHTML(displayFilters.dateRange)}`,
             value: displayFilters.dateRange
         });
     }
@@ -1511,24 +1500,40 @@ function updateActiveFiltersDisplay() {
     const filtersHTML = activeFilters.map(filter => `
         <span class="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm">
             ${filter.label}
-            <button onclick="removeFilter('${filter.type}', '${filter.value}')" 
-                    class="text-primary-600 hover:text-primary-800">
+        <button class="remove-filter-btn text-primary-600 hover:text-primary-800" 
+            data-type="${Utils.escapeHTML(filter.type)}" 
+            data-value="${encodeURIComponent(String(filter.value))}">
                 <i class="fas fa-times"></i>
             </button>
         </span>
     `).join('');
     
-    activeFiltersContainer.innerHTML = `
+    const activeHTML = `
         <div class="flex flex-wrap gap-2 items-center">
             ${filtersHTML}
             ${activeFilters.length > 1 ? `
-                <button onclick="clearAllFilters()" 
+                <button class=\"clear-all-filters-btn\" 
                         class="text-red-600 hover:text-red-800 text-sm font-medium ml-2">
                     Clear All
                 </button>
             ` : ''}
         </div>
     `;
+    activeFiltersContainer.innerHTML = Utils.sanitizeHTML(activeHTML);
+    // Delegate click handlers
+    activeFiltersContainer.onclick = (e) => {
+        const removeBtn = e.target.closest('.remove-filter-btn');
+        if (removeBtn && activeFiltersContainer.contains(removeBtn)) {
+            const type = removeBtn.getAttribute('data-type');
+            const value = removeBtn.getAttribute('data-value');
+            removeFilter(type, decodeURIComponent(value || ''));
+            return;
+        }
+        const clearBtn = e.target.closest('.clear-all-filters-btn');
+        if (clearBtn && activeFiltersContainer.contains(clearBtn)) {
+            clearAllFilters();
+        }
+    };
 }
 
 // Update pagination display
@@ -1638,6 +1643,123 @@ function changePage(page) {
     if (container) {
         container.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+}
+
+// --- Application Modal wiring ---
+function setupApplicationModalHandlers() {
+    const modal = Utils.$('#applicationModal');
+    if (!modal) return;
+
+    const closeBtn = Utils.$('#closeApplicationModal');
+    const cancelBtn = Utils.$('#cancelApplication');
+    const form = Utils.$('#applicationForm');
+    const notes = Utils.$('#applicationNotes');
+    const uploadArea = Utils.$('#documentUploadArea');
+    const uploadInput = Utils.$('#documentUpload');
+    const uploadedList = Utils.$('#uploadedFiles');
+
+    const close = () => { modal.classList.add('hidden'); };
+
+    closeBtn && closeBtn.addEventListener('click', close);
+    cancelBtn && cancelBtn.addEventListener('click', close);
+
+    // Drag/drop upload UX (optional)
+    if (uploadArea && uploadInput && uploadedList) {
+        const refreshFiles = () => {
+            uploadedList.innerHTML = '';
+            Array.from(uploadInput.files || []).forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between text-sm px-3 py-2 rounded border';
+                item.style.borderColor = 'var(--slate-400)';
+                item.innerHTML = `<span>${Utils.escapeHTML(file.name)}</span><span class="text-muted">${(file.size/1024/1024).toFixed(2)} MB</span>`;
+                uploadedList.appendChild(item);
+            });
+        };
+        uploadArea.addEventListener('click', () => uploadInput.click());
+        uploadInput.addEventListener('change', refreshFiles);
+        ['dragover','dragenter'].forEach(evt => uploadArea.addEventListener(evt, e => { e.preventDefault(); uploadArea.classList.add('ring'); }));
+        ;['dragleave','drop'].forEach(evt => uploadArea.addEventListener(evt, e => { e.preventDefault(); uploadArea.classList.remove('ring'); }));
+        uploadArea.addEventListener('drop', e => {
+            const dt = e.dataTransfer;
+            if (!dt) return;
+            uploadInput.files = dt.files;
+            refreshFiles();
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = Utils.$('#submitApplication');
+            const submitText = Utils.$('#submitButtonText');
+            const spinner = Utils.$('#submitSpinner');
+            try {
+                submitBtn && (submitBtn.disabled = true);
+                submitText && (submitText.textContent = 'Submitting...');
+                spinner && spinner.classList.remove('hidden');
+
+                if (typeof window.applyToOpportunity === 'function' && currentApplicationOpportunityId) {
+                    await window.applyToOpportunity(currentApplicationOpportunityId);
+                } else {
+                    Utils.showToast('Application submitted (demo)', 'success');
+                }
+                modal.classList.add('hidden');
+            } catch (err) {
+                console.error('Application submit failed', err);
+                Utils.showToast(err?.message || 'Failed to submit application', 'error');
+            } finally {
+                submitBtn && (submitBtn.disabled = false);
+                submitText && (submitText.textContent = 'Submit Application');
+                spinner && spinner.classList.add('hidden');
+                notes && (notes.value = '');
+                const uploadedList = Utils.$('#uploadedFiles');
+                if (uploadedList) uploadedList.innerHTML = '';
+                const uploadInput = Utils.$('#documentUpload');
+                if (uploadInput) uploadInput.value = '';
+            }
+        });
+    }
+}
+
+function toggleApplicationForm(opportunityId) {
+    const modal = Utils.$('#applicationModal');
+    if (!modal) return;
+    currentApplicationOpportunityId = opportunityId;
+    const titleEl = Utils.$('#opportunityTitle');
+    const opp = (window.currentOpportunities || []).find(o => String(o.id) === String(opportunityId));
+    const title = opp ? `${Utils.escapeHTML(opp.title || 'Opportunity')} — ${Utils.escapeHTML(opp.organization_name || opp.organization?.name || '')}` : 'Opportunity';
+    if (titleEl) titleEl.textContent = title;
+
+    // Load dynamic questions if API supports it (best-effort)
+    const qContainer = Utils.$('#dynamicQuestions');
+    if (qContainer) {
+        qContainer.innerHTML = '<div class="text-sm text-gray-600">Preparing questions…</div>';
+        (async () => {
+            try {
+                if (api?.opportunities?.getQuestions) {
+                    const res = await api.opportunities.getQuestions(opportunityId);
+                    const questions = Array.isArray(res?.results) ? res.results : (Array.isArray(res) ? res : []);
+                    if (!questions.length) { qContainer.innerHTML = '<div class="text-sm text-gray-500">No additional questions.</div>'; return; }
+                    qContainer.innerHTML = questions.map((q, idx) => {
+                        const label = Utils.escapeHTML(q.label || q.text || `Question ${idx+1}`);
+                        const name = Utils.escapeHTML(q.name || `q_${idx}`);
+                        const required = q.required ? 'required' : '';
+                        if ((q.type||'').toLowerCase() === 'textarea') {
+                            return `<div><label class="block text-sm font-medium mb-1">${label}</label><textarea name="${name}" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md" ${required}></textarea></div>`;
+                        }
+                        return `<div><label class="block text-sm font-medium mb-1">${label}</label><input name="${name}" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md" ${required}/></div>`;
+                    }).join('');
+                } else {
+                    qContainer.innerHTML = '<div class="text-sm text-gray-500">No additional questions.</div>';
+                }
+            } catch (e) {
+                console.warn('Questions load failed', e);
+                qContainer.innerHTML = '<div class="text-sm text-gray-500">No additional questions.</div>';
+            }
+        })();
+    }
+
+    modal.classList.remove('hidden');
 }
 
 // Setup user menu toggle
@@ -1755,12 +1877,13 @@ window.debugOpportunities = debugOpportunities;
 window.exportCurrentFilters = exportCurrentFilters;
 window.importFilters = importFilters;
 window.showFilterAnalytics = showFilterAnalytics;
+window.toggleApplicationForm = toggleApplicationForm;
 
 // Setup skills filter functionality
 function setupSkillsFilter() {
     console.log('🔧 Setting up skills filter...');
     
-    const skillInput = Utils.$('#skill-input');
+    const skillInput = Utils.$('#skills-input');
     if (skillInput) {
         skillInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -1776,11 +1899,140 @@ function setupSkillsFilter() {
     const addSkillBtn = Utils.$('#add-skill-btn');
     if (addSkillBtn) {
         addSkillBtn.addEventListener('click', () => {
-            const skillInput = Utils.$('#skill-input');
+            const skillInput = Utils.$('#skills-input');
             const skill = skillInput?.value.trim();
             if (skill) {
                 addSkill(skill);
             }
         });
     }
+}
+
+// ----- UX helpers added to align with new UI -----
+function updateViewModeButtons() {
+    const gridBtn = Utils.$('#grid-view-btn');
+    const listBtn = Utils.$('#list-view-btn');
+    if (!gridBtn || !listBtn) return;
+    if (currentViewMode === 'grid') {
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+    } else {
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+    }
+}
+
+function addSkill(skill) {
+    const s = String(skill).trim();
+    if (!s) return;
+    if (!Array.isArray(currentFilters.skills)) currentFilters.skills = [];
+    if (!currentFilters.skills.includes(s)) {
+        currentFilters.skills.push(s);
+        updateSkillsDisplay();
+        currentPage = 1;
+        loadOpportunities();
+    }
+    const input = Utils.$('#skills-input');
+    if (input) input.value = '';
+}
+
+function removeSkill(skill) {
+    const s = String(skill).trim();
+    if (!Array.isArray(currentFilters.skills)) return;
+    currentFilters.skills = currentFilters.skills.filter(x => x !== s);
+    if (currentFilters.skills.length === 0) delete currentFilters.skills;
+    updateSkillsDisplay();
+    currentPage = 1;
+    loadOpportunities();
+}
+
+function removeFilter(type, value) {
+    switch (type) {
+        case 'search':
+            delete currentFilters.search;
+            if (searchInput) searchInput.value = '';
+            break;
+        case 'location':
+            delete currentFilters.location;
+            break;
+        case 'type':
+            delete currentFilters.type;
+            break;
+        case 'opportunity_type':
+            delete currentFilters.opportunity_type;
+            break;
+        case 'remote':
+            delete currentFilters.isRemote;
+            break;
+        case 'deadline':
+            delete currentFilters.deadline;
+            break;
+        case 'dateRange':
+            delete currentFilters.dateRange;
+            break;
+        case 'skill':
+            removeSkill(value);
+            return;
+        default:
+            delete currentFilters[type];
+    }
+    updateActiveFiltersDisplay();
+    currentPage = 1;
+    loadOpportunities();
+}
+
+function saveCurrentFilters() {
+    const sets = JSON.parse(localStorage.getItem('savedFilterSets') || '[]');
+    const entry = { id: Date.now(), name: `Set ${sets.length + 1}`, filters: currentFilters };
+    sets.push(entry);
+    localStorage.setItem('savedFilterSets', JSON.stringify(sets));
+    Utils.showToast('Filter set saved', 'success');
+    updateSavedFiltersDropdown();
+}
+
+function updateSavedFiltersDropdown() {
+    const select = Utils.$('#saved-filters');
+    if (!select) return;
+    const sets = JSON.parse(localStorage.getItem('savedFilterSets') || '[]');
+    select.innerHTML = '<option value="">Select a saved filter set...</option>' +
+        sets.map(s => `<option value="${s.id}">${Utils.escapeHTML(s.name)}</option>`).join('');
+    select.onchange = () => {
+        const id = Number(select.value);
+        const chosen = sets.find(s => s.id === id);
+        if (chosen) {
+            currentFilters = { ...chosen.filters };
+            updateFiltersUI();
+            currentPage = 1;
+            loadOpportunities();
+        }
+    };
+}
+
+async function exportCurrentFilters() {
+    const data = JSON.stringify(currentFilters, null, 2);
+    try { await navigator.clipboard.writeText(data); Utils.showToast('Filters copied', 'success'); }
+    catch { prompt('Copy filters JSON:', data); }
+}
+
+async function importFilters() {
+    const str = prompt('Paste filters JSON:');
+    if (!str) return;
+    try {
+        const obj = JSON.parse(str);
+        currentFilters = obj && typeof obj === 'object' ? obj : {};
+        updateFiltersUI();
+        loadOpportunities();
+    } catch { Utils.showToast('Invalid JSON', 'error'); }
+}
+
+function showFilterAnalytics() {
+    const analytics = JSON.parse(localStorage.getItem('filterAnalytics') || '{}');
+    console.table(analytics);
+    Utils.showToast('Analytics logged to console', 'info');
+}
+
+function debugOpportunities() {
+    console.log('Filters:', currentFilters);
+    console.log('Page:', currentPage, '/', totalPages);
+    console.log('Cache keys:', Array.from(filterCache.keys()));
 }
