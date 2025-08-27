@@ -30,6 +30,11 @@ urlpatterns = [
     # Languages
     path('languages/', views.LanguageListCreateView.as_view(), name='language-list-create'),
     path('languages/<int:pk>/', views.LanguageDetailView.as_view(), name='language-detail'),
+
+    # Social links
+    path('social-links/', views.SocialLinkListCreateView.as_view(), name='social-link-list-create'),
+    path('social-links/<int:pk>/', views.SocialLinkDetailView.as_view(), name='social-link-detail'),
+    path('social-links/upsert/', views.upsert_social_link, name='social-link-upsert'),
     
     # File Upload
     path('upload-resume/', views.upload_resume, name='upload-resume'),
@@ -37,4 +42,7 @@ urlpatterns = [
     
     # Application Stats
     path('application-stats/', views.student_application_stats, name='student-application-stats'),
+
+    # Public Opportuni Card (no auth)
+    path('card/<str:student_id>/', views.public_opportuni_card, name='public-opportuni-card'),
 ]

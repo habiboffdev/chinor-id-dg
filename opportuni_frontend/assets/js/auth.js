@@ -4,13 +4,45 @@ class AuthManager {
     constructor() {
         this.currentUser = null;
         this.userLoadPromise = null;
-        this.init();
+    this.init();
     }
 
     // Initialize authentication
     init() {
+        // Ensure global CSS for auth visibility is present
+        this.ensureAuthVisibilityStyles();
+        // Default body state to logged out until proven otherwise
+        this.setBodyAuthState(false);
         this.userLoadPromise = this.loadCurrentUser();
         this.setupTokenRefresh();
+    }
+
+    // Inject minimal global CSS to make nav auth visibility deterministic
+    ensureAuthVisibilityStyles() {
+        if (document.getElementById('auth-visibility-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'auth-visibility-styles';
+        style.textContent = `
+          /* Only scope to nav bars to avoid affecting hero CTAs */
+          .auth-logged-in .brand-nav .auth-buttons,
+          .auth-logged-in .student-nav .auth-buttons{ display:none !important }
+          .auth-logged-in .brand-nav .user-menu,
+          .auth-logged-in .student-nav .user-menu{ display:flex !important; align-items:center }
+
+          .auth-logged-out .brand-nav .auth-buttons,
+          .auth-logged-out .student-nav .auth-buttons{ display:flex !important }
+          .auth-logged-out .brand-nav .user-menu,
+          .auth-logged-out .student-nav .user-menu{ display:none !important }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Toggle body class for global state
+    setBodyAuthState(isLoggedIn){
+        const b = document.body;
+        if (!b) return;
+        b.classList.toggle('auth-logged-in', !!isLoggedIn);
+        b.classList.toggle('auth-logged-out', !isLoggedIn);
     }
 
     // Wait for user to be loaded
@@ -28,8 +60,12 @@ class AuthManager {
             try {
                 // Make sure the token is set in the API instance first
                 api.setToken(token);
+                // Optimistically reflect logged-in UI immediately
+                this.setBodyAuthState(true);
+                this.updateUIForLoggedInUser();
         this.currentUser = await api.auth.getProfile();
         this.updateUIForLoggedInUser();
+        this.setBodyAuthState(true);
         Logger.info('Successfully loaded user profile');
             } catch (error) {
         Logger.error('Failed to load user profile', error);
@@ -38,6 +74,7 @@ class AuthManager {
                     try {
                         this.currentUser = await api.auth.getProfile();
                         this.updateUIForLoggedInUser();
+            this.setBodyAuthState(true);
             Logger.info('Successfully loaded user profile on retry');
                     } catch (retryError) {
             Logger.error('Failed to load user profile after retry', retryError);
@@ -48,6 +85,8 @@ class AuthManager {
                         this.currentUser = null;
                         // Optionally flag a stale profile state for later UI use
                         try { Utils.storage.set('auth_profile_stale', true); } catch {}
+                        // Keep UI in logged-in state if token is present
+                        this.setBodyAuthState(!!token);
                     }
                 }, 1000);
             }
@@ -111,6 +150,7 @@ class AuthManager {
                     
                     // Update UI
                     this.updateUIForLoggedInUser();
+                    this.setBodyAuthState(true);
                     
                     // Redirect to appropriate dashboard
                     this.redirectToDashboard();
@@ -142,6 +182,7 @@ class AuthManager {
                 Utils.storage.set('refresh_token', response.refresh);
                 this.currentUser = await api.auth.getProfile();
                 this.updateUIForLoggedInUser();
+                this.setBodyAuthState(true);
                 this.redirectToDashboard();
             }
             
@@ -170,6 +211,7 @@ class AuthManager {
             
             // Update UI
             this.updateUIForLoggedOutUser();
+            this.setBodyAuthState(false);
             
             // Redirect to home
             window.location.href = '/';
@@ -185,7 +227,7 @@ class AuthManager {
         const userMenu = Utils.$$('.user-menu');
         
         authButtons.forEach(el => el.style.display = 'none');
-        userMenu.forEach(el => el.style.display = 'block');
+    userMenu.forEach(el => el.style.display = 'flex');
         
         // Update user info in UI
         if (this.currentUser) {
@@ -225,7 +267,7 @@ class AuthManager {
         const authButtons = Utils.$$('.auth-buttons');
         const userMenu = Utils.$$('.user-menu');
         
-        authButtons.forEach(el => el.style.display = 'block');
+    authButtons.forEach(el => el.style.display = 'flex');
         userMenu.forEach(el => el.style.display = 'none');
     }
 

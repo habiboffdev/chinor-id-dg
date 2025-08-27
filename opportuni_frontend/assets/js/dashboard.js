@@ -112,50 +112,50 @@ function updateDashboardStats(stats) {
     if (!statsContainer) return;
     
     statsContainer.innerHTML = `
-        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-            <div class="flex items-center">
-                <div class="p-3 bg-primary-100 rounded-full">
-                    <i class="fas fa-file-alt text-primary-600 text-xl"></i>
+        <div class="card p-6 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-muted text-sm">Total Applications</p>
+                    <p class="text-2xl font-bold" style="color: var(--white-0);">${stats.total_applications || 0}</p>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-2xl font-bold text-gray-900">${stats.total_applications || 0}</h3>
-                    <p class="text-gray-600">Total Applications</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-            <div class="flex items-center">
-                <div class="p-3 bg-yellow-100 rounded-full">
-                    <i class="fas fa-clock text-yellow-600 text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-2xl font-bold text-gray-900">${stats.pending_applications || 0}</h3>
-                    <p class="text-gray-600">Pending</p>
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(108,99,255,0.18); color: var(--accent-2);">
+                    <i class="fas fa-file-alt text-xl"></i>
                 </div>
             </div>
         </div>
         
-        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-            <div class="flex items-center">
-                <div class="p-3 bg-green-100 rounded-full">
-                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+        <div class="card p-6 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-muted text-sm">Pending</p>
+                    <p class="text-2xl font-bold" style="color: var(--warning);">${stats.pending_applications || 0}</p>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-2xl font-bold text-gray-900">${stats.accepted_applications || 0}</h3>
-                    <p class="text-gray-600">Accepted</p>
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(251,192,45,0.15); color: var(--warning);">
+                    <i class="fas fa-clock text-xl"></i>
                 </div>
             </div>
         </div>
         
-        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-            <div class="flex items-center">
-                <div class="p-3 bg-red-100 rounded-full">
-                    <i class="fas fa-times-circle text-red-600 text-xl"></i>
+        <div class="card p-6 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-muted text-sm">Accepted</p>
+                    <p class="text-2xl font-bold" style="color: var(--success);">${stats.accepted_applications || 0}</p>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-2xl font-bold text-gray-900">${stats.rejected_applications || 0}</h3>
-                    <p class="text-gray-600">Rejected</p>
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(29,209,161,0.16); color: var(--success);">
+                    <i class="fas fa-check text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card p-6 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-muted text-sm">Rejected</p>
+                    <p class="text-2xl font-bold" style="color: var(--danger);">${stats.rejected_applications || 0}</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(255,77,79,0.18); color: var(--danger);">
+                    <i class="fas fa-times text-xl"></i>
                 </div>
             </div>
         </div>
@@ -181,10 +181,12 @@ function displayRecentApplications(applications) {
     if (!applications || applications.length === 0) {
         container.innerHTML = `
             <div class="text-center py-8">
-                <i class="fas fa-file-alt text-4xl text-gray-300 mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No applications yet</h3>
-                <p class="text-gray-600 mb-4">Start by browsing available opportunities</p>
-                <a href="/opportunities.html" class="text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105" style="background: var(--brand-primary);">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style="background: rgba(108,99,255,0.18); color: var(--accent-2);">
+                    <i class="fas fa-file-alt text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-medium mb-2" style="color: var(--white-0);">No applications yet</h3>
+                <p class="text-muted mb-4">Start by browsing available opportunities</p>
+                <a href="/opportunities.html" class="btn btn--secondary btn--pill transition-all duration-200 transform hover:scale-105">
                     Browse Opportunities
                 </a>
             </div>
@@ -193,20 +195,20 @@ function displayRecentApplications(applications) {
     }
     
     container.innerHTML = Utils.sanitizeHTML(applications.map(application => `
-        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all duration-200">
+        <div class="flex items-center justify-between p-4 rounded-lg transition-all duration-200" style="border:1px solid var(--slate-400); background: var(--ink-900);">
             <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(124,131,255,0.15);">
-                    <i class="fas fa-briefcase text-primary-600"></i>
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(124,131,255,0.18); color: var(--accent-2);">
+                    <i class="fas fa-briefcase"></i>
                 </div>
                 <div>
-                    <h4 class="font-medium text-gray-900">${Utils.escapeHTML(application.opportunity_title || 'Opportunity')}</h4>
-                    <p class="text-sm text-gray-600">${Utils.escapeHTML(application.organization_name || 'Organization')}</p>
-                    <p class="text-xs text-gray-500">Applied ${Utils.getRelativeTime(application.created_at)}</p>
+                    <h4 class="font-medium" style="color: var(--mist-200);">${Utils.escapeHTML(application.opportunity_title || 'Opportunity')}</h4>
+                    <p class="text-sm" style="color: var(--mist-300);">${Utils.escapeHTML(application.organization_name || 'Organization')}</p>
+                    <p class="text-xs" style="color: var(--mist-400);">Applied ${Utils.getRelativeTime(application.created_at)}</p>
                 </div>
             </div>
             <div class="flex items-center space-x-3">
                 ${getStatusBadge(application.status)}
-                <button onclick="viewApplication('${Utils.escapeHTML(String(application.id))}')" class="text-primary-600 hover:text-primary-700">
+                <button onclick="viewApplication('${Utils.escapeHTML(String(application.id))}')" class="btn btn--ghost btn--sm">
                     <i class="fas fa-external-link-alt"></i>
                 </button>
             </div>
@@ -216,13 +218,21 @@ function displayRecentApplications(applications) {
 
 // Get status badge for application
 function getStatusBadge(status) {
-    const badges = {
-        'pending': '<span class="px-3 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Pending</span>',
-        'accepted': '<span class="px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Accepted</span>',
-        'rejected': '<span class="px-3 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Rejected</span>',
-        'withdrawn': '<span class="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">Withdrawn</span>'
+    const styleMap = {
+        pending: 'background: rgba(251,192,45,0.15); color: #FBC02D;',
+        accepted: 'background: rgba(29,209,161,0.16); color: var(--success);',
+        rejected: 'background: rgba(255,77,79,0.18); color: var(--danger);',
+        withdrawn: 'background: rgba(255,255,255,0.08); color: var(--mist-300);'
     };
-    return badges[status] || badges['pending'];
+    const labelMap = {
+        pending: 'Pending',
+        accepted: 'Accepted',
+        rejected: 'Rejected',
+        withdrawn: 'Withdrawn'
+    };
+    const style = styleMap[status] || 'background: rgba(255,255,255,0.08); color: var(--mist-300);';
+    const label = labelMap[status] || 'Unknown';
+    return `<span class="badge" style="${style}">${label}</span>`;
 }
 
 // Load recommended opportunities
@@ -245,20 +255,18 @@ function displayRecommendedOpportunities(opportunities) {
     if (!opportunities || opportunities.length === 0) {
         container.innerHTML = `
             <div class="text-center py-6">
-                <i class="fas fa-lightbulb text-2xl text-gray-300 mb-2"></i>
-                <p class="text-gray-600 text-sm">No recommendations available</p>
+                <i class="fas fa-lightbulb text-2xl" style="color: var(--mist-300);"></i>
+                <p class="text-sm mt-2" style="color: var(--mist-300);">No recommendations available</p>
             </div>
         `;
         return;
     }
     
     container.innerHTML = opportunities.map(opportunity => `
-        <div class="p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 cursor-pointer" onclick="viewOpportunity('${Utils.escapeHTML(String(opportunity.id))}')">
-            <h4 class="font-medium text-gray-900 mb-1">${Utils.escapeHTML(Utils.truncate(opportunity.title, 40))}</h4>
-            <p class="text-sm text-gray-600 mb-2">${Utils.escapeHTML(opportunity.organization_name)}</p>
-            <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full">
-                ${Utils.escapeHTML(opportunity.opportunity_type)}
-            </span>
+        <div class="p-4 rounded-lg transition-all duration-200 cursor-pointer" onclick="viewOpportunity('${Utils.escapeHTML(String(opportunity.id))}')" style="border:1px solid var(--slate-400); background: var(--ink-900);">
+            <h4 class="font-medium mb-1" style="color: var(--mist-200);">${Utils.escapeHTML(Utils.truncate(opportunity.title, 40))}</h4>
+            <p class="text-sm mb-2" style="color: var(--mist-300);">${Utils.escapeHTML(opportunity.organization_name)}</p>
+            <span class="badge" style="background: rgba(124,131,255,0.18); color: var(--accent-2);">${Utils.escapeHTML(opportunity.opportunity_type)}</span>
         </div>
     `).join('');
 }

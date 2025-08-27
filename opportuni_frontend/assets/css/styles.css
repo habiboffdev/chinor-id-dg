@@ -31,20 +31,9 @@ html {
     animation: breathe 4s ease-in-out infinite;
 }
 
+/* Remove hover and active underline on nav links */
 .nav-link::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -2px;
-    left: 50%;
-    background: #3b82f6;
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-}
-
-.nav-link:hover::after {
-    width: 100%;
+    content: none;
 }
 
 /* Feature cards hover effect */
@@ -68,29 +57,18 @@ html {
     left: 100%;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #3b82f6;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #2563eb;
-}
+/* Custom scrollbar - align with dark theme when theme-opportuni is active */
+body.theme-opportuni ::-webkit-scrollbar { width: 10px; height: 10px; }
+body.theme-opportuni ::-webkit-scrollbar-track { background: var(--ink-900); }
+body.theme-opportuni ::-webkit-scrollbar-thumb { background: var(--slate-400); border-radius: 6px; }
+body.theme-opportuni ::-webkit-scrollbar-thumb:hover { background: var(--slate-600); }
 
 /* Navbar scroll effect */
 .navbar-scrolled {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    /* Use brand-neutral divider, not blue */
+    border-bottom: 1px solid var(--slate-400);
 }
 
 /* Modal animations */
@@ -164,10 +142,7 @@ html {
     transition: all 0.3s ease;
 }
 
-.form-input:focus {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
-}
+.form-input:focus { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(108, 99, 255, 0.12); }
 
 .form-label {
     transition: all 0.3s ease;
@@ -193,15 +168,12 @@ html {
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
 }
 
-.btn-ripple:active::before {
-    width: 300px;
-    height: 300px;
-}
+.btn-ripple:active::before { width: 220px; height: 220px; }
 
 /* Loading animations */
 .skeleton {
@@ -743,7 +715,7 @@ html {
 .checkbox:focus { outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.25); }
 
 /* Buttons */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600; border-radius: 10px; padding: 0.75rem 1rem; transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600; border-radius: 10px; padding: 0.75rem 1rem; transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease; cursor: pointer; }
 .btn:active { transform: translateY(0); }
 .btn-primary { background: #2563eb; color: #fff; }
 .btn-primary:hover { background: #1d4ed8; box-shadow: 0 6px 20px rgba(29,78,216,0.25); transform: translateY(-1px); }

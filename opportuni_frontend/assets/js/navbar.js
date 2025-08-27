@@ -13,11 +13,14 @@
     if(document.getElementById('student-nav-styles')) return;
     const style = document.createElement('style');
     style.id = 'student-nav-styles';
-    style.textContent = `
+  style.textContent = `
       /* Root bar */
-      .student-nav{position:sticky;top:0;background:var(--ink-900);isolation:isolate;z-index:70}
+      .hidden{display:none!important}
+  .student-nav{position:sticky;top:0;background:var(--ink-900);isolation:isolate;z-index:70;box-shadow: 0 1px 0 rgba(255,255,255,0.06)}
       .student-nav::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--slate-400);z-index:0}
-      .student-nav .nav-wrap{position:relative;z-index:1}
+      .student-nav .nav-wrap{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:0 16px}
+      @media (min-width:640px){ .student-nav .nav-wrap{ padding:0 24px } }
+      @media (min-width:1024px){ .student-nav .nav-wrap{ padding:0 32px } }
 
       /* Core layout */
       .student-nav .nav-core{height:64px;display:flex;align-items:center;justify-content:space-between}
@@ -28,16 +31,29 @@
       .student-nav .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--accent-1);box-shadow:0 0 0 2px rgba(200,255,0,0.15)}
 
       /* Capsule link rail */
-      .student-nav .link-rail{position:relative;display:flex;align-items:center;gap:6px;background:var(--ink-800);border:1px solid var(--slate-400);border-radius:999px;padding:4px;overflow:visible}
-      .student-nav .active-indicator{position:absolute;top:4px;bottom:4px;left:4px;border-radius:999px;background:var(--brand-primary);border:1px solid var(--accent-3);box-shadow:var(--shadow-glow-brand);width:0;transform:translateX(0);transition:transform 200ms ease,width 200ms ease}
+  .student-nav .link-rail{position:relative;display:flex;align-items:center;gap:6px;background:var(--ink-800);border:1px solid var(--slate-400);border-radius:999px;padding:4px;overflow:visible}
+  .student-nav .active-indicator{position:absolute;top:4px;bottom:4px;left:4px;border-radius:999px;background:var(--slate-600);border:1px solid var(--slate-400);box-shadow:none;width:0;transform:translateX(0);transition:transform 200ms ease,width 200ms ease}
       .student-nav .nav-link{position:relative;display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;color:var(--mist-300);font-weight:600;white-space:nowrap}
-      .student-nav .nav-link:hover{color:var(--white-0)}
-      .student-nav .nav-link.active{color:var(--white-0);text-shadow:0 0 10px rgba(108,99,255,0.25)}
+  .student-nav a{ text-decoration: none }
+  .student-nav a:hover{ text-decoration: none }
+  .student-nav .nav-link{ text-decoration: none }
+  .student-nav .nav-link:hover{color:var(--white-0); text-decoration: none }
+  .student-nav .nav-link.active{color:var(--white-0);text-shadow:none; text-decoration: none }
+  .student-nav .nav-link:focus{ outline: none }
+  .student-nav .nav-link:focus-visible{ outline: none; box-shadow: 0 0 0 2px var(--slate-400) }
 
-      /* Right cluster */
-      .student-nav .menu-right{display:flex;align-items:center;gap:10px}
-      .student-nav .btn-icon{color:var(--mist-300);border-radius:12px}
-      .student-nav .btn-icon:hover{filter:brightness(1.08);background:var(--ink-800)}
+  /* Right cluster */
+  .student-nav .menu-right{display:flex;align-items:center;gap:12px}
+  .student-nav .btn-icon{display:inline-flex;align-items:center;justify-content:center;gap:8px;color:var(--mist-300);border-radius:12px;padding:8px;background:transparent;border:1px solid var(--slate-400);cursor:pointer;position:relative}
+  .student-nav .btn-icon i{font-size:1rem}
+  .student-nav .btn-icon:hover{filter:brightness(1.08);background:var(--ink-800)}
+  .student-nav .btn-icon i.fa-chevron-down{ margin-left: 6px }
+  .student-nav #notification-count{position:absolute;top:-6px;right:-6px;color:#fff;font-size:12px;border-radius:999px;height:20px;width:20px;display:flex;align-items:center;justify-content:center}
+  .student-nav .user-avatar{display:block;height:32px;width:32px;border-radius:999px;object-fit:cover}
+  .student-nav .user-name{display:none}
+  /* Hide user menu by default until auth initializes */
+  .student-nav .user-menu{ display:none }
+  @media (min-width:768px){ .student-nav .user-name{display:inline} }
 
       /* Dropdowns */
       .student-nav .dd-wrap{position:relative}
@@ -109,7 +125,7 @@
               </div>
             </div>
 
-            <div class="dd-wrap">
+            <div class="dd-wrap user-menu">
               <button class="flex items-center gap-2 p-2 rounded-lg btn-icon" data-action="toggle-user" aria-haspopup="true" aria-expanded="false">
                 <img class="user-avatar h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=ffffff" alt="User Avatar">
                 <span class="user-name hidden md:block">User</span>
@@ -125,7 +141,7 @@
               </div>
             </div>
 
-            <div class="auth-buttons hidden md:flex items-center gap-2">
+            <div class="auth-buttons flex items-center gap-2">
               <a href="/login.html" class="btn btn--ghost">Sign in</a>
               <a href="/signup.html" class="btn btn--secondary btn--pill">Sign up</a>
             </div>
@@ -219,12 +235,18 @@
 
   function tryUpdateAuthUI(){
     // Defer to auth manager to populate user-name/avatar across the page
-    const update = ()=> { if(window.auth) auth.updateUIForLoggedInUser(); };
+    const updateLoggedIn = ()=> auth.updateUIForLoggedInUser();
+    const updateLoggedOut = ()=> auth.updateUIForLoggedOutUser();
     if(window.auth){
-      auth.waitForUser().then(update).catch(()=>{});
-      // Fallback: still make sure buttons reflect token state
+      auth.waitForUser().then(()=>{
+        if(auth.isLoggedIn()) updateLoggedIn(); else updateLoggedOut();
+      }).catch(()=>{
+        // On error assume logged out UI
+        updateLoggedOut();
+      });
+      // Fallback after a short delay in case waitForUser didn't trigger
       setTimeout(()=>{
-        if(auth.isLoggedIn()) update();
+        if(auth.isLoggedIn()) updateLoggedIn(); else updateLoggedOut();
       }, 300);
     }
   }

@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <style>
-        .line-clamp-2 {
+    /* Utils */
+    .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
             line-clamp: 2;
@@ -53,113 +54,143 @@
             border-radius: 3px;
         }
         
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Brand: Status chips */
+    .status-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .status-chip { padding: 8px 12px; border-radius: 999px; border: 1px solid var(--slate-400); color: var(--mist-200); background: rgba(255,255,255,0.03); font-weight: 600; font-size: 0.85rem; transition: 150ms ease-out; cursor: pointer; }
+    .status-chip:hover { background: rgba(255,255,255,0.06); border-color: var(--mist-300); }
+    .status-chip.active { background: rgba(108,99,255,0.18); border-color: rgba(108,99,255,0.45); color: var(--accent-2); }
+
+    /* Brand: Badges by state */
+    .badge { display:inline-flex; align-items:center; gap:6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .badge--pending { background: rgba(251,192,45,0.15); color: #FBC02D; }
+    .badge--review { background: rgba(255,92,124,0.15); color: var(--promo); }
+    .badge--interview { background: rgba(108,99,255,0.18); color: var(--accent-2); }
+    .badge--shortlist { background: rgba(0,229,255,0.18); color: var(--accent-3); }
+    .badge--accepted { background: rgba(29,209,161,0.16); color: var(--success); }
+    .badge--rejected { background: rgba(255,77,79,0.18); color: var(--danger); }
+    .badge--withdrawn { background: rgba(255,255,255,0.08); color: var(--mist-300); }
+
+    /* Brand: Application list item */
+    .app-item { padding: 16px; border-bottom: 1px solid var(--slate-400); transition: background 150ms ease; }
+    .app-item:hover { background: var(--ink-800); }
+    .app-icon { width: 44px; height: 44px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; background: var(--ink-800); border: 1px solid var(--slate-400); color: var(--accent-2); }
+    .app-meta { color: var(--mist-300); font-size: 0.9rem; display: flex; gap: 16px; flex-wrap: wrap; }
+    .app-title { color: var(--mist-200); font-weight: 600; }
+    .app-org { color: var(--mist-300); }
+    .app-tools .btn { padding: 8px 10px; border-radius: 10px; font-size: 0.85rem; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="theme-opportuni min-h-screen">
     <!-- Student Navbar (shared component) -->
     <div id="student-navbar-root"></div>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header -->
-        <div class="mb-8">
+        <div class="mb-6">
             <div class="flex justify-between items-start">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">My Applications</h1>
-                    <p class="text-gray-600">Track and manage your opportunity applications</p>
+                    <h1 class="text-3xl font-bold mb-2" style="font-family: var(--font-display); color: var(--white-0);">My Applications</h1>
+                    <p class="text-muted">Track and manage your opportunity applications.</p>
                 </div>
-                <div class="flex space-x-3">
-                    <select id="statusFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="under_review">Under Review</option>
-                        <option value="interview_scheduled">Interview Scheduled</option>
-                        <option value="accepted">Accepted</option>
-                        <option value="rejected">Rejected</option>
-                        <option value="withdrawn">Withdrawn</option>
-                    </select>
-                    <a href="opportunities.html" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200">
-                        <i class="fas fa-plus mr-2"></i>Apply to More
-                    </a>
+                <div class="flex space-x-2">
+                    <a href="opportunities.html" class="btn btn--secondary btn--pill"><i class="fas fa-plus"></i><span>Apply to More</span></a>
                 </div>
+            </div>
+            <div class="status-chips mt-4" id="statusChipRow" role="tablist" aria-label="Filter by status">
+                <button class="status-chip active" data-status="">All</button>
+                <button class="status-chip" data-status="pending">Pending</button>
+                <button class="status-chip" data-status="under_review">Under Review</button>
+                <button class="status-chip" data-status="interview_scheduled">Interview Scheduled</button>
+                <button class="status-chip" data-status="accepted">Accepted</button>
+                <button class="status-chip" data-status="rejected">Rejected</button>
+                <button class="status-chip" data-status="withdrawn">Withdrawn</button>
             </div>
         </div>
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="card p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-gray-600 text-sm">Total Applications</p>
-                        <p id="totalApplications" class="text-2xl font-bold text-gray-900">-</p>
+                        <p class="text-muted text-sm">Total Applications</p>
+                        <p id="totalApplications" class="text-2xl font-bold" style="color: var(--white-0);">-</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-file-alt text-blue-600 text-xl"></i>
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(108,99,255,0.18); color: var(--accent-2);">
+                        <i class="fas fa-file-alt text-xl"></i>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="card p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-gray-600 text-sm">Pending</p>
-                        <p id="pendingApplications" class="text-2xl font-bold text-yellow-600">-</p>
+                        <p class="text-muted text-sm">Pending</p>
+                        <p id="pendingApplications" class="text-2xl font-bold" style="color: var(--warning);">-</p>
                     </div>
-                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(251,192,45,0.15); color: var(--warning);">
+                        <i class="fas fa-clock text-xl"></i>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="card p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-gray-600 text-sm">Under Review</p>
-                        <p id="reviewingApplications" class="text-2xl font-bold text-orange-600">-</p>
+                        <p class="text-muted text-sm">Under Review</p>
+                        <p id="reviewingApplications" class="text-2xl font-bold" style="color: var(--promo);">-</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-search text-orange-600 text-xl"></i>
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(255,92,124,0.15); color: var(--promo);">
+                        <i class="fas fa-search text-xl"></i>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="card p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-gray-600 text-sm">Accepted</p>
-                        <p id="acceptedApplications" class="text-2xl font-bold text-green-600">-</p>
+                        <p class="text-muted text-sm">Accepted</p>
+                        <p id="acceptedApplications" class="text-2xl font-bold" style="color: var(--success);">-</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-check text-green-600 text-xl"></i>
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: rgba(29,209,161,0.16); color: var(--success);">
+                        <i class="fas fa-check text-xl"></i>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Applications List -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Applications</h3>
+        <div class="card overflow-hidden">
+            <div class="px-6 py-4 flex items-center justify-between gap-4 flex-wrap" style="border-bottom:1px solid var(--slate-400);">
+                <h3 class="text-lg font-semibold" style="color: var(--white-0);">Applications</h3>
+                <div class="flex items-center gap-2">
+                    <label for="sortSelect" class="text-sm" style="color: var(--mist-300);">Sort:</label>
+                    <select id="sortSelect" class="px-3 py-2 rounded-lg text-sm" style="background: var(--ink-900); color: var(--mist-200); border:1px solid var(--slate-400);">
+                        <option value="-created_at">Newest</option>
+                        <option value="created_at">Oldest</option>
+                        <option value="-updated_at">Recently Updated</option>
+                        <option value="updated_at">Least Recently Updated</option>
+                    </select>
+                </div>
             </div>
             
-            <div id="applicationsContainer" class="divide-y divide-gray-200">
+            <div id="applicationsContainer">
                 <!-- Applications will be loaded here -->
             </div>
             
             <!-- Empty State -->
             <div id="emptyState" class="hidden p-12 text-center">
-                <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-file-alt text-gray-400 text-2xl"></i>
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style="background: rgba(108,99,255,0.18); color: var(--accent-2);">
+                    <i class="fas fa-file-alt text-2xl"></i>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No applications yet</h3>
-                <p class="text-gray-600 mb-6">Start applying to opportunities to see them here</p>
-                <a href="opportunities.html" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200">
-                    <i class="fas fa-search mr-2"></i>Browse Opportunities
+                <h3 class="text-lg font-medium" style="color: var(--white-0);">No applications yet</h3>
+                <p class="text-muted mb-6">Apply less. Win more. Your shortlist awaits.</p>
+                <a href="opportunities.html" class="btn btn--secondary btn--pill">
+                    <i class="fas fa-search"></i><span>Browse Opportunities</span>
                 </a>
             </div>
             
             <!-- Pagination -->
-            <div id="pagination" class="px-6 py-4 border-t border-gray-200">
+            <div id="pagination" class="px-6 py-4" style="border-top:1px solid var(--slate-400);">
                 <!-- Pagination will be loaded here -->
             </div>
         </div>
@@ -167,10 +198,10 @@
 
     <!-- Application Detail Modal -->
     <div id="applicationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
-            <div class="flex justify-between items-center p-6 border-b border-gray-200">
-                <h3 class="text-xl font-semibold text-gray-900">Application Details</h3>
-                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <div class="modal-content" style="background: var(--ink-900); border:1px solid var(--slate-400); border-radius: 12px; max-width: 960px; width: 100%; margin: 0 16px; max-height: 90vh; overflow: hidden;">
+            <div class="flex justify-between items-center p-6" style="border-bottom:1px solid var(--slate-400);">
+                <h3 class="text-xl font-semibold" style="color: var(--white-0);">Application Details</h3>
+                <button id="closeModalBtn" class="btn btn--ghost">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -182,23 +213,23 @@
 
     <!-- Withdraw Confirmation Modal -->
     <div id="withdrawModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+        <div class="modal-content" style="background: var(--ink-900); border:1px solid var(--slate-400); border-radius: 12px; max-width: 480px; width: 100%; margin: 0 16px;">
             <div class="p-6">
                 <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
-                        <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4" style="background: rgba(255,77,79,0.18); color: var(--danger);">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Withdraw Application</h3>
-                        <p class="text-sm text-gray-600">This action cannot be undone</p>
+                        <h3 class="text-lg font-semibold" style="color: var(--white-0);">Withdraw Application</h3>
+                        <p class="text-sm" style="color: var(--mist-300);">This action cannot be undone</p>
                     </div>
                 </div>
-                <p class="text-gray-700 mb-6">Are you sure you want to withdraw your application? You won't be able to restore it later.</p>
+                <p class="mb-6" style="color: var(--mist-200);">Are you sure you want to withdraw your application? You won't be able to restore it later.</p>
                 <div class="flex justify-end space-x-3">
-                    <button id="cancelWithdrawBtn" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                    <button id="cancelWithdrawBtn" class="btn btn--ghost">
                         Cancel
                     </button>
-                    <button id="confirmWithdrawBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    <button id="confirmWithdrawBtn" class="btn btn--secondary" style="background: var(--danger);">
                         Withdraw Application
                     </button>
                 </div>
@@ -208,9 +239,9 @@
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
-            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <span class="text-gray-700">Loading...</span>
+        <div class="rounded-lg p-6 flex items-center space-x-3" style="background: var(--ink-900); border:1px solid var(--slate-400); color: var(--mist-200);">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2" style="border-color: var(--accent-2);"></div>
+            <span>Loading...</span>
         </div>
     </div>
 
@@ -238,7 +269,7 @@
             return div.innerHTML;
         }
         
-        document.addEventListener('DOMContentLoaded', async function() {
+    document.addEventListener('DOMContentLoaded', async function() {
             console.log('Applications page loading...');
             
             // Simple auth check
@@ -273,14 +304,28 @@
             }
             
             // Event listeners
-            const statusFilter = document.getElementById('statusFilter');
+            const statusChipRow = document.getElementById('statusChipRow');
             const closeModalBtn = document.getElementById('closeModalBtn');
             const cancelWithdrawBtn = document.getElementById('cancelWithdrawBtn');
             const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
             const userMenuBtn = document.getElementById('userMenuBtn');
             const userMenu = document.getElementById('userMenu');
             
-            if (statusFilter) statusFilter.addEventListener('change', handleFilter);
+            if (statusChipRow) {
+                statusChipRow.addEventListener('click', (e)=>{
+                    const btn = e.target.closest('.status-chip');
+                    if(!btn) return;
+                    statusChipRow.querySelectorAll('.status-chip').forEach(b=> b.classList.remove('active'));
+                    btn.classList.add('active');
+                    // Trigger reload using existing filter handler
+                    handleFilter();
+                });
+            }
+            // Sort change
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', ()=> handleFilter());
+            }
             if (closeModalBtn) closeModalBtn.addEventListener('click', hideApplicationModal);
             if (cancelWithdrawBtn) cancelWithdrawBtn.addEventListener('click', hideWithdrawModal);
             if (confirmWithdrawBtn) confirmWithdrawBtn.addEventListener('click', handleWithdraw);
@@ -339,7 +384,7 @@
             }
         }
 
-        async function loadApplications(page = 1) {
+    async function loadApplications(page = 1) {
             if (isLoading) {
                 console.log('Applications already loading, skipping...');
                 return;
@@ -348,12 +393,13 @@
             try {
                 isLoading = true;
                 showLoading(true);
-                const filters = {
-                    page
-                };
+                const sortSelect = document.getElementById('sortSelect');
+                const ordering = sortSelect ? sortSelect.value : '-created_at';
+                const filters = { page, ordering };
                 
                 // Only add status filter if it's not empty
-                const statusValue = document.getElementById('statusFilter').value;
+                const chipActive = document.querySelector('#statusChipRow .status-chip.active');
+                const statusValue = chipActive ? chipActive.dataset.status : '';
                 if (statusValue) {
                     filters.status = statusValue;
                 }
@@ -394,40 +440,36 @@
                 ) : null;
                 
                 return `
-                    <div class="p-6 hover:bg-gray-50 transition-colors">
+                    <div class="app-item">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <div class="flex items-start space-x-4">
-                                    <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-building text-white"></i>
+                                    <div class="app-icon flex-shrink-0">
+                                        <i class="fas fa-building"></i>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <h3 class="text-lg font-semibold text-gray-900 mb-1">${escapeHtml(app.opportunity_title || app.opportunity?.title || 'Opportunity')}</h3>
-                                        <p class="text-gray-600 mb-2">${escapeHtml(app.organization_name || app.opportunity?.organization?.name || 'Organization')}</p>
-                                        <div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
+                                        <h3 class="text-lg app-title mb-1">${escapeHtml(app.opportunity_title || app.opportunity?.title || 'Opportunity')}</h3>
+                                        <p class="app-org mb-2">${escapeHtml(app.organization_name || app.opportunity?.organization?.name || 'Organization')}</p>
+                                        <div class="app-meta mb-3">
                                             <span><i class="fas fa-calendar mr-1"></i>Applied ${formatDate(app.applied_at)}</span>
                                             <span><i class="fas fa-clock mr-1"></i>${escapeHtml(app.opportunity?.opportunity_type || 'Unknown')}</span>
                                             <span><i class="fas fa-map-marker-alt mr-1"></i>${escapeHtml(app.opportunity?.location || 'Remote')}</span>
                                         </div>
                                         ${coverLetterAnswer ? `
-                                        <div class="bg-gray-50 rounded-lg p-3 mb-3">
-                                            <p class="text-sm text-gray-700 font-medium mb-1">Cover Letter:</p>
-                                            <p class="text-sm text-gray-600 line-clamp-2">${escapeHtml(coverLetterAnswer.answer_text)}</p>
+                                        <div class="rounded-lg p-3 mb-3" style="background: var(--ink-800); border:1px solid var(--slate-400);">
+                                            <p class="text-sm" style="color: var(--mist-200); font-weight:600;">Cover Letter:</p>
+                                            <p class="text-sm" style="color: var(--mist-300);">${escapeHtml(coverLetterAnswer.answer_text)}</p>
                                         </div>
                                         ` : ''}
                                     </div>
                                 </div>
                             </div>
-                            <div class="ml-6 flex flex-col items-end space-y-3">
+                            <div class="ml-6 flex flex-col items-end space-y-3 app-tools">
                                 ${getStatusBadge(app.status)}
-                                <div class="flex space-x-2">
-                                    <button onclick="viewApplication(${app.id})" class="px-3 py-1 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors text-sm">
-                                        <i class="fas fa-eye mr-1"></i>View
-                                    </button>
+                                <div class="flex gap-2">
+                                    <button onclick="viewApplication(${app.id})" class="btn btn--ghost"><i class="fas fa-eye"></i><span>View</span></button>
                                     ${canWithdraw ? `
-                                    <button onclick="showWithdrawModal(${app.id})" class="px-3 py-1 text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors text-sm">
-                                        <i class="fas fa-times mr-1"></i>Withdraw
-                                    </button>
+                                    <button onclick="showWithdrawModal(${app.id})" class="btn btn--secondary" style="background: var(--danger);"><i class="fas fa-times"></i><span>Withdraw</span></button>
                                     ` : ''}
                                 </div>
                             </div>
@@ -435,15 +477,15 @@
                         
                         <!-- Status Timeline -->
                         ${app.status_history && app.status_history.length > 0 ? `
-                        <div class="mt-4 pt-4 border-t border-gray-200">
-                            <p class="text-sm font-medium text-gray-700 mb-2">Status History</p>
+                        <div class="mt-4 pt-4" style="border-top:1px solid var(--slate-400);">
+                            <p class="text-sm" style="color: var(--mist-200); font-weight:600;">Status History</p>
                             <div class="flex space-x-4 overflow-x-auto">
                                 ${app.status_history.slice(-3).map(history => `
                                     <div class="flex-shrink-0 text-center">
-                                        <div class="w-8 h-8 rounded-full ${getStatusColor(history.status)} flex items-center justify-center mb-1">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center mb-1" style="${getStatusDotStyle(history.status)}">
                                             <i class="fas ${getStatusIcon(history.status)} text-xs"></i>
                                         </div>
-                                        <p class="text-xs text-gray-500">${formatDate(history.created_at)}</p>
+                                        <p class="text-xs" style="color: var(--mist-300);">${formatDate(history.created_at)}</p>
                                     </div>
                                 `).join('')}
                             </div>
@@ -456,30 +498,30 @@
 
         function getStatusBadge(status) {
             const badges = {
-                pending: '<span class="px-3 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-full font-medium">Pending</span>',
-                under_review: '<span class="px-3 py-1 text-sm bg-orange-100 text-orange-800 rounded-full font-medium">Under Review</span>',
-                reviewing: '<span class="px-3 py-1 text-sm bg-orange-100 text-orange-800 rounded-full font-medium">Under Review</span>',
-                interview_scheduled: '<span class="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full font-medium">Interview Scheduled</span>',
-                shortlisted: '<span class="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full font-medium">Shortlisted</span>',
-                accepted: '<span class="px-3 py-1 text-sm bg-green-100 text-green-800 rounded-full font-medium">Accepted</span>',
-                rejected: '<span class="px-3 py-1 text-sm bg-red-100 text-red-800 rounded-full font-medium">Rejected</span>',
-                withdrawn: '<span class="px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded-full font-medium">Withdrawn</span>'
+                pending: '<span class="badge badge--pending">Pending</span>',
+                under_review: '<span class="badge badge--review">Under Review</span>',
+                reviewing: '<span class="badge badge--review">Under Review</span>',
+                interview_scheduled: '<span class="badge badge--interview">Interview Scheduled</span>',
+                shortlisted: '<span class="badge badge--shortlist">Shortlisted</span>',
+                accepted: '<span class="badge badge--accepted">Accepted</span>',
+                rejected: '<span class="badge badge--rejected">Rejected</span>',
+                withdrawn: '<span class="badge badge--withdrawn">Withdrawn</span>'
             };
-            return badges[status] || '<span class="px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded-full font-medium">Unknown</span>';
+            return badges[status] || '<span class="badge" style="background: rgba(255,255,255,0.08); color: var(--mist-300);">Unknown</span>';
         }
 
-        function getStatusColor(status) {
-            const colors = {
-                pending: 'bg-yellow-200 text-yellow-700',
-                under_review: 'bg-orange-200 text-orange-700',
-                reviewing: 'bg-orange-200 text-orange-700',
-                interview_scheduled: 'bg-blue-200 text-blue-700',
-                shortlisted: 'bg-blue-200 text-blue-700',
-                accepted: 'bg-green-200 text-green-700',
-                rejected: 'bg-red-200 text-red-700',
-                withdrawn: 'bg-gray-200 text-gray-700'
+        function getStatusDotStyle(status) {
+            const map = {
+                pending: 'background: rgba(251,192,45,0.15); color:#FBC02D;',
+                under_review: 'background: rgba(255,92,124,0.15); color: var(--promo);',
+                reviewing: 'background: rgba(255,92,124,0.15); color: var(--promo);',
+                interview_scheduled: 'background: rgba(108,99,255,0.18); color: var(--accent-2);',
+                shortlisted: 'background: rgba(0,229,255,0.18); color: var(--accent-3);',
+                accepted: 'background: rgba(29,209,161,0.16); color: var(--success);',
+                rejected: 'background: rgba(255,77,79,0.18); color: var(--danger);',
+                withdrawn: 'background: rgba(255,255,255,0.08); color: var(--mist-300);'
             };
-            return colors[status] || 'bg-gray-200 text-gray-700';
+            return map[status] || 'background: rgba(255,255,255,0.08); color: var(--mist-300);';
         }
 
         function getStatusIcon(status) {
@@ -506,20 +548,20 @@
             }
             
             let pagination = '<div class="flex items-center justify-between">';
-            pagination += `<p class="text-sm text-gray-700">Showing ${((currentPage - 1) * 20) + 1} to ${Math.min(currentPage * 20, data.count)} of ${data.count} results</p>`;
-            pagination += '<div class="flex space-x-2">';
+            pagination += `<p class=\"text-sm\" style=\"color: var(--mist-300);\">Showing ${((currentPage - 1) * 20) + 1} to ${Math.min(currentPage * 20, data.count)} of ${data.count} results</p>`;
+            pagination += '<div class="flex gap-2">';
             
             if (currentPage > 1) {
-                pagination += `<button onclick="loadApplications(${currentPage - 1})" class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Previous</button>`;
+                pagination += `<button onclick=\"loadApplications(${currentPage - 1})\" class=\"btn btn--ghost btn--sm\">Previous</button>`;
             }
             
             for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
                 const isActive = i === currentPage;
-                pagination += `<button onclick="loadApplications(${i})" class="px-3 py-1 border ${isActive ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 hover:bg-gray-50'} rounded text-sm">${i}</button>`;
+                pagination += `<button onclick=\"loadApplications(${i})\" class=\"btn btn--sm ${isActive ? 'btn--secondary' : 'btn--ghost'}\">${i}</button>`;
             }
             
             if (currentPage < totalPages) {
-                pagination += `<button onclick="loadApplications(${currentPage + 1})" class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Next</button>`;
+                pagination += `<button onclick=\"loadApplications(${currentPage + 1})\" class=\"btn btn--ghost btn--sm\">Next</button>`;
             }
             
             pagination += '</div></div>';
@@ -536,15 +578,15 @@
                 modalContent.innerHTML = `
                     <div class="space-y-6">
                         <!-- Opportunity Info -->
-                        <div class="bg-blue-50 rounded-lg p-4">
+                        <div class="rounded-lg p-4" style="background: var(--ink-800); border:1px solid var(--slate-400);">
                             <div class="flex items-start space-x-4">
-                                <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-building text-white"></i>
+                                <div class="app-icon flex-shrink-0">
+                                    <i class="fas fa-building"></i>
                                 </div>
                                 <div class="flex-1 min-w-0 overflow-hidden">
-                                    <h4 class="text-lg font-semibold text-gray-900 break-words">${escapeHtml(app.opportunity_title || app.opportunity?.title || 'Opportunity')}</h4>
-                                    <p class="text-gray-600 break-words">${escapeHtml(app.organization_name || app.opportunity?.organization?.name || 'Organization')}</p>
-                                    <div class="flex items-center space-x-4 text-sm text-gray-500 mt-2 flex-wrap">
+                                    <h4 class="text-lg font-semibold break-words" style="color: var(--white-0);">${escapeHtml(app.opportunity_title || app.opportunity?.title || 'Opportunity')}</h4>
+                                    <p class="break-words" style="color: var(--mist-300);">${escapeHtml(app.organization_name || app.opportunity?.organization?.name || 'Organization')}</p>
+                                    <div class="flex items-center space-x-4 text-sm mt-2 flex-wrap" style="color: var(--mist-300);">
                                         <span class="break-words"><i class="fas fa-clock mr-1"></i>${escapeHtml(app.opportunity?.opportunity_type || 'Unknown')}</span>
                                         <span class="break-words"><i class="fas fa-map-marker-alt mr-1"></i>${escapeHtml(app.opportunity?.location || 'Remote')}</span>
                                         <span class="break-words"><i class="fas fa-calendar mr-1"></i>Deadline: ${formatDate(app.opportunity?.application_deadline)}</span>
@@ -556,48 +598,47 @@
                         <!-- Application Details -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-hidden">
                             <div class="overflow-hidden">
-                                <h5 class="font-medium text-gray-900 mb-2">Application Info</h5>
+                                <h5 class="font-medium mb-2" style="color: var(--white-0);">Application Info</h5>
                                 <div class="space-y-2 text-sm overflow-hidden">
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Applied on:</span>
-                                        <span class="font-medium">${formatDate(app.applied_at)}</span>
+                                        <span style="color: var(--mist-300);">Applied on:</span>
+                                        <span class="font-medium" style="color: var(--mist-200);">${formatDate(app.applied_at)}</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Status:</span>
+                                        <span style="color: var(--mist-300);">Status:</span>
                                         <span>${getStatusBadge(app.status)}</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-gray-600">Last Updated:</span>
-                                        <span class="font-medium">${formatDate(app.updated_at)}</span>
+                                        <span style="color: var(--mist-300);">Last Updated:</span>
+                                        <span class="font-medium" style="color: var(--mist-200);">${formatDate(app.updated_at)}</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="overflow-hidden">
-                                <h5 class="font-medium text-gray-900 mb-2">Documents</h5>
+                                <h5 class="font-medium mb-2" style="color: var(--white-0);">Documents</h5>
                                 <div class="space-y-2 overflow-hidden">
                                     ${app.resume ? `
-                                    <a href="${app.resume}" target="_blank" class="flex items-center text-sm text-blue-600 hover:text-blue-800">
+                                    <a href="${app.resume}" target="_blank" class="flex items-center text-sm" style="color: var(--accent-2);">
                                         <i class="fas fa-file-pdf mr-2"></i>Resume
                                     </a>
-                                    ` : '<p class="text-sm text-gray-500">No resume attached</p>'}
+                                    ` : '<p class="text-sm" style="color: var(--mist-300);">No resume attached</p>'}
                                 </div>
                             </div>
                         </div>
                         
                         ${app.answers && app.answers.length > 0 ? `
                         <div>
-                            <h5 class="font-medium text-gray-900 mb-3">Application Answers</h5>
+                            <h5 class="font-medium mb-3" style="color: var(--white-0);">Application Answers</h5>
                             <div class="space-y-4">
                                 ${app.answers.map(answer => {
-                                    // Escape HTML in user content and handle line breaks
                                     const escapedQuestion = escapeHtml(answer.question_text || 'Question');
                                     const escapedAnswer = escapeHtml(answer.answer_text || 'No answer provided');
                                     const formattedAnswer = escapedAnswer.replace(/\n/g, '<br>');
                                     
                                     return `
-                                    <div class="bg-gray-50 rounded-lg p-4 break-words">
-                                        <p class="font-medium text-gray-900 mb-2 break-words">${escapedQuestion}</p>
-                                        <div class="text-sm text-gray-700 break-words whitespace-pre-wrap overflow-hidden">
+                                    <div class="rounded-lg p-4 break-words" style="background: var(--ink-800); border:1px solid var(--slate-400);">
+                                        <p class="font-medium mb-2 break-words" style="color: var(--mist-200);">${escapedQuestion}</p>
+                                        <div class="text-sm break-words whitespace-pre-wrap overflow-hidden" style="color: var(--mist-300);">
                                             ${formattedAnswer}
                                         </div>
                                     </div>
@@ -610,17 +651,17 @@
                         <!-- Status History -->
                         ${app.status_history && app.status_history.length > 0 ? `
                         <div>
-                            <h5 class="font-medium text-gray-900 mb-3">Status History</h5>
+                            <h5 class="font-medium mb-3" style="color: var(--white-0);">Status History</h5>
                             <div class="space-y-3">
                                 ${app.status_history.map(history => `
-                                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                                        <div class="w-8 h-8 rounded-full ${getStatusColor(history.status)} flex items-center justify-center flex-shrink-0">
-                                            <i class="fas ${getStatusIcon(history.status)} text-xs"></i>
+                                    <div class=\"flex items-center space-x-3 p-3 rounded-lg\" style=\"background: var(--ink-800); border:1px solid var(--slate-400);\">
+                                        <div class=\"w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0\" style=\"${getStatusDotStyle(history.status)}\">
+                                            <i class=\"fas ${getStatusIcon(history.status)} text-xs\"></i>
                                         </div>
-                                        <div class="flex-1">
-                                            <p class="text-sm font-medium text-gray-900">${formatStatusName(history.status)}</p>
-                                            ${history.note ? `<p class="text-sm text-gray-600 break-words">${escapeHtml(history.note)}</p>` : ''}
-                                            <p class="text-xs text-gray-500">${formatDate(history.created_at)}</p>
+                                        <div class=\"flex-1\">
+                                            <p class=\"text-sm font-medium\" style=\"color: var(--mist-200);\">${formatStatusName(history.status)}</p>
+                                            ${history.note ? `<p class=\"text-sm break-words\" style=\"color: var(--mist-300);\">${escapeHtml(history.note)}</p>` : ''}
+                                            <p class=\"text-xs\" style=\"color: var(--mist-300);\">${formatDate(history.created_at)}</p>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -629,14 +670,14 @@
                         ` : ''}
                         
                         <!-- Actions -->
-                        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                        <div class="flex justify-end space-x-3 pt-4" style="border-top:1px solid var(--slate-400);">
                             ${['pending', 'under_review'].includes(app.status) ? `
-                            <button onclick="showWithdrawModal(${app.id}); hideApplicationModal();" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                                <i class="fas fa-times mr-2"></i>Withdraw Application
+                            <button onclick="showWithdrawModal(${app.id}); hideApplicationModal();" class="btn btn--secondary" style="background: var(--danger);">
+                                <i class="fas fa-times mr-2"></i><span>Withdraw Application</span>
                             </button>
                             ` : ''}
-                            <button onclick="window.open('/opportunity-details.html?id=${app.opportunity?.id || ''}', '_blank')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                <i class="fas fa-external-link-alt mr-2"></i>View Opportunity
+                            <button onclick="window.open('/opportunity-details.html?id=${app.opportunity?.id || ''}', '_blank')" class="btn btn--secondary">
+                                <i class="fas fa-external-link-alt mr-2"></i><span>View Opportunity</span>
                             </button>
                         </div>
                     </div>

@@ -8,6 +8,7 @@ from .models import (
     Project,
     Achievement,
     Language,
+    SocialLink,
 )
 
 
@@ -153,3 +154,10 @@ class LanguageAdmin(admin.ModelAdmin):
     list_display = ('student', 'language', 'proficiency')
     list_filter = ('proficiency',)
     search_fields = ('student__user__email', 'student__user__first_name', 'student__user__last_name', 'language')
+
+
+@admin.register(SocialLink)
+class SocialLinkAdmin(admin.ModelAdmin):
+    list_display = ("student", "platform", "label", "url", "is_public", "sort_order")
+    list_filter = ("platform", "is_public")
+    search_fields = ("student__user__email", "student__user__first_name", "student__user__last_name", "label", "url")

@@ -5,13 +5,13 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from .models import (
     StudentProfile, Education, Experience, Skill, StudentSkill, 
-    Project, Achievement, Language
+    Project, Achievement, Language, SocialLink
 )
 from .serializers import (
     StudentProfileSerializer, StudentProfileUpdateSerializer,
     EducationSerializer, ExperienceSerializer, SkillSerializer,
     StudentSkillSerializer, ProjectSerializer, AchievementSerializer,
-    LanguageSerializer, StudentDashboardSerializer
+    LanguageSerializer, StudentDashboardSerializer, SocialLinkSerializer
 )
 
 User = get_user_model()
@@ -241,6 +241,59 @@ class LanguageDetailView(generics.RetrieveUpdateDestroyAPIView):
         )
         return Language.objects.filter(student=student_profile)
 
+# Social Links Views
+class SocialLinkListCreateView(generics.ListCreateAPIView):
+    serializer_class = SocialLinkSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        student_profile, _ = StudentProfile.objects.get_or_create(user=self.request.user)
+        return SocialLink.objects.filter(student=student_profile)
+
+    def perform_create(self, serializer):
+        student_profile, _ = StudentProfile.objects.get_or_create(user=self.request.user)
+        serializer.save(student=student_profile)
+
+
+class SocialLinkDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = SocialLinkSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        student_profile, _ = StudentProfile.objects.get_or_create(user=self.request.user)
+        return SocialLink.objects.filter(student=student_profile)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def upsert_social_link(request):
+    """Create or update a single social link by platform for the current student."""
+    try:
+        student_profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+        platform = request.data.get('platform')
+        url = request.data.get('url')
+        label = request.data.get('label', '')
+        is_public = request.data.get('is_public', True)
+        sort_order = request.data.get('sort_order', 0)
+
+        if not platform or not url:
+            return Response({'detail': 'platform and url are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        obj, created = SocialLink.objects.update_or_create(
+            student=student_profile,
+            platform=platform,
+            defaults={
+                'url': url,
+                'label': label,
+                'is_public': bool(is_public),
+                'sort_order': int(sort_order) if str(sort_order).isdigit() else 0,
+            }
+        )
+        ser = SocialLinkSerializer(obj)
+        return Response(ser.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'detail': f'Failed to upsert social link: {e}'}, status=status.HTTP_400_BAD_REQUEST)
+
 # Resume Upload View
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -337,3 +390,110 @@ def student_application_stats(request):
             {'error': f'Failed to get application stats: {str(e)}'}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+# Public Opportuni Card (read-only, no auth)
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def public_opportuni_card(request, student_id):
+    """Return a public, shareable snapshot of a student's profile (respecting privacy)."""
+    try:
+        profile = get_object_or_404(StudentProfile, student_id=student_id)
+        user = profile.user
+        # Basic identity
+        data = {
+            'student_id': profile.student_id,
+            'name': user.get_full_name() or user.email,
+            'avatar_url': getattr(user, 'avatar', None).url if getattr(user, 'avatar', None) else None,
+            'university': profile.university,
+            'major': profile.major,
+            'location': profile.location,
+            'bio': profile.bio,
+            'portfolio_url': profile.portfolio_url,
+        }
+        # Respect visibility prefs
+        if profile.email_visible:
+            data['email'] = user.email
+        if profile.phone_visible and profile.phone:
+            data['phone'] = profile.phone
+
+        # Recent education (most recent first via model Meta ordering)
+        edu = profile.education.all().order_by('-start_date')[:1]
+        data['education'] = [
+            {
+                'institution': e.institution,
+                'degree': e.degree,
+                'field_of_study': e.field_of_study,
+                'start_date': e.start_date.isoformat(),
+                'end_date': e.end_date.isoformat() if e.end_date else None,
+                'gpa': float(e.gpa) if e.gpa is not None else None,
+            } for e in edu
+        ]
+
+        # Top 6 skills by proficiency, fallback to name asc
+        skills_qs = profile.skills.select_related('skill').all()
+        skills_sorted = sorted(
+            skills_qs,
+            key=lambda s: (-(s.proficiency_level or 0), (s.skill.name or '').lower())
+        )[:6]
+        data['skills'] = [
+            {
+                'name': s.skill.name,
+                'category': s.skill.category,
+                'proficiency_level': s.proficiency_level,
+            } for s in skills_sorted
+        ]
+
+        # Featured or latest project
+        proj = (
+            profile.projects.filter(featured=True).order_by('-start_date').first()
+            or profile.projects.order_by('-start_date').first()
+        )
+        if proj:
+            data['project'] = {
+                'title': proj.title,
+                'description': proj.description,
+                'project_url': proj.project_url,
+                'github_url': proj.github_url,
+                'start_date': proj.start_date.isoformat(),
+                'end_date': proj.end_date.isoformat() if proj.end_date else None,
+                'is_ongoing': proj.is_ongoing,
+            }
+
+        # Latest experience
+        exp = profile.experiences.order_by('-start_date').first()
+        if exp:
+            data['experience'] = {
+                'title': exp.title,
+                'company': exp.company,
+                'experience_type': exp.experience_type,
+                'location': exp.location,
+                'start_date': exp.start_date.isoformat(),
+                'end_date': exp.end_date.isoformat() if exp.end_date else None,
+                'is_current': exp.is_current,
+            }
+
+        # Recent achievements (top 2)
+        ach_qs = profile.achievements.order_by('-date_achieved')[:2]
+        data['achievements'] = [
+            {
+                'title': a.title,
+                'achievement_type': a.achievement_type,
+                'issuing_organization': a.issuing_organization,
+                'date_achieved': a.date_achieved.isoformat(),
+                'certificate_url': a.certificate_url,
+            } for a in ach_qs
+        ]
+
+        # Languages (up to 6)
+        lang_qs = profile.languages.all()[:6]
+        data['languages'] = [
+            {
+                'language': l.language,
+                'proficiency': l.proficiency,
+            } for l in lang_qs
+        ]
+
+        return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': f'Not found or unavailable: {str(e)}'}, status=status.HTTP_404_NOT_FOUND)

@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="assets/css/components.css?v=20250814-2" />
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="theme-opportuni">
+<body class="theme-opportuni min-h-screen">
     <!-- Student Navbar (shared component) -->
     <div id="student-navbar-root"></div>
 
@@ -31,46 +31,46 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Welcome Section -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold mb-2" style="font-family: var(--font-display);">Apply less. Win more.</h1>
-            <p>Here’s what’s happening with your opportunities today.</p>
+            <h1 class="text-3xl font-bold mb-2" style="font-family: var(--font-display); color: var(--white-0);">Apply less. Win more.</h1>
+            <p class="text-muted">Here’s what’s happening with your opportunities today.</p>
         </div>
         
         <!-- Statistics Cards -->
-    <div id="dashboard-stats" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <!-- Stats will be loaded here -->
-            <div class="bg-white p-6 rounded-xl shadow-lg animate-pulse">
+        <div id="dashboard-stats" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Dark themed skeletons while loading -->
+            <div class="card p-6 animate-pulse">
                 <div class="flex items-center">
-                    <div class="p-3 bg-gray-200 rounded-full w-12 h-12"></div>
+                    <div class="w-12 h-12 rounded-full" style="background: var(--ink-800);"></div>
                     <div class="ml-4 flex-1">
-                        <div class="h-6 bg-gray-200 rounded mb-2"></div>
-                        <div class="h-4 bg-gray-200 rounded w-20"></div>
+                        <div class="h-6 rounded mb-2" style="background: var(--ink-800);"></div>
+                        <div class="h-4 rounded w-20" style="background: var(--ink-800);"></div>
                     </div>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg animate-pulse">
+            <div class="card p-6 animate-pulse">
                 <div class="flex items-center">
-                    <div class="p-3 bg-gray-200 rounded-full w-12 h-12"></div>
+                    <div class="w-12 h-12 rounded-full" style="background: var(--ink-800);"></div>
                     <div class="ml-4 flex-1">
-                        <div class="h-6 bg-gray-200 rounded mb-2"></div>
-                        <div class="h-4 bg-gray-200 rounded w-20"></div>
+                        <div class="h-6 rounded mb-2" style="background: var(--ink-800);"></div>
+                        <div class="h-4 rounded w-20" style="background: var(--ink-800);"></div>
                     </div>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg animate-pulse">
+            <div class="card p-6 animate-pulse">
                 <div class="flex items-center">
-                    <div class="p-3 bg-gray-200 rounded-full w-12 h-12"></div>
+                    <div class="w-12 h-12 rounded-full" style="background: var(--ink-800);"></div>
                     <div class="ml-4 flex-1">
-                        <div class="h-6 bg-gray-200 rounded mb-2"></div>
-                        <div class="h-4 bg-gray-200 rounded w-20"></div>
+                        <div class="h-6 rounded mb-2" style="background: var(--ink-800);"></div>
+                        <div class="h-4 rounded w-20" style="background: var(--ink-800);"></div>
                     </div>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg animate-pulse">
+            <div class="card p-6 animate-pulse">
                 <div class="flex items-center">
-                    <div class="p-3 bg-gray-200 rounded-full w-12 h-12"></div>
+                    <div class="w-12 h-12 rounded-full" style="background: var(--ink-800);"></div>
                     <div class="ml-4 flex-1">
-                        <div class="h-6 bg-gray-200 rounded mb-2"></div>
-                        <div class="h-4 bg-gray-200 rounded w-20"></div>
+                        <div class="h-6 rounded mb-2" style="background: var(--ink-800);"></div>
+                        <div class="h-4 rounded w-20" style="background: var(--ink-800);"></div>
                     </div>
                 </div>
             </div>
@@ -80,36 +80,39 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Recent Applications -->
             <div class="lg:col-span-2">
-        <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="card p-6">
                     <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold">Recent Applications</h2>
-            <a href="/applications.html" class="text-sm font-medium" style="color: var(--accent-3);">View all</a>
+                        <h2 class="text-xl font-semibold flex items-center gap-2" style="color: var(--white-0);">
+                            <i class="fas fa-clipboard-list" style="color: var(--accent-2);"></i>
+                            Recent Applications
+                        </h2>
+                        <a href="/applications.html" class="text-sm font-medium" style="color: var(--accent-3);">View all</a>
                     </div>
                     
                     <div id="recent-applications" class="space-y-4">
                         <!-- Applications will be loaded here -->
                         <div class="animate-pulse">
-                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                            <div class="flex items-center justify-between p-4 rounded-lg" style="border:1px solid var(--slate-400); background: var(--ink-900);">
                                 <div class="flex items-center space-x-4">
-                                    <div class="w-12 h-12 bg-gray-200 rounded-lg"></div>
+                                    <div class="w-12 h-12 rounded-lg" style="background: var(--ink-800);"></div>
                                     <div>
-                                        <div class="h-4 bg-gray-200 rounded w-32 mb-2"></div>
-                                        <div class="h-3 bg-gray-200 rounded w-24"></div>
+                                        <div class="h-4 rounded w-32 mb-2" style="background: var(--ink-800);"></div>
+                                        <div class="h-3 rounded w-24" style="background: var(--ink-800);"></div>
                                     </div>
                                 </div>
-                                <div class="h-6 bg-gray-200 rounded w-16"></div>
+                                <div class="h-6 rounded w-16" style="background: var(--ink-800);"></div>
                             </div>
                         </div>
                         <div class="animate-pulse">
-                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                            <div class="flex items-center justify-between p-4 rounded-lg" style="border:1px solid var(--slate-400); background: var(--ink-900);">
                                 <div class="flex items-center space-x-4">
-                                    <div class="w-12 h-12 bg-gray-200 rounded-lg"></div>
+                                    <div class="w-12 h-12 rounded-lg" style="background: var(--ink-800);"></div>
                                     <div>
-                                        <div class="h-4 bg-gray-200 rounded w-32 mb-2"></div>
-                                        <div class="h-3 bg-gray-200 rounded w-24"></div>
+                                        <div class="h-4 rounded w-32 mb-2" style="background: var(--ink-800);"></div>
+                                        <div class="h-3 rounded w-24" style="background: var(--ink-800);"></div>
                                     </div>
                                 </div>
-                                <div class="h-6 bg-gray-200 rounded w-16"></div>
+                                <div class="h-6 rounded w-16" style="background: var(--ink-800);"></div>
                             </div>
                         </div>
                     </div>
@@ -119,76 +122,82 @@
             <!-- Quick Actions & Recommended -->
             <div class="space-y-6">
                 <!-- Quick Actions -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+                <div class="card p-6">
+                    <h2 class="text-xl font-semibold flex items-center gap-2 mb-4" style="color: var(--white-0);">
+                        <i class="fas fa-bolt" style="color: var(--accent-1);"></i>
+                        Quick Actions
+                    </h2>
                     <div class="space-y-3">
-                        <a href="/opportunities.html" class="flex items-center p-3 rounded-lg border border-gray-200 transition-all duration-200">
-                            <div class="p-2 rounded-lg mr-3" style="background: rgba(108,99,255,0.15);">
+                        <a href="/opportunities.html" class="flex items-center p-3 rounded-lg transition-all duration-200" style="border:1px solid var(--slate-400); background: var(--ink-900);">
+                            <div class="p-2 rounded-lg mr-3" style="background: rgba(108,99,255,0.18);">
                                 <i class="fas fa-search" style="color: var(--accent-2);"></i>
                             </div>
                             <div>
-                                <div class="font-medium">Browse Opportunities</div>
-                                <div class="text-sm">Find new opportunities</div>
+                                <div class="font-medium" style="color: var(--mist-200);">Browse Opportunities</div>
+                                <div class="text-sm" style="color: var(--mist-300);">Find new opportunities</div>
                             </div>
                         </a>
                         
-                        <a href="/profile.html" class="flex items-center p-3 rounded-lg border border-gray-200 transition-all duration-200">
-                            <div class="p-2 rounded-lg mr-3" style="background: rgba(0,229,255,0.15);">
+                        <a href="/profile.html" class="flex items-center p-3 rounded-lg transition-all duration-200" style="border:1px solid var(--slate-400); background: var(--ink-900);">
+                            <div class="p-2 rounded-lg mr-3" style="background: rgba(0,229,255,0.18);">
                                 <i class="fas fa-user-edit" style="color: var(--accent-3);"></i>
                             </div>
                             <div>
-                                <div class="font-medium">Update Profile</div>
-                                <div class="text-sm">Keep your profile current</div>
+                                <div class="font-medium" style="color: var(--mist-200);">Update Profile</div>
+                                <div class="text-sm" style="color: var(--mist-300);">Keep your profile current</div>
                             </div>
                         </a>
                         
-                        <button onclick="showResumeUpload()" class="w-full flex items-center p-3 rounded-lg border border-gray-200 transition-all duration-200">
-                            <div class="p-2 rounded-lg mr-3" style="background: rgba(200,255,0,0.15);">
+                        <button onclick="showResumeUpload()" class="w-full flex items-center p-3 rounded-lg transition-all duration-200" style="border:1px solid var(--slate-400); background: var(--ink-900);">
+                            <div class="p-2 rounded-lg mr-3" style="background: rgba(200,255,0,0.18);">
                                 <i class="fas fa-file-upload" style="color: var(--accent-1);"></i>
                             </div>
                             <div class="text-left">
-                                <div class="font-medium">Upload Resume</div>
-                                <div class="text-sm">Update your resume</div>
+                                <div class="font-medium" style="color: var(--mist-200);">Upload Resume</div>
+                                <div class="text-sm" style="color: var(--mist-300);">Update your resume</div>
                             </div>
                         </button>
                     </div>
                 </div>
                 
                 <!-- Recommended Opportunities -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-semibold mb-4">Recommended for You</h2>
+                <div class="card p-6">
+                    <h2 class="text-xl font-semibold flex items-center gap-2 mb-4" style="color: var(--white-0);">
+                        <i class="fas fa-stars" style="color: var(--accent-2);"></i>
+                        Recommended for You
+                    </h2>
                     <div id="recommended-opportunities" class="space-y-4">
                         <!-- Recommendations will be loaded here -->
                         <div class="animate-pulse">
-                            <div class="p-4 border border-gray-200 rounded-lg">
-                                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                                <div class="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                                <div class="h-6 bg-gray-200 rounded w-16"></div>
+                            <div class="p-4 rounded-lg" style="border:1px solid var(--slate-400); background: var(--ink-900);">
+                                <div class="h-4 rounded w-3/4 mb-2" style="background: var(--ink-800);"></div>
+                                <div class="h-3 rounded w-1/2 mb-2" style="background: var(--ink-800);"></div>
+                                <div class="h-6 rounded w-16" style="background: var(--ink-800);"></div>
                             </div>
                         </div>
                         <div class="animate-pulse">
-                            <div class="p-4 border border-gray-200 rounded-lg">
-                                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                                <div class="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                                <div class="h-6 bg-gray-200 rounded w-16"></div>
+                            <div class="p-4 rounded-lg" style="border:1px solid var(--slate-400); background: var(--ink-900);">
+                                <div class="h-4 rounded w-3/4 mb-2" style="background: var(--ink-800);"></div>
+                                <div class="h-3 rounded w-1/2 mb-2" style="background: var(--ink-800);"></div>
+                                <div class="h-6 rounded w-16" style="background: var(--ink-800);"></div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Profile Completion -->
-                <div class="rounded-xl shadow-lg p-6" style="background: rgba(108,99,255,0.12);">
-                    <h2 class="text-xl font-semibold mb-4">Profile Completion</h2>
+                <div class="rounded-xl shadow-lg p-6" style="background: rgba(108,99,255,0.12); border:1px solid var(--slate-400);">
+                    <h2 class="text-xl font-semibold mb-4" style="color: var(--white-0);">Profile Completion</h2>
                     <div class="mb-4">
                         <div class="flex justify-between text-sm mb-2">
-                            <span>Progress</span>
-                            <span class="font-medium" id="profile-completion-percent">75%</span>
+                            <span class="text-muted">Progress</span>
+                            <span class="font-medium" id="profile-completion-percent" style="color: var(--mist-200);">75%</span>
                         </div>
-                        <div class="w-full rounded-full h-2" style="background: var(--slate-400);">
+                        <div class="w-full rounded-full h-2" style="background: var(--ink-800);">
                             <div class="h-2 rounded-full" style="width: 75%; background: var(--brand-primary);" id="profile-completion-bar"></div>
                         </div>
                     </div>
-                    <p class="text-sm mb-4">Complete your profile to get better opportunity matches!</p>
+                    <p class="text-sm mb-4" style="color: var(--mist-300);">Complete your profile to get better opportunity matches!</p>
                     <a href="/profile.html" class="inline-flex items-center font-medium text-sm" style="color: var(--accent-3);">
                         Complete Profile <i class="fas fa-arrow-right ml-1"></i>
                     </a>
@@ -199,22 +208,22 @@
 
     <!-- Resume Upload Modal -->
     <div id="resume-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+        <div class="rounded-2xl shadow-2xl max-w-md w-full p-6" style="background: var(--ink-900); border:1px solid var(--slate-400);">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold">Upload Resume</h3>
+                <h3 class="text-lg font-semibold" style="color: var(--white-0);">Upload Resume</h3>
                 <button onclick="closeResumeModal()" class="" style="color: var(--mist-300);">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
             
             <div class="mb-6">
-                <div class="border-2 border-dashed rounded-lg p-6 text-center transition-colors duration-200" id="resume-drop-zone" style="border-color: var(--slate-400);">
+                <div class="border-2 border-dashed rounded-lg p-6 text-center transition-colors duration-200" id="resume-drop-zone" style="border-color: var(--slate-400); background: var(--ink-900);">
                     <input type="file" id="resume-file" class="hidden" accept=".pdf,.doc,.docx">
                     <i class="fas fa-cloud-upload-alt text-4xl mb-4" style="color: var(--mist-300);"></i>
-                    <p class="mb-2">Click to upload or drag and drop</p>
+                    <p class="mb-2" style="color: var(--mist-200);">Click to upload or drag and drop</p>
                     <p class="text-sm" style="color: var(--mist-300);">PDF, DOC, DOCX up to 10MB</p>
                 </div>
-                <div id="resume-file-info" class="hidden mt-4 p-3 rounded-lg" style="background: var(--ink-900); border: 1px solid var(--slate-400);">
+                <div id="resume-file-info" class="hidden mt-4 p-3 rounded-lg" style="background: var(--ink-900); border: 1px solid var(--slate-400); color: var(--mist-200);">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <i class="fas fa-file-alt mr-2" style="color: var(--accent-2);"></i>
@@ -228,7 +237,7 @@
             </div>
             
             <div class="flex justify-end space-x-3">
-                <button onclick="closeResumeModal()" class="px-4 py-2 border rounded-lg" style="border-color: var(--slate-400);">
+                <button onclick="closeResumeModal()" class="px-4 py-2 border rounded-lg" style="border-color: var(--slate-400); color: var(--mist-200);">
                     Cancel
                 </button>
                 <button onclick="uploadResume()" class="text-white px-6 py-2 rounded-lg font-semibold" disabled id="upload-resume-btn" style="background: var(--brand-primary);">
@@ -240,7 +249,7 @@
 
     <!-- Loading Spinner -->
     <div id="loading-spinner" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg p-8 flex flex-col items-center">
+        <div class="rounded-lg p-8 flex flex-col items-center" style="background: var(--ink-900); border:1px solid var(--slate-400); color: var(--mist-200);">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 mb-4" style="border-color: var(--accent-2);"></div>
             <p>Loading...</p>
         </div>

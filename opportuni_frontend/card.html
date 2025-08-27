@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opportuni Card</title>
+  <link rel="stylesheet" href="assets/css/theme.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/profile.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dymIli6Q8n+H9hSoKOlne342XQI3/OQvPsvBLnBxGZ+rsoAhH2m6q+UpBAkLTUEX2UjsFvdcMZx1z7Y6Y3v3EQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script>
+    // Font Awesome fallback: try alternate CDNs, then emoji fallback
+    (function(){
+      function faPresent(){
+        try { var i=document.createElement('i'); i.className='fas fa-check'; i.style.cssText='position:absolute;left:-9999px;top:-9999px;'; document.documentElement.appendChild(i); var fam=getComputedStyle(i).fontFamily||''; var w=i.getBoundingClientRect().width; i.remove(); return /Font Awesome/i.test(fam)||w>0; } catch(_) { return false; }
+      }
+      function loadCss(href,id){ if(document.getElementById(id))return; var l=document.createElement('link'); l.rel='stylesheet'; l.href=href; l.id=id; l.crossOrigin='anonymous'; document.head.appendChild(l); }
+      function ensureFA(){ if(faPresent()) return; loadCss('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css','fa-fallback-jsdelivr'); setTimeout(function(){ if(!faPresent()) loadCss('https://unpkg.com/@fortawesome/fontawesome-free@5.15.4/css/all.min.css','fa-fallback-unpkg'); },600); setTimeout(function(){ if(!faPresent()){ loadCss('assets/css/icon-fallback.css','emoji-fallback-css'); document.body.classList.add('emoji-fallback'); } },1200); }
+      window.addEventListener('load', function(){ setTimeout(ensureFA,200); });
+    })();
+  </script>
+  <style>
+    .card-wrap { max-width: 720px; margin: 40px auto; padding: 16px; }
+    .op-card { background: var(--ink-900); border: 1px solid var(--slate-400); padding: 24px; border-radius: var(--radius-lg); }
+    .op-card .top { display:flex; gap:16px; align-items:center; }
+    .op-card .avatar { width:72px; height:72px; border-radius: 12px; background: var(--ink-800); display:flex; align-items:center; justify-content:center; color: var(--mist-300); font-size: 28px; overflow: hidden; }
+    .op-card .name { font-size: 20px; color: var(--white-0); font-weight: 600; }
+    .op-card .subtle { color: var(--mist-300); font-size: 13px; }
+  .op-card .skills { display:flex; flex-wrap: wrap; gap:8px; margin-top: 12px; }
+    .op-chip { background: var(--ink-800); border:1px solid var(--slate-400); color: var(--mist-200); padding:6px 10px; border-radius: 999px; font-size: 12px; }
+  .op-card .edu, .op-card .proj, .op-card .exp, .op-card .ach, .op-card .langs { margin-top: 16px; }
+    .op-card h3 { font-size: 14px; color: var(--mist-200); margin: 0 0 8px; }
+    .op-card .proj a { color: var(--accent-3); text-decoration: none; }
+    .op-card .proj a:hover { color: var(--accent-2); text-decoration: underline; }
+    .share-row { display:flex; gap:8px; margin-top: 16px; }
+    .btn-sm { padding: 8px 12px; font-size: 13px; border-radius: 999px; }
+  .grid2 { display:grid; grid-template-columns: 1fr; gap:16px; }
+  @media (min-width: 700px){ .grid2 { grid-template-columns: 1fr 1fr; } }
+  .muted { color: var(--mist-300); font-size: 12px; }
+  </style>
+</head>
+<body class="theme-opportuni">
+  <main class="card-wrap">
+    <div class="op-card" id="cardRoot">
+      <div class="top">
+  <div id="avatar" class="avatar" aria-label="Avatar"></div>
+        <div class="meta">
+          <div id="name" class="name">—</div>
+          <div id="bio" class="subtle">—</div>
+          <div id="contact" class="subtle" style="margin-top:6px;">—</div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div>
+          <div id="edu" class="edu"></div>
+          <div class="skills-block">
+            <h3><i class="fas fa-screwdriver-wrench mr-2 icon-subtle"></i>Skills</h3>
+            <div id="skills" class="skills"></div>
+          </div>
+        </div>
+        <div>
+          <div id="proj" class="proj"></div>
+          <div id="exp" class="exp"></div>
+        </div>
+      </div>
+  <div id="ach" class="ach"></div>
+  <div id="langs" class="langs"></div>
+      <div class="share-row">
+        <button id="btnCopy" class="btn btn-ghost btn-sm"><i class="fas fa-link"></i> Copy link</button>
+        <button id="btnDownload" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download PNG</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="assets/js/utils.js"></script>
+  <script>
+    // Default API base for local dev if not injected
+    if (!window.API_BASE_URL) {
+      try {
+        const origin = window.location.origin;
+        window.API_BASE_URL = origin.replace(':8080', ':8000') + '/api';
+      } catch (e) { window.API_BASE_URL = '/api'; }
+    }
+  </script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/export.js"></script>
+  <script>
+  // Label/icon/date helpers (aligned with profile)
+  function formatDateString(s){ if(!s) return ''; try{ const d=new Date(s); if(isNaN(d)) return String(s); return d.toLocaleDateString('en-US',{month:'short',year:'numeric'});}catch{ return String(s);} }
+  function formatDateRange(start,end){ const a=formatDateString(start); const b=end?formatDateString(end):'Present'; return `${a||''}${a||b?' - ':''}${b||''}`.trim(); }
+  function formatDegreeLabel(v){ switch(String(v||'').toLowerCase()){ case 'high_school': return 'High School Diploma'; case 'associate': return 'Associate Degree'; case 'bachelor': return "Bachelor's"; case 'master': return "Master's"; case 'phd': return 'Ph.D.'; case 'certificate': return 'Certificate'; default: return v||''; } }
+  function degreeIcon(v){ switch(String(v||'').toLowerCase()){ case 'high_school': return 'fa-school'; case 'associate': case 'bachelor': case 'master': case 'phd': return 'fa-user-graduate'; case 'certificate': return 'fa-award'; default: return 'fa-graduation-cap'; } }
+  function formatExperienceType(v){ switch(String(v||'').toLowerCase()){ case 'internship': return 'Internship'; case 'part_time': return 'Part-time'; case 'full_time': return 'Full-time'; case 'volunteer': return 'Volunteer'; case 'freelance': return 'Freelance'; case 'project': return 'Project'; default: return v||''; } }
+  function experienceTypeIcon(v){ switch(String(v||'').toLowerCase()){ case 'internship': return 'fa-user-graduate'; case 'volunteer': return 'fa-hands-helping'; case 'project': return 'fa-project-diagram'; default: return 'fa-briefcase'; } }
+  function formatLanguageProficiency(v){ if(!v) return ''; const t=String(v).replace(/_/g,' '); return t.charAt(0).toUpperCase()+t.slice(1); }
+    const params = new URLSearchParams(location.search);
+    const studentId = params.get('id');
+    const api = new API();
+    // Resolve media URLs that may come back as relative (e.g., /media/avatars/..)
+    function resolveMediaUrl(u){
+      if(!u) return null;
+      try {
+        // Absolute URL -> return as-is
+        if (/^https?:\/\//i.test(u)) return u;
+        // Derive backend origin from API_BASE_URL (e.g., http://localhost:8000/api -> http://localhost:8000)
+        const apiAbs = new URL(window.API_BASE_URL, window.location.href);
+        const backendOrigin = apiAbs.origin;
+        return backendOrigin + u;
+      } catch(e){
+        return u;
+      }
+    }
+
+    async function loadCard(){
+      const root = document.getElementById('cardRoot');
+      if(!studentId){ root.innerHTML = '<div class="text-normal">Missing student id.</div>'; return; }
+      try {
+        const r = await api.students.getPublicCard(studentId);
+        const data = r.data || r;
+        renderCard(data);
+      } catch(err){
+        root.innerHTML = '<div class="text-normal">Card not found.</div>';
+      }
+    }
+
+    function renderCard(d){
+      const av = document.getElementById('avatar');
+      const name = (d.name||'').trim();
+      const initials = name ? name.split(/\s+/).slice(0,2).map(s=>s[0]).join('').toUpperCase() : 'U';
+      const showInitials = () => {
+        av.innerHTML = `<span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:12px;background:var(--ink-800);color:var(--mist-300);font-weight:700;">${initials}</span>`;
+      };
+      if (d.avatar_url) {
+        const src = resolveMediaUrl(d.avatar_url);
+        const img = new Image();
+        img.alt = 'avatar';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '12px';
+        img.onload = () => { av.innerHTML = ''; av.appendChild(img); };
+        img.onerror = () => { showInitials(); };
+        img.src = src;
+      } else {
+        showInitials();
+      }
+      document.getElementById('name').textContent = d.name || '—';
+  document.getElementById('bio').textContent = d.bio || '';
+  const contacts = [];
+  if (d.email) contacts.push(`${escapeHtml(d.email)}`);
+  if (d.phone) contacts.push(`${escapeHtml(d.phone)}`);
+  if (d.portfolio_url) contacts.push(`<a class="link-accent" target="_blank" href="${escapeAttr(d.portfolio_url)}">Portfolio</a>`);
+  if (d.github_url) contacts.push(`<a class="link-accent" target="_blank" href="${escapeAttr(d.github_url)}">GitHub</a>`);
+  document.getElementById('contact').innerHTML = contacts.join(' · ');
+
+      const eduEl = document.getElementById('edu');
+      eduEl.innerHTML = '';
+        if (Array.isArray(d.education) && d.education.length){
+          const e = d.education[0];
+          const degLabel = formatDegreeLabel(e.degree);
+          const dates = formatDateRange(e.start_date, e.end_date);
+          const gpa = (e.gpa!==undefined && e.gpa!==null && String(e.gpa) !== '') ? ` <span class='ml-2'>GPA: ${escapeHtml(e.gpa)}</span>` : '';
+          eduEl.innerHTML = `<h3><i class='fas fa-graduation-cap mr-2 icon-subtle'></i>Education</h3>
+            <div class='subtle'>${escapeHtml(degLabel)} in ${escapeHtml(e.field_of_study||'')} · ${escapeHtml(e.institution||'')}</div>
+            <div class='muted mt-1'>${dates}${gpa}</div>`;
+      }
+
+      const skillsEl = document.getElementById('skills');
+      skillsEl.innerHTML = '';
+      (d.skills||[]).forEach(s=>{ const div = document.createElement('div'); div.className = 'op-chip'; div.textContent = s.name; skillsEl.appendChild(div); });
+
+      const projEl = document.getElementById('proj');
+      projEl.innerHTML = '';
+        if (d.project){
+          const p = d.project;
+          const dates = formatDateRange(p.start_date, p.end_date);
+          const badges = [p.featured?'<span class="op-chip">Featured</span>':'', p.is_ongoing?'<span class="op-chip">Ongoing</span>':''].filter(Boolean).join(' ');
+          projEl.innerHTML = `<h3><i class='fas fa-diagram-project mr-2 icon-subtle'></i>Project</h3>
+            <div class='subtle'>${escapeHtml(p.title||'')} ${badges}</div>
+            <div class='muted mt-1'>${dates}</div>
+            ${p.project_url?`<div class='mt-1'><a class='link-accent' href='${escapeAttr(p.project_url)}' target='_blank'>View</a></div>`:''}`;
+      }
+
+      const expEl = document.getElementById('exp');
+      expEl.innerHTML = '';
+        if (d.experience){
+          const x = d.experience;
+          const typeLabel = formatExperienceType(x.experience_type);
+          const dates = formatDateRange(x.start_date, x.end_date);
+          const loc = x.location?` · ${escapeHtml(x.location)}`:'';
+          expEl.innerHTML = `<h3><i class='fas fa-briefcase mr-2 icon-subtle'></i>Experience</h3>
+            <div class='subtle'>${escapeHtml(x.title||'')} · ${escapeHtml(x.company||'')}</div>
+            <div class='muted mt-1'>${dates} · ${escapeHtml(typeLabel)}${loc}</div>`;
+      }
+
+      const achEl = document.getElementById('ach');
+      achEl.innerHTML = '';
+      if (Array.isArray(d.achievements) && d.achievements.length){
+  achEl.innerHTML = `<h3><i class='fas fa-trophy mr-2 icon-subtle'></i>Achievements</h3>` + d.achievements.map(a=>`<div class='subtle'>${escapeHtml(a.title)} · ${escapeHtml(a.issuing_organization||'')}</div>`).join('');
+      }
+
+      const langEl = document.getElementById('langs');
+      langEl.innerHTML = '';
+      if (Array.isArray(d.languages) && d.languages.length){
+  langEl.innerHTML = `<h3><i class='fas fa-language mr-2 icon-subtle'></i>Languages</h3><div class='skills'>${d.languages.map(l=>`<div class='op-chip'>${escapeHtml(l.language)} (${escapeHtml(formatLanguageProficiency(l.proficiency))})</div>`).join('')}</div>`;
+      }
+    }
+
+    function escapeHtml(s){ return String(s??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m])); }
+    function escapeAttr(s){ return String(s??'').replace(/"/g,'&quot;'); }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      document.getElementById('btnCopy').addEventListener('click', async ()=>{
+        try { 
+          await navigator.clipboard.writeText(location.href);
+          if (typeof showToast !== 'undefined') showToast('Link copied', 'success');
+        } catch {}
+      });
+
+  document.getElementById('btnDownload').addEventListener('click', async ()=>{
+        const node = document.querySelector('.op-card');
+        await exportNodeToPng(node, {
+          filename: 'opportuni-card.png',
+          scale: 2,
+          cssUrls: [
+            'assets/css/theme.css',
+            'assets/css/components.css',
+            'assets/css/styles.css',
+    'assets/css/profile.css',
+    'assets/css/icon-fallback.css'
+          ]
+        });
+      });
+
+      loadCard();
+    });
+  </script>
+</body>
+</html>

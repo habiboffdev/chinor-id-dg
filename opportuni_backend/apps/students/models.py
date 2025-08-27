@@ -192,3 +192,41 @@ class Language(models.Model):
     
     def __str__(self):
         return f"{self.language} ({self.get_proficiency_display()})"
+
+
+class SocialLink(models.Model):
+    PLATFORM_CHOICES = [
+        ('github', 'GitHub'),
+        ('linkedin', 'LinkedIn'),
+        ('twitter', 'Twitter/X'),
+        ('website', 'Website'),
+        ('instagram', 'Instagram'),
+        ('facebook', 'Facebook'),
+        ('youtube', 'YouTube'),
+        ('tiktok', 'TikTok'),
+        ('medium', 'Medium'),
+        ('devto', 'Dev.to'),
+        ('stackoverflow', 'Stack Overflow'),
+        ('kaggle', 'Kaggle'),
+        ('behance', 'Behance'),
+        ('dribbble', 'Dribbble'),
+        ('telegram', 'Telegram'),
+        ('custom', 'Custom'),
+    ]
+
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='social_links')
+    platform = models.CharField(max_length=32, choices=PLATFORM_CHOICES)
+    label = models.CharField(max_length=50, blank=True)
+    url = models.URLField()
+    is_public = models.BooleanField(default=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('student', 'platform')
+        ordering = ['sort_order', 'platform']
+
+    def __str__(self):
+        lbl = self.label or self.get_platform_display()
+        return f"{self.student.user.get_full_name() or self.student.user.email} — {lbl}"

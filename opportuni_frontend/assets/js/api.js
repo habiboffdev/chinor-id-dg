@@ -353,6 +353,23 @@ class API {
             return this.delete(`/students/languages/${id}/`);
         },
 
+        // Social links endpoints
+        getSocialLinks: async () => {
+            return this.get('/students/social-links/');
+        },
+        addSocialLink: async (data) => {
+            return this.post('/students/social-links/', data);
+        },
+        updateSocialLink: async (id, data) => {
+            return this.put(`/students/social-links/${id}/`, data);
+        },
+        deleteSocialLink: async (id) => {
+            return this.delete(`/students/social-links/${id}/`);
+        },
+        upsertSocialLink: async (data) => {
+            return this.post('/students/social-links/upsert/', data);
+        },
+
         // Upload resume
         uploadResume: async (file) => {
             const formData = new FormData();
@@ -385,6 +402,11 @@ class API {
         // Get application stats
         getApplicationStats: async () => {
             return this.get('/students/application-stats/');
+        },
+
+        // Public Opportuni Card (no auth required)
+        getPublicCard: async (studentId) => {
+            return this.get(`/students/card/${encodeURIComponent(studentId)}/`);
         },
     };
 

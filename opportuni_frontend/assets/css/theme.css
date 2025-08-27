@@ -63,7 +63,8 @@
 /* Base theme hook */
 body.theme-opportuni {
   /* Solid background only (no gradients) */
-  background: var(--ink-1000);
+  background: var(--ink-1000) !important;
+  background-image: none !important;
   color: var(--mist-200);
   font-family: var(--font-text);
   position: relative;
@@ -71,6 +72,16 @@ body.theme-opportuni {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* Hidden utility — do NOT use !important so responsive utilities (e.g., md:flex) can override */
+.hidden { display: none; }
+
+/* Ensure common responsive display utilities win over .hidden when breakpoint matches */
+@media (min-width: 768px){
+  .md\:flex { display: flex !important; }
+  .md\:inline-flex { display: inline-flex !important; }
+  .md\:block { display: block !important; }
 }
 
 /* Brand nav */
@@ -99,6 +110,27 @@ body.theme-opportuni .text-gray-600 { color: var(--mist-300) !important; }
 body.theme-opportuni .text-gray-500 { color: rgba(143, 162, 184, 0.9) !important; }
 body.theme-opportuni .border-gray-200 { border-color: var(--slate-400) !important; }
 body.theme-opportuni .bg-gray-200 { background-color: var(--slate-400) !important; }
+
+/* Brand form controls: checkboxes and radios (global) */
+:where(.theme-opportuni) input[type="checkbox"],
+:where(.theme-opportuni) input[type="radio"] {
+  /* Even dimmer accent to avoid visual noise on dark */
+  accent-color: var(--slate-400);
+}
+:where(.theme-opportuni) input[type="checkbox"] {
+  width: 14px; height: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--slate-400);
+  background: var(--ink-900);
+}
+:where(.theme-opportuni) input[type="radio"] {
+  width: 14px; height: 14px;
+}
+:where(.theme-opportuni) input[type="checkbox"]:focus-visible,
+:where(.theme-opportuni) input[type="radio"]:focus-visible {
+  outline: none; box-shadow: var(--focus-ring);
+  border-color: var(--brand-primary);
+}
 
 /* Map any leftover gradient utilities to solid brand color (safety net) */
 body.theme-opportuni .bg-gradient-to-r,

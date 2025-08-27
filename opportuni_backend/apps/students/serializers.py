@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import (
     StudentProfile, Education, Experience, Skill, StudentSkill, 
-    Project, Achievement, Language
+    Project, Achievement, Language, SocialLink
 )
 
 User = get_user_model()
@@ -25,12 +25,39 @@ class EducationSerializer(serializers.ModelSerializer):
         model = Education
         fields = '__all__'
         read_only_fields = ['student']
+        extra_kwargs = {
+            'end_date': { 'required': False, 'allow_null': True },
+            'description': { 'required': False, 'allow_blank': True },
+            'gpa': { 'required': False, 'allow_null': True },
+        }
+
+    def validate(self, attrs):
+        # Normalize empty string to None for end_date
+        end_date = attrs.get('end_date', None)
+        if end_date == '':
+            attrs['end_date'] = None
+        is_current = attrs.get('is_current', False)
+        if is_current:
+            attrs['end_date'] = None
+        return super().validate(attrs)
 
 class ExperienceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experience
         fields = '__all__'
         read_only_fields = ['student']
+        extra_kwargs = {
+            'end_date': { 'required': False, 'allow_null': True },
+            'location': { 'required': False, 'allow_blank': True },
+        }
+
+    def validate(self, attrs):
+        end_date = attrs.get('end_date', None)
+        if end_date == '':
+            attrs['end_date'] = None
+        if attrs.get('is_current', False):
+            attrs['end_date'] = None
+        return super().validate(attrs)
 
 class ProjectSerializer(serializers.ModelSerializer):
     technologies = SkillSerializer(many=True, read_only=True)
@@ -44,6 +71,19 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = '__all__'
         read_only_fields = ['student']
+        extra_kwargs = {
+            'end_date': { 'required': False, 'allow_null': True },
+            'project_url': { 'required': False, 'allow_blank': True },
+            'github_url': { 'required': False, 'allow_blank': True },
+        }
+
+    def validate(self, attrs):
+        end_date = attrs.get('end_date', None)
+        if end_date == '':
+            attrs['end_date'] = None
+        if attrs.get('is_ongoing', False):
+            attrs['end_date'] = None
+        return super().validate(attrs)
     
     def create(self, validated_data):
         technology_ids = validated_data.pop('technology_ids', [])
@@ -75,6 +115,13 @@ class LanguageSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['student']
 
+
+class SocialLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SocialLink
+        fields = '__all__'
+        read_only_fields = ['student']
+
 class StudentProfileSerializer(serializers.ModelSerializer):
     # User fields
     first_name = serializers.CharField(source='user.first_name', read_only=True)
@@ -90,6 +137,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
     projects = ProjectSerializer(many=True, read_only=True)
     achievements = AchievementSerializer(many=True, read_only=True)
     languages = LanguageSerializer(many=True, read_only=True)
+    social_links = SocialLinkSerializer(many=True, read_only=True)
     
     class Meta:
         model = StudentProfile
@@ -100,8 +148,8 @@ class StudentProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
         fields = [
-            'phone', 'date_of_birth', 'location', 'bio', 'university', 
-            'major', 'graduation_year', 'gpa', 'portfolio_url', 'about_me', 
+            'phone', 'date_of_birth', 'location', 'bio', 'university',
+            'major', 'graduation_year', 'gpa', 'portfolio_url', 'about_me',
             'phone_visible', 'email_visible'
         ]
         extra_kwargs = {
