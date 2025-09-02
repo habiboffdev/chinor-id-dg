@@ -9,6 +9,11 @@ from .models import (
     Achievement,
     Language,
     SocialLink,
+    Preference,
+    StudentPreference,
+    AcademicExam,
+    AcademicExamSection,
+    StudentExamScore,
 )
 
 
@@ -62,6 +67,14 @@ class StudentSkillInline(admin.TabularInline):
     autocomplete_fields = ('skill',)
 
 
+class StudentPreferenceInline(admin.TabularInline):
+    model = StudentPreference
+    extra = 0
+    fields = ('preference', 'created_at')
+    readonly_fields = ('created_at',)
+    autocomplete_fields = ('preference',)
+
+
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
     list_display = (
@@ -98,6 +111,7 @@ class StudentProfileAdmin(admin.ModelAdmin):
         AchievementInline,
         LanguageInline,
         StudentSkillInline,
+    StudentPreferenceInline,
     ]
 
 
@@ -161,3 +175,47 @@ class SocialLinkAdmin(admin.ModelAdmin):
     list_display = ("student", "platform", "label", "url", "is_public", "sort_order")
     list_filter = ("platform", "is_public")
     search_fields = ("student__user__email", "student__user__first_name", "student__user__last_name", "label", "url")
+
+
+@admin.register(Preference)
+class PreferenceAdmin(admin.ModelAdmin):
+    list_display = ("key", "name", "description", "created_at")
+    search_fields = ("key", "name", "description")
+    ordering = ("key",)
+
+
+@admin.register(StudentPreference)
+class StudentPreferenceAdmin(admin.ModelAdmin):
+    list_display = ("student", "preference", "created_at")
+    list_filter = ("preference",)
+    search_fields = (
+        "student__user__email",
+        "student__user__first_name",
+        "student__user__last_name",
+        "preference__name",
+        "preference__key",
+    )
+
+
+@admin.register(AcademicExam)
+class AcademicExamAdmin(admin.ModelAdmin):
+    list_display = ("name", "slug")
+    search_fields = ("name", "slug")
+
+
+@admin.register(AcademicExamSection)
+class AcademicExamSectionAdmin(admin.ModelAdmin):
+    list_display = ("exam", "name", "min_score", "max_score", "step", "sort_order")
+    list_filter = ("exam",)
+    ordering = ("exam", "sort_order")
+
+
+@admin.register(StudentExamScore)
+class StudentExamScoreAdmin(admin.ModelAdmin):
+    list_display = ("student", "exam", "section", "score", "taken_date")
+    list_filter = ("exam",)
+    search_fields = (
+        "student__user__email",
+        "student__user__first_name",
+        "student__user__last_name",
+    )

@@ -63,21 +63,30 @@ class AuthManager {
                 // Optimistically reflect logged-in UI immediately
                 this.setBodyAuthState(true);
                 this.updateUIForLoggedInUser();
+        
+        console.log('Auth: About to fetch profile with token:', token.substring(0, 50) + '...');
         this.currentUser = await api.auth.getProfile();
+        console.log('Auth: Profile fetch successful:', this.currentUser);
         this.updateUIForLoggedInUser();
         this.setBodyAuthState(true);
         Logger.info('Successfully loaded user profile');
             } catch (error) {
+        console.error('Auth: Profile fetch failed:', error);
         Logger.error('Failed to load user profile', error);
+        
                 // Don't log out immediately, retry once more after a small delay
                 setTimeout(async () => {
                     try {
+                        console.log('Auth: Retrying profile fetch...');
                         this.currentUser = await api.auth.getProfile();
+                        console.log('Auth: Profile fetch successful on retry:', this.currentUser);
                         this.updateUIForLoggedInUser();
             this.setBodyAuthState(true);
             Logger.info('Successfully loaded user profile on retry');
                     } catch (retryError) {
+            console.error('Auth: Profile fetch failed on retry:', retryError);
             Logger.error('Failed to load user profile after retry', retryError);
+            
                         // Do NOT force logout here. Keep tokens and allow
                         // protected pages to gate via requireAuth(). This avoids
                         // logging the user out when the profile endpoint is
@@ -292,6 +301,27 @@ class AuthManager {
         }
         
     if (window.DEBUG) Logger.info('Redirecting user type', { user_type: this.currentUser.user_type });
+        
+        // Check if user is already on appropriate page type - don't redirect
+        const currentPath = window.location.pathname;
+        const isOnOrgPage = currentPath.includes('/organization/');
+        const isOnStudentPage = !currentPath.includes('/organization/') && !currentPath.includes('/admin/');
+        
+        if (window.DEBUG) {
+            console.log('redirectToDashboard - currentPath:', currentPath);
+            console.log('redirectToDashboard - isOnOrgPage:', isOnOrgPage);
+            console.log('redirectToDashboard - user_type:', this.currentUser.user_type);
+        }
+        
+        if (this.currentUser.user_type === 'organization' && isOnOrgPage) {
+            if (window.DEBUG) Logger.info('User already on organization page, skipping redirect');
+            return;
+        }
+        
+        if (this.currentUser.user_type === 'student' && isOnStudentPage) {
+            if (window.DEBUG) Logger.info('User already on student page, skipping redirect');
+            return;
+        }
         
         // Use a small delay to ensure any pending operations complete
         setTimeout(() => {

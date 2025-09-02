@@ -45,4 +45,11 @@ urlpatterns = [
 
     # Public Opportuni Card (no auth)
     path('card/<str:student_id>/', views.public_opportuni_card, name='public-opportuni-card'),
+
+    # Academic Exams & Scores
+    path('exams/', views.AcademicExamListView.as_view(), name='academic-exam-list'),
+    path('exams/<int:exam_id>/sections/', views.AcademicExamSectionListView.as_view(), name='academic-exam-section-list'),
+    path('exam-scores/', views.StudentExamScoreListCreateView.as_view(), name='student-exam-score-list-create'),
+    path('exam-scores/<int:pk>/', views.StudentExamScoreDetailView.as_view(), name='student-exam-score-detail'),
+    path('exams/seed-defaults/', views.seed_default_exams, name='academic-exam-seed-defaults'),
 ]

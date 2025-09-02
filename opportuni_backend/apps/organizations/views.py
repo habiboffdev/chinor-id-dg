@@ -32,6 +32,23 @@ class OrganizationDashboardView(generics.RetrieveAPIView):
     def get_object(self):
         return get_object_or_404(Organization, user=self.request.user)
 
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Return dashboard payload aligned with frontend expectations.
+        """
+        org = self.get_object()
+        data = self.get_serializer(org).data
+        # Map keys for frontend compatibility (organization-dashboard.js expects these)
+        payload = {
+            'active_opportunities': data.get('total_opportunities', 0),
+            'new_applications': data.get('total_applications', 0),
+            'interviews_scheduled': data.get('interviews_scheduled', 0),
+            'hires_month': data.get('accepted_applications', 0),
+            'member_count': data.get('member_count', 0),
+            'recent_applications': data.get('recent_applications', []),
+        }
+        return Response(payload)
+
 
 # Organization Members Views
 class OrganizationMemberListCreateView(generics.ListCreateAPIView):

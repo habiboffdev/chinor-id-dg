@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import (
-    StudentProfile, Education, Experience, Skill, StudentSkill, 
-    Project, Achievement, Language, SocialLink
+    StudentProfile, Education, Experience, Skill, StudentSkill,
+    Project, Achievement, Language, SocialLink,
+    AcademicExam, AcademicExamSection, StudentExamScore,
 )
 
 User = get_user_model()
@@ -121,6 +122,60 @@ class SocialLinkSerializer(serializers.ModelSerializer):
         model = SocialLink
         fields = '__all__'
         read_only_fields = ['student']
+
+
+class AcademicExamSectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AcademicExamSection
+        fields = ['id', 'name', 'min_score', 'max_score', 'step', 'sort_order']
+
+
+class AcademicExamSerializer(serializers.ModelSerializer):
+    sections = AcademicExamSectionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = AcademicExam
+        fields = ['id', 'slug', 'name', 'description', 'sections']
+
+
+class StudentExamScoreSerializer(serializers.ModelSerializer):
+    exam = AcademicExamSerializer(read_only=True)
+    section = AcademicExamSectionSerializer(read_only=True)
+    exam_id = serializers.IntegerField(write_only=True)
+    section_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = StudentExamScore
+        fields = ['id', 'exam', 'section', 'exam_id', 'section_id', 'score', 'taken_date', 'notes']
+        read_only_fields = []
+
+    def validate(self, attrs):
+        exam_id = attrs.get('exam_id')
+        section_id = attrs.get('section_id')
+        score = attrs.get('score')
+        # Ensure section belongs to exam and score within bounds
+        try:
+            section = AcademicExamSection.objects.get(id=section_id, exam_id=exam_id)
+        except AcademicExamSection.DoesNotExist:
+            raise serializers.ValidationError('Invalid exam/section combination')
+        if score is None or not (section.min_score <= score <= section.max_score):
+            raise serializers.ValidationError(f'Score must be between {section.min_score} and {section.max_score}')
+        # Check step with decimals safely
+        try:
+            from decimal import Decimal, getcontext
+            getcontext().prec = 10
+            step = Decimal(section.step)
+            base = Decimal(section.min_score)
+            s = Decimal(score)
+            if step > 0:
+                remainder = (s - base) % step
+                if remainder != 0:
+                    # Allow small floating rounding tolerance
+                    if remainder.copy_abs() > Decimal('0.0001') and (step - remainder).copy_abs() > Decimal('0.0001'):
+                        raise serializers.ValidationError(f'Score must be in increments of {section.step}')
+        except Exception:
+            pass
+        return attrs
 
 class StudentProfileSerializer(serializers.ModelSerializer):
     # User fields

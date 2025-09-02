@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.utils import timezone
 from .models import Opportunity, OpportunityRequirement, OpportunityCategory, OpportunityQuestion
+from apps.students.models import Skill
 from apps.organizations.serializers import OrganizationSerializer
 from apps.students.serializers import SkillSerializer
 
@@ -50,11 +51,15 @@ class OpportunitySerializer(serializers.ModelSerializer):
 
 
 class OpportunityCreateUpdateSerializer(serializers.ModelSerializer):
+    # Make skills writable by ID
     required_skills = serializers.PrimaryKeyRelatedField(
-        many=True, 
-        read_only=True
+        many=True,
+        queryset=Skill.objects.all(),
+        required=False
     )
     requirements = OpportunityRequirementSerializer(many=True, required=False)
+    # Accept additional questions on create/update
+    additional_questions = OpportunityQuestionSerializer(many=True, required=False)
     
     class Meta:
         model = Opportunity
@@ -64,36 +69,54 @@ class OpportunityCreateUpdateSerializer(serializers.ModelSerializer):
             'required_skills', 'min_gpa', 'required_major',
             'graduation_year_min', 'graduation_year_max', 'location',
             'is_remote', 'compensation', 'benefits', 'max_applications',
-            'featured', 'requirements'
+            'featured', 'requirements', 'additional_questions'
         ]
     
     def create(self, validated_data):
         requirements_data = validated_data.pop('requirements', [])
-        
+        questions_data = validated_data.pop('additional_questions', [])
+
+        required_skills = validated_data.pop('required_skills', [])
         opportunity = Opportunity.objects.create(**validated_data)
-        
+        if required_skills:
+            opportunity.required_skills.set(required_skills)
+
         for requirement_data in requirements_data:
             OpportunityRequirement.objects.create(
                 opportunity=opportunity, **requirement_data
             )
-        
+
+        for q in questions_data:
+            OpportunityQuestion.objects.create(opportunity=opportunity, **q)
+
         return opportunity
     
     def update(self, instance, validated_data):
         requirements_data = validated_data.pop('requirements', [])
-        
+        questions_data = validated_data.pop('additional_questions', [])
+        skills = validated_data.pop('required_skills', None)
+
         # Update opportunity fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-        
-        # Update requirements
+
+        # Update skills if provided
+        if skills is not None:
+            instance.required_skills.set(skills)
+
+        # Replace requirements
         instance.requirements.all().delete()
         for requirement_data in requirements_data:
             OpportunityRequirement.objects.create(
                 opportunity=instance, **requirement_data
             )
-        
+
+        # Replace additional questions
+        instance.additional_questions.all().delete()
+        for q in questions_data:
+            OpportunityQuestion.objects.create(opportunity=instance, **q)
+
         return instance
 
 

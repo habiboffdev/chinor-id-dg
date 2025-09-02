@@ -2,6 +2,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class User(AbstractUser):
+    LANGUAGE_CHOICES = (
+        ('en', 'English'),
+        ('ru', 'Русский'),
+        ('uz', "O‘zbekcha"),
+    )
     USER_TYPES = (
         ('student', 'Student'),
         ('organization', 'Organization'),
@@ -10,6 +15,9 @@ class User(AbstractUser):
     user_type = models.CharField(max_length=20, choices=USER_TYPES)
     email_verified = models.BooleanField(default=False)
     phone = models.CharField(max_length=20, blank=True)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default='en')
+    # Telegram linkage for bot onboarding/auth
+    telegram_id = models.BigIntegerField(null=True, blank=True, unique=True, db_index=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -58,6 +58,7 @@
             <h3><i class="fas fa-screwdriver-wrench mr-2 icon-subtle"></i>Skills</h3>
             <div id="skills" class="skills"></div>
           </div>
+          <div id="scores" class="scores"></div>
         </div>
         <div>
           <div id="proj" class="proj"></div>
@@ -204,6 +205,26 @@
       langEl.innerHTML = '';
       if (Array.isArray(d.languages) && d.languages.length){
   langEl.innerHTML = `<h3><i class='fas fa-language mr-2 icon-subtle'></i>Languages</h3><div class='skills'>${d.languages.map(l=>`<div class='op-chip'>${escapeHtml(l.language)} (${escapeHtml(formatLanguageProficiency(l.proficiency))})</div>`).join('')}</div>`;
+      }
+
+      // Exam scores
+      const scoresEl = document.getElementById('scores');
+      scoresEl.innerHTML = '';
+      const exams = Array.isArray(d.exam_scores) ? d.exam_scores : [];
+      if (exams.length){
+        // Pick best by total score
+        const best = exams.slice().sort((a,b)=> (b.total||0)-(a.total||0))[0];
+        
+        // Format scores properly (show decimals for IELTS)
+        const isIELTS = best.slug === 'ielts' || best.exam.toLowerCase().includes('ielts');
+        const formatScore = (score) => isIELTS ? Number(score).toFixed(1) : Number(score);
+        const formatTotal = formatScore(best.total || 0);
+        const formatMax = best.max ? ` / ${formatScore(best.max)}` : '';
+        
+        const secHtml = (best.sections||[]).map(s=>`<div class='op-chip'>${escapeHtml(s.name)}: ${formatScore(s.score)}</div>`).join(' ');
+        scoresEl.innerHTML = `<h3><i class='fas fa-chart-line mr-2 icon-subtle'></i>Best exam</h3>
+          <div class='subtle'>${escapeHtml(best.exam)} · ${formatTotal}${formatMax}</div>
+          <div class='skills mt-1'>${secHtml}</div>`;
       }
     }
 

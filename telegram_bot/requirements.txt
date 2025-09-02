@@ -1,0 +1,5 @@
+pyTelegramBotAPI>=4.17.0,<5.0
+python-dotenv>=1.0.1,<2.0
+requests>=2.32.3,<3.0
+# Optional if using Django ORM access from bot env; keep versions aligned with backend
+Django>=4.2,<5.1

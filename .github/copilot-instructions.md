@@ -1,177 +1,170 @@
-# Opportuni - Student Opportunity Management Platform
+# Copilot Instructions for Opportuni MVP
 
 ## Project Overview
-Opportuni connects students with internships, scholarships, competitions, and volunteer positions while providing organizations with tools to manage applications. The project is structured as:
-
-- **Backend**: Django REST Framework with multiple specialized apps
-- **Frontend**: Vanilla JavaScript (no frameworks) with HTML/CSS
+This is a Django REST API backend with a vanilla HTML/CSS/JS frontend for a student-organization opportunity matching platform. The system connects students with internship/scholarship opportunities from organizations.
 
 ## Architecture
+- **Backend**: Django REST Framework with JWT authentication
+- **Frontend**: Vanilla HTML/CSS/JS (no frameworks, no Tailwind)
+- **Database**: PostgreSQL (production), SQLite (development)
+- **Deployment**: Gunicorn + Nginx on Linux VPS
 
-### Backend (Django + DRF)
-- **Core Framework**: Django 4.2+ with modular app structure
-- **Database**: PostgreSQL with custom models
-- **Authentication**: JWT token system
-- **API**: REST endpoints across specialized apps
-- **Async**: Django Channels for WebSockets (notifications)
-- **Background Tasks**: Celery + Redis
+## Brand & Design System
+- **Fonts**: Space Grotesk (display), Inter (body)
+- **Colors**: Dark-first palette with accent tokens (--accent-1, --accent-2)
+- **CSS Architecture**: Semantic classes only, NO utility classes or Tailwind
+- **Theme**: All pages must use `body.theme-opportuni` wrapper
+- **Universal Components**: Shared navbar, consistent button/card styles
 
-### Frontend (Vanilla JavaScript)
-- **Pure ES6+**: No frameworks or build tools
-- **API Communication**: Custom fetch wrapper with token auth
-- **State Management**: LocalStorage for persistence
-- **Components**: Custom JavaScript components
-- **Styling**: CSS Grid/Flexbox with custom properties
+## Key Principles
+1. **Brand-First Design**: Strict adherence to BRAND_BLUEPRINT.md rules
+2. **No Tailwind**: Use semantic CSS classes and brand tokens only
+3. **Universal Components**: Reusable navbar, consistent styling across pages
+4. **Django Best Practices**: Use built-in features, follow REST conventions
+5. **Clear Separation**: Distinct student vs organization interfaces
 
-## Key Files & Directories
+## Backend Structure
 
-### Backend Structure
+### Django Apps
+- **accounts**: User authentication, profiles, JWT tokens
+- **students**: Student profiles, education, experience, skills, projects
+- **organizations**: Organization profiles, dashboard, members
+- **opportunities**: Job/internship listings, requirements, questions
+- **applications**: Student applications to opportunities
+- **communications**: Messaging, email templates, notifications
+- **notifications**: Real-time notifications, settings
+- **core**: Shared utilities, pagination, permissions, tasks
+
+### API Patterns
+- Use Django REST Framework ViewSets and generic views
+- JWT authentication via rest_framework_simplejwt
+- Standard serializers for CRUD operations
+- Separate serializers for list/detail/create/update operations
+- Filtering with django-filter, search with DRF SearchFilter
+- Custom pagination class in core.pagination
+- Permission classes for organization-scoped data
+
+### Model Relationships
+- User → StudentProfile/Organization (OneToOne via user_type field)
+- Organization → Opportunity (ForeignKey)
+- Student → Application → Opportunity (through relationship)
+- Opportunity → OpportunityRequirement/OpportunityQuestion (reverse FK)
+- Student → Education/Experience/Skill/Project (reverse FK)
+
+### URL Structure
 ```
-opportuni_backend/
-├── manage.py                # Django management script
-├── opportuni/               # Main Django project config
-├── apps/                    # Django applications
-│   ├── accounts/            # Authentication & users
-│   ├── students/            # Student profiles
-│   ├── organizations/       # Organization management
-│   ├── opportunities/       # Listings & opportunities
-│   ├── applications/        # Application handling
-│   ├── communications/      # Messaging
-│   └── notifications/       # Real-time notifications
+/api/auth/ - Authentication endpoints
+/api/students/ - Student profiles and related data
+/api/organizations/ - Organization profiles and dashboard
+/api/opportunities/ - Opportunity listings and CRUD
+/api/applications/ - Application management
+/api/communications/ - Messaging system
+/api/notifications/ - Notification management
 ```
 
-### Frontend Structure
-```
-opportuni_frontend/
-├── index.html               # Landing page
-├── dashboard.html           # Student dashboard
-├── opportunities.html       # Browse opportunities
-├── profile.html             # Student profile
-├── assets/
-│   ├── css/                 # Stylesheets
-│   ├── js/                  # JavaScript modules
-│   │   ├── api.js           # API wrapper
-│   │   ├── auth.js          # Authentication
-│   │   ├── main.js          # Core functionality
-│   │   └── utils.js         # Utilities
-│   └── images/              # Static images
-```
+## Frontend Structure
 
-## Development Workflow
+### Page Architecture
+- **Student Pages**: `/` (landing), `/dashboard.html`, `/opportunities.html`, `/applications.html`, `/profile.html`
+- **Organization Pages**: `/organization/` folder with dashboard, opportunities, applications, students, communications, profile
+- **Shared Components**: Universal navbars, authentication forms
+
+### JavaScript Architecture
+- **auth.js**: Authentication manager, user sessions, redirects
+- **api.js**: API client with organized endpoints by domain
+- **main.js**: Page-specific controllers and utilities
+- **components.js**: Reusable UI components (modals, forms, etc.)
+- **navbar.js**: Student navbar controller
+- **org-navbar.js**: Organization navbar controller
+
+### CSS Architecture
+- **theme.css**: Brand tokens, typography, base styles
+- **styles.css**: General component styles
+- **org.css**: Organization-specific components
+- **layout-shim.css**: Minimal utility classes for layout
+
+### Navbar Requirements
+- **Student Navbar**: Rendered by navbar.js into `#student-navbar-root`
+- **Organization Navbar**: Rendered by org-navbar.js, mount with `OrgNavbar.mount()`
+- Both navbars: Sticky positioning, dropdown menus, active states, responsive design
+- Required scripts: Include respective navbar JS and call mount functions
+
+## Development Workflows
 
 ### Backend Development
-1. **Run the server**: 
-   ```bash
-   cd opportuni_backend
-   source venv/bin/activate
-   python manage.py runserver
-   ```
-
-2. **Make migrations**:
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
-
-3. **API Structure**: Every Django app has its own serializers, viewsets, and URLs
-   - Each app follows: models → serializers → views → urls pattern
-   - Apps communicate through Django's ORM relationships
+1. **Model Changes**: Create migrations with `python manage.py makemigrations`
+2. **API Testing**: Use Django shell or curl for endpoint testing
+3. **System Checks**: Run `python manage.py check` before commits
+4. **Permissions**: Always check user permissions in views (student vs org data)
 
 ### Frontend Development
-1. **Run local server**:
-   ```bash
-   cd opportuni_frontend
-   python -m http.server 8080
-   ```
+1. **Local Server**: `cd opportuni_frontend && python3 -m http.server 8080`
+2. **Page Structure**: Always include theme.css, relevant navbar, brand wrapper
+3. **Script Loading**: Load dependencies in order: utils → api → auth → components → page-specific
+4. **API Integration**: Use api.js client methods, handle errors gracefully
 
-2. **Authentication Flow**:
-   - Login process is handled in `auth.js`
-   - JWT tokens stored in localStorage
-   - `requireAuth()` function used to protect pages
+### Organization Pages Checklist
+- [ ] Include theme.css, org.css, layout-shim.css
+- [ ] Add `<div id="org-navbar"></div>` at top of body
+- [ ] Include org-navbar.js and call `OrgNavbar.mount()`
+- [ ] Wrap with `body.theme-opportuni`
+- [ ] Use semantic CSS classes only (no utilities)
+- [ ] Test navbar dropdown functionality
+- [ ] Verify active page highlighting
 
-3. **API Integration**:
-   - API calls use `api.js` wrapper
-   - Endpoints organized by resource (students, opportunities, etc.)
-   - Authentication headers automatically added to requests
-
-## Key Patterns & Conventions
-
-### Authentication
-- Uses JWT tokens stored in localStorage
-- Token refresh handled automatically in `auth.js`
-- `isLoggedIn()` checks for valid token
-- `requireAuth()` redirects unauthenticated users
-
-### API Integration
-- Frontend uses consistent pattern for API calls:
+### API Client Usage
 ```javascript
-// Example: api.opportunities.getAll() returns all opportunities
-const opportunities = await api.opportunities.getAll();
+// Get organization dashboard data
+const dashboard = await api.organizations.dashboard();
+
+// List applications for organization
+const apps = await api.applications.listForOrg();
+
+// Create new opportunity
+const opportunity = await api.opportunities.create(data);
 ```
 
-### Data Handling
-- Backend: Django REST Framework serializers enforce validation
-- Frontend: Form validation using custom JavaScript functions
-- ID patterns: `student_id`, `opportunity_id` used consistently
+## Common Pitfalls
 
-### State Management
-- Data fetched from API and stored in variables/DOM
-- Form state managed with JavaScript objects
-- User state (auth) stored in localStorage
+### Backend
+- Don't forget organization scoping in views (filter by request.user's org)
+- Use get_or_create for student profiles to handle missing records
+- Separate serializers for different operations (list vs detail vs create)
+- Always include permission checks in custom views
 
-## Common Tasks
+### Frontend
+- Never use Tailwind classes - use semantic CSS only
+- Include all required scripts in correct order
+- Mount navbars explicitly with JavaScript
+- Test dropdown menus on mobile devices
+- Verify API endpoints match backend URLs exactly
 
-### Adding New Feature
-1. Identify Django app for backend changes
-2. Update/create models and run migrations
-3. Create/modify serializers and viewsets
-4. Update/create API endpoints in urls.py
-5. Add frontend API calls in appropriate JavaScript file
-6. Update UI to display and interact with the new data
+### Brand Compliance
+- Use Space Grotesk for headings, Inter for body text
+- Follow dark-first color palette from theme.css
+- No utility classes - semantic component classes only
+- Consistent button, card, and form styling across all pages
 
-### Fixing Authentication Issues
-- Check for token validity in LocalStorage
-- Verify JWT token expiration
-- Review backend permissions in DRF viewsets
-- Check CORS settings if cross-origin requests fail
+## File Organization
+```
+opportuni_backend/
+├── apps/
+│   ├── accounts/          # User auth and profiles
+│   ├── students/          # Student data and dashboard
+│   ├── organizations/     # Organization data and dashboard
+│   ├── opportunities/     # Job/internship listings
+│   ├── applications/      # Application management
+│   ├── communications/    # Messaging system
+│   └── notifications/     # Real-time notifications
+├── opportuni/settings/    # Environment-specific settings
+└── static/media/         # Static and uploaded files
 
-### Database Migrations
-- Recent fix: Made StudentProfile fields nullable to prevent constraint errors
-- When changing models, be sure to create and apply migrations
-- If you encounter NOT NULL constraint issues, may need raw SQL:
-```sql
-ALTER TABLE students_studentprofile ALTER COLUMN field_name DROP NOT NULL;
+opportuni_frontend/
+├── assets/
+│   ├── css/              # Brand and component styles
+│   └── js/               # API client and controllers
+├── organization/         # Organization-specific pages
+└── *.html               # Student-facing pages
 ```
 
-## Recent Fixes & Known Issues
-
-### Fixed Issues
-- Authentication flow now works correctly with token persistence
-- StudentProfile NOT NULL constraints fixed with migration
-- Profile update functionality fixed by handling user fields correctly
-
-### Current Challenges
-- File upload optimization needed for documents/images
-- Form validation could be enhanced on frontend
-- Additional error handling needed for edge cases
-
-## Testing
-
-### Backend Testing
-```bash
-python manage.py test
-```
-
-### Frontend Testing
-- Manual testing of user flows
-- Check console for errors
-- Verify API responses with browser dev tools
-
-## Deployment
-Project uses a DigitalOcean Ubuntu server with:
-- Nginx for serving static files and proxying
-- Gunicorn for WSGI application server
-- Supervisor for process management
-- PostgreSQL for database
-
-Deployment scripts in `deployment/` directory.
+This structure ensures maintainable, scalable code that follows Django and frontend best practices while maintaining strict brand consistency.

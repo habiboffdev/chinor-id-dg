@@ -4,14 +4,16 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from .models import (
-    StudentProfile, Education, Experience, Skill, StudentSkill, 
-    Project, Achievement, Language, SocialLink
+    StudentProfile, Education, Experience, Skill, StudentSkill,
+    Project, Achievement, Language, SocialLink,
+    AcademicExam, AcademicExamSection, StudentExamScore,
 )
 from .serializers import (
     StudentProfileSerializer, StudentProfileUpdateSerializer,
     EducationSerializer, ExperienceSerializer, SkillSerializer,
     StudentSkillSerializer, ProjectSerializer, AchievementSerializer,
-    LanguageSerializer, StudentDashboardSerializer, SocialLinkSerializer
+    LanguageSerializer, StudentDashboardSerializer, SocialLinkSerializer,
+    AcademicExamSerializer, AcademicExamSectionSerializer, StudentExamScoreSerializer,
 )
 
 User = get_user_model()
@@ -392,6 +394,121 @@ def student_application_stats(request):
         )
 
 
+# Academic Exams endpoints
+class AcademicExamListView(generics.ListAPIView):
+    queryset = AcademicExam.objects.all().prefetch_related('sections')
+    serializer_class = AcademicExamSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class AcademicExamSectionListView(generics.ListAPIView):
+    serializer_class = AcademicExamSectionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        exam_id = self.kwargs.get('exam_id')
+        return AcademicExamSection.objects.filter(exam_id=exam_id)
+
+
+class StudentExamScoreListCreateView(generics.ListCreateAPIView):
+    serializer_class = StudentExamScoreSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        profile, _ = get_or_create_student_profile(self.request.user)
+        # exam and section are FK (select_related OK); sections is reverse M2O from exam, so prefetch
+        return (
+            StudentExamScore.objects
+            .filter(student=profile)
+            .select_related('exam', 'section')
+            .prefetch_related('exam__sections')
+        )
+
+    def perform_create(self, serializer):
+        profile, _ = get_or_create_student_profile(self.request.user)
+        serializer.save(student=profile)
+
+
+class StudentExamScoreDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = StudentExamScoreSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        profile, _ = get_or_create_student_profile(self.request.user)
+        return StudentExamScore.objects.filter(student=profile)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def seed_default_exams(request):
+    """Seed a set of default exams with common sections.
+
+    This ensures global exam definitions exist (once) so students can add their own
+    scores against them. Safe to call multiple times.
+
+    Seeded exams:
+    - SAT: Math, English (200–800 step 10)
+    - GRE: Verbal, Quantitative (130–170 step 1), Analytical Writing (0–6 step 1)
+    - GMAT: Quantitative (6–51 step 1), Verbal (6–51 step 1), IR (1–8 step 1), AWA (0–6 step 1)
+    - IELTS: Listening/Reading/Writing/Speaking (0–9 step 1)
+    - TOEFL iBT: Reading/Listening/Speaking/Writing (0–30 step 1)
+    """
+    created = []
+
+    def ensure_exam(slug, name, sections):
+        ex, ex_created = AcademicExam.objects.get_or_create(slug=slug, defaults={'name': name})
+        if ex_created:
+            created.append(name)
+        # Create sections if missing
+        for idx, s in enumerate(sections, start=1):
+            AcademicExamSection.objects.get_or_create(
+                exam=ex,
+                name=s['name'],
+                defaults={
+                    'min_score': s.get('min', 0),
+                    'max_score': s.get('max', 0),
+                    'step': s.get('step', 1),
+                    'sort_order': s.get('order', idx),
+                }
+            )
+
+    # SAT
+    ensure_exam('sat', 'SAT', [
+        {'name': 'Math', 'min': 200, 'max': 800, 'step': 10, 'order': 1},
+        {'name': 'English', 'min': 200, 'max': 800, 'step': 10, 'order': 2},
+    ])
+
+    # GRE
+    ensure_exam('gre', 'GRE', [
+        {'name': 'Verbal Reasoning', 'min': 130, 'max': 170, 'step': 1, 'order': 1},
+        {'name': 'Quantitative Reasoning', 'min': 130, 'max': 170, 'step': 1, 'order': 2},
+        {'name': 'Analytical Writing', 'min': 0, 'max': 6, 'step': 1, 'order': 3},
+    ])
+
+    # GMAT (classic scales simplified to integer steps)
+    ensure_exam('gmat', 'GMAT', [
+        {'name': 'Quantitative', 'min': 6, 'max': 51, 'step': 1, 'order': 1},
+        {'name': 'Verbal', 'min': 6, 'max': 51, 'step': 1, 'order': 2},
+        {'name': 'Integrated Reasoning', 'min': 1, 'max': 8, 'step': 1, 'order': 3},
+        {'name': 'Analytical Writing Assessment', 'min': 0, 'max': 6, 'step': 1, 'order': 4},
+    ])
+
+    # IELTS — typically users share Overall band. Use one Overall section (1.0–9.0, step 0.5)
+    ensure_exam('ielts', 'IELTS', [
+        {'name': 'Overall', 'min': 1.0, 'max': 9.0, 'step': 0.5, 'order': 1},
+    ])
+
+    # TOEFL iBT
+    ensure_exam('toefl', 'TOEFL iBT', [
+        {'name': 'Reading', 'min': 0, 'max': 30, 'step': 1, 'order': 1},
+        {'name': 'Listening', 'min': 0, 'max': 30, 'step': 1, 'order': 2},
+        {'name': 'Speaking', 'min': 0, 'max': 30, 'step': 1, 'order': 3},
+        {'name': 'Writing', 'min': 0, 'max': 30, 'step': 1, 'order': 4},
+    ])
+
+    return Response({'message': 'Defaults ensured', 'created': created}, status=status.HTTP_200_OK)
+
+
 # Public Opportuni Card (read-only, no auth)
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
@@ -493,6 +610,41 @@ def public_opportuni_card(request, student_id):
                 'proficiency': l.proficiency,
             } for l in lang_qs
         ]
+
+        # Academic exam scores summary (public): per-exam totals and section details
+        try:
+            scores = (
+                StudentExamScore.objects
+                .filter(student=profile)
+                .select_related('exam', 'section')
+                .order_by('exam__name', 'section__sort_order')
+            )
+            exams = {}
+            for s in scores:
+                ex_id = s.exam_id
+                if ex_id not in exams:
+                    exams[ex_id] = {
+                        'exam': s.exam.name,
+                        'slug': getattr(s.exam, 'slug', None),
+                        'total': 0,
+                        'max': 0,
+                        'sections': []
+                    }
+                exams[ex_id]['total'] += int(s.score or 0)
+                exams[ex_id]['sections'].append({
+                    'name': s.section.name,
+                    'score': int(s.score or 0),
+                })
+            # Compute theoretical max totals per exam from all sections
+            for ex_id, rec in exams.items():
+                try:
+                    exam_obj = AcademicExam.objects.prefetch_related('sections').get(id=ex_id)
+                    rec['max'] = sum(int(sec.max_score or 0) for sec in exam_obj.sections.all())
+                except AcademicExam.DoesNotExist:
+                    rec['max'] = None
+            data['exam_scores'] = list(exams.values())
+        except Exception:
+            data['exam_scores'] = []
 
         return Response(data, status=status.HTTP_200_OK)
     except Exception as e:

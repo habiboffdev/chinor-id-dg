@@ -11,20 +11,32 @@ from .serializers import (
 )
 from apps.organizations.models import Organization
 import django_filters
+from django.db import models
 
 
 class OpportunityFilter(django_filters.FilterSet):
     title = django_filters.CharFilter(lookup_expr='icontains')
     location = django_filters.CharFilter(lookup_expr='icontains')
     opportunity_type = django_filters.MultipleChoiceFilter(choices=Opportunity.OPPORTUNITY_TYPES)
+    status = django_filters.MultipleChoiceFilter(choices=Opportunity.STATUS_CHOICES)
     min_gpa = django_filters.NumberFilter(field_name='min_gpa', lookup_expr='lte')
     is_remote = django_filters.BooleanFilter()
     featured = django_filters.BooleanFilter()
     deadline_after = django_filters.DateTimeFilter(field_name='application_deadline', lookup_expr='gte')
+    is_active = django_filters.BooleanFilter(method='filter_is_active')
     
     class Meta:
         model = Opportunity
-        fields = ['title', 'location', 'opportunity_type', 'is_remote', 'featured']
+        fields = ['title', 'location', 'opportunity_type', 'status', 'is_remote', 'featured']
+
+    def filter_is_active(self, queryset, name, value):
+        """Active means not closed/cancelled and deadline in the future."""
+        if value is None:
+            return queryset
+        now = timezone.now()
+        if value:
+            return queryset.exclude(status__in=['closed', 'cancelled']).filter(application_deadline__gt=now)
+        return queryset.filter(models.Q(status__in=['closed', 'cancelled']) | models.Q(application_deadline__lte=now))
 
 
 class OpportunityListCreateView(generics.ListCreateAPIView):
@@ -80,6 +92,32 @@ class OpportunityListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         organization = get_object_or_404(Organization, user=self.request.user)
         serializer.save(organization=organization)
+
+
+class OrganizationActiveOpportunitiesView(generics.ListAPIView):
+    """
+    Convenience endpoint for organizations to list their active opportunities
+    (status not closed/cancelled and deadline in future). Supports pagination.
+    """
+    serializer_class = OpportunityListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['title']
+    ordering_fields = ['created_at', 'application_deadline']
+    ordering = ['-created_at']
+
+    def get_queryset(self):
+        organization = get_object_or_404(Organization, user=self.request.user)
+        qs = Opportunity.objects.filter(
+            organization=organization,
+        ).exclude(status__in=['closed', 'cancelled']).filter(
+            application_deadline__gt=timezone.now()
+        )
+        # optional toggle by query param is_active=true/false
+        is_active = self.request.query_params.get('is_active')
+        if is_active in ('false', '0'):
+            qs = Opportunity.objects.filter(organization=organization)
+        return qs.select_related('organization')
 
 
 class OpportunityDetailView(generics.RetrieveUpdateDestroyAPIView):

@@ -245,6 +245,11 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 
+# Telegram Bot configuration
+# Telegram Bot Settings
+TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default=None)
+TELEGRAM_BOT_USERNAME = config('TELEGRAM_BOT_USERNAME', default=None)
+
 # Spectacular settings for API documentation
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Opportuni API',

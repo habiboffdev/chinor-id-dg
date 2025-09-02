@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="assets/css/components.css" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/profile.css" />
+  <link rel="stylesheet" href="assets/css/profile-scores.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   
 </head>
@@ -79,6 +80,7 @@
   <button class="tab" data-tab="projects"><i class="fas fa-diagram-project mr-2"></i>Projects</button>
   <button class="tab" data-tab="achievements"><i class="fas fa-trophy mr-2"></i>Achievements</button>
   <button class="tab" data-tab="languages"><i class="fas fa-language mr-2"></i>Languages</button>
+  <button class="tab" data-tab="scores"><i class="fas fa-chart-line mr-2"></i>Scores</button>
   <button class="tab" data-tab="preferences"><i class="fas fa-gear mr-2"></i>Preferences</button>
       </div>
 
@@ -197,11 +199,109 @@
                   <div class="preview-subtle" style="font-weight:600;"><i class="fas fa-language mr-2 icon-subtle"></i>Languages</div>
                   <div class="preview-extras-lang" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
                 </div>
+                <div class="mt-3">
+                  <div class="preview-subtle" style="font-weight:600;"><i class="fas fa-chart-line mr-2 icon-subtle"></i>Scores</div>
+                  <div class="preview-extras-scores text-normal" style="font-size:13px;">—</div>
+                </div>
               </div>
               <div class="mt-3" style="display:flex; gap:8px;">
                 <button type="button" id="openCardSide" class="btn btn-ghost btn-sm"><i class="fas fa-id-card"></i> Open</button>
                 <button type="button" id="shareCardSide" class="btn btn-violet btn-sm"><i class="fas fa-share-from-square"></i> Share</button>
                 <button type="button" id="downloadCardSide" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> PNG</button>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+      
+      <section id="scoresTab" class="mt-5 hidden">
+        <div class="card p-5">
+          <div class="personal-layout">
+            <div>
+              <div class="flex items-center justify-between">
+                <h2 class="text-white font-semibold">Academic Scores</h2>
+                <div class="section-controls">
+                  <input id="scoresSearch" class="ctrl-input" placeholder="Search exams..." />
+                  <select id="scoresSort" class="ctrl-select" title="Sort">
+                    <option value="date_desc">Most Recent</option>
+                    <option value="date_asc">Oldest First</option>
+                    <option value="score_desc">Highest Score</option>
+                    <option value="exam_name">Exam Name</option>
+                  </select>
+                  <button id="scoresDensityBtn" class="ctrl-toggle" title="Toggle density"><i class="fas fa-grip-lines"></i></button>
+                  <button id="addScoreBtn" class="btn-add"><i class="fas fa-plus"></i>Add</button>
+                </div>
+              </div>
+              
+              <!-- Quick Stats Overview -->
+              <div id="scoresOverview" class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                  <div class="stat-content">
+                    <div class="stat-number" id="totalExamsCount">0</div>
+                    <div class="stat-label">Exams Taken</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                  <div class="stat-content">
+                    <div class="stat-number" id="highestScore">—</div>
+                    <div class="stat-label">Best Score</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+                  <div class="stat-content">
+                    <div class="stat-number" id="latestExam">—</div>
+                    <div class="stat-label">Latest Test</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Scores Grid -->
+              <div id="scoresList" class="mt-6 scores-grid"></div>
+              
+              <!-- Seed Button (only shown when no scores) -->
+              <div id="seedPrompt" class="mt-6 text-center hidden">
+                <div class="empty-state-large">
+                  <div class="empty-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                  </div>
+                  <h3>No Academic Scores Yet</h3>
+                  <p>Showcase your test scores to strengthen your academic profile</p>
+                  <div class="empty-actions">
+                    <button id="seedExamsBtn" class="btn btn-ghost mr-3">
+                      <i class="fas fa-seedling"></i>Seed Default Exams
+                    </button>
+                    <button class="btn btn-primary" onclick="showScoreModal()">
+                      <i class="fas fa-plus"></i>Add First Score
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Preview Panel -->
+            <aside class="preview-panel">
+              <div class="preview-avatar"><i class="fas fa-user"></i></div>
+              <div class="preview-name">Your name</div>
+              <div class="preview-subtle preview-email">—</div>
+              <div class="preview-subtle preview-location">Location</div>
+              <div class="preview-bio">Write a short bio to introduce yourself.</div>
+              <div class="preview-links"></div>
+              <div class="preview-extras">
+                <div class="mt-3"><div class="preview-subtle" style="font-weight:600;"><i class="fas fa-graduation-cap mr-2 icon-subtle"></i>Education</div><div class="preview-extras-edu text-normal" style="font-size:13px;">—</div></div>
+                <div class="mt-3"><div class="preview-subtle" style="font-weight:600;"><i class="fas fa-screwdriver-wrench mr-2 icon-subtle"></i>Top skills</div><div class="preview-extras-skills" style="display:flex;flex-wrap:wrap;gap:6px;"></div></div>
+                <div class="mt-3"><div class="preview-subtle" style="font-weight:600;"><i class="fas fa-diagram-project mr-2 icon-subtle"></i>Project</div><div class="preview-extras-project text-normal" style="font-size:13px;">—</div></div>
+                <div class="mt-3"><div class="preview-subtle" style="font-weight:600;"><i class="fas fa-briefcase mr-2 icon-subtle"></i>Experience</div><div class="preview-extras-exp text-normal" style="font-size:13px;">—</div></div>
+                <div class="mt-3"><div class="preview-subtle" style="font-weight:600;"><i class="fas fa-trophy mr-2 icon-subtle"></i>Achievements</div><div class="preview-extras-ach text-normal" style="font-size:13px;">—</div></div>
+                <div class="mt-3"><div class="preview-subtle" style="font-weight:600;"><i class="fas fa-chart-line mr-2 icon-subtle"></i>Test Scores</div><div class="preview-extras-scores text-normal" style="font-size:13px;">—</div></div>
+                <div class="mt-3"><div class="preview-subtle" style="font-weight:600;"><i class="fas fa-language mr-2 icon-subtle"></i>Languages</div><div class="preview-extras-lang" style="display:flex;flex-wrap:wrap;gap:6px;"></div></div>
+              </div>
+              <div class="mt-3" style="display:flex; gap:8px;">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('openCardSide')?.click()"><i class="fas fa-id-card"></i> Open</button>
+                <button type="button" class="btn btn-violet btn-sm" onclick="document.getElementById('shareCardSide')?.click()"><i class="fas fa-share-from-square"></i> Share</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="downloadCardPng()"><i class="fas fa-download"></i> PNG</button>
               </div>
             </aside>
           </div>
@@ -521,6 +621,9 @@
   let availableSkills = [];
   let educationDataCache = [];
   let eduDensity = false;
+  let academicExams = [];
+  let studentExamScores = [];
+  let selectedExamId = null;
   const api = new API();
 
     const qs = (s, r=document) => r.querySelector(s);
@@ -651,6 +754,7 @@
         showLoading(true);
         await loadProfile();
         await loadAllData();
+  try { await loadAcademicData(); } catch {}
       } catch (e) {
         console.error(e);
         showToast('Error loading profile', 'error');
@@ -659,6 +763,23 @@
   syncToggleText();
   positionTabIndicator();
       setTimeout(positionTabIndicator, 250);
+  // Scores: Add score modal and controls
+  qs('#addScoreBtn')?.addEventListener('click', ()=> showScoreModal());
+  qs('#scoresSearch')?.addEventListener('input', renderScoresTab);
+  qs('#scoresSort')?.addEventListener('change', renderScoresTab);
+  qs('#scoresDensityBtn')?.addEventListener('click', function() {
+    this.classList.toggle('active');
+    renderScoresTab();
+  });
+  qs('#seedExamsBtn')?.addEventListener('click', async ()=>{
+    try {
+      await api.students.seedDefaultExams();
+      await loadScoresData();
+      showToast('Default exams added successfully', 'success');
+    } catch(err) {
+      showToast(err.message || 'Failed to seed exams', 'error');
+    }
+  });
     });
 
     function switchTab(tab, el){
@@ -709,6 +830,450 @@
     async function loadStats(){
       try { const s = await api.students.getDashboardStats(); const stats = s.data || s; qs('#applicationsCount').textContent = stats.total_applications || 0; qs('#acceptedCount').textContent = stats.accepted_applications || 0; } catch { qs('#applicationsCount').textContent = '0'; qs('#acceptedCount').textContent = '0'; }
     }
+
+    async function loadAcademicData(){
+      if (window.Logger) Logger.info('Scores: loadAcademicData start');
+      const [ex, sc] = await Promise.all([
+        api.students.getExams().catch(err=>{ if (Logger) Logger.error('Scores: getExams failed', err); throw err; }),
+        api.students.getExamScores().catch(err=>{ if (Logger) Logger.error('Scores: getExamScores failed', err); throw err; })
+      ]);
+      academicExams = ex.results || ex.data || ex || [];
+      studentExamScores = sc.results || sc.data || sc || [];
+      if (!selectedExamId && academicExams.length) selectedExamId = academicExams[0].id;
+      // Seed button
+      const seedBtn = qs('#seedExamsBtn');
+      if (seedBtn){
+        seedBtn.onclick = async ()=>{
+          try {
+            if (Logger) Logger.info('Scores: seedDefaultExams click');
+            await api.students.seedDefaultExams();
+            const ex2 = await api.students.getExams();
+            academicExams = ex2.results || ex2.data || ex2 || [];
+            if (!selectedExamId && academicExams.length) selectedExamId = academicExams[0].id;
+            renderScoresTab(); showToast('Defaults ensured', 'success');
+          } catch(e){ if (Logger) Logger.error('Scores: seed default failed', e); showToast(e.message||'Failed to seed', 'error'); }
+        };
+      }
+      updateScoresPreview();
+      if (Logger) Logger.info('Scores: loadAcademicData done', { exams: academicExams.length, scores: studentExamScores.length });
+      renderScoresTab();
+    }
+
+    function updateScoresPreview(){
+      try{
+        const map = new Map();
+        studentExamScores.forEach(s => {
+          const key = s.exam?.id || s.exam_id;
+          if (!map.has(key)) map.set(key, { exam: s.exam, total: 0, max: 0 });
+          const rec = map.get(key);
+          rec.total += Number(s.score)||0;
+        });
+        map.forEach((rec, key)=>{
+          const exam = rec.exam || academicExams.find(e=>e.id===key);
+          if (exam && Array.isArray(exam.sections)) rec.max = exam.sections.reduce((a,s)=> a + Number(s.max_score||0), 0);
+        });
+        let best = null; map.forEach(v=>{ if (!best || v.total>best.total) best = v; });
+        const txt = best && best.exam ? `${best.exam.name}: ${best.total}${best.max?` / ${best.max}`:''}` : '—';
+        qsa('.preview-extras-scores').forEach(el=> el.textContent = txt);
+      }catch{}
+    }
+
+    function renderScoresTab(){
+      const listEl = qs('#scoresList');
+      const overviewEl = qs('#scoresOverview');
+      const seedPromptEl = qs('#seedPrompt');
+      
+      if (!listEl || !overviewEl) return;
+      
+      // Group scores by exam
+      const examGroups = {};
+      studentExamScores.forEach(score => {
+        const examId = score.exam?.id || score.exam_id;
+        const examName = score.exam?.name || 'Unknown Exam';
+        const examSlug = score.exam?.slug || '';
+        
+        if (!examGroups[examId]) {
+          examGroups[examId] = {
+            id: examId,
+            name: examName,
+            slug: examSlug,
+            sections: [],
+            total: 0,
+            maxTotal: 0,
+            latestDate: null
+          };
+        }
+        
+        const isIELTS = examSlug === 'ielts' || examName.toLowerCase().includes('ielts');
+        const formattedScore = isIELTS ? Number(score.score || 0).toFixed(1) : Number(score.score || 0);
+        const section = score.section || {};
+        const maxScore = section.max_score ? (isIELTS ? Number(section.max_score).toFixed(1) : Number(section.max_score)) : '';
+        
+        examGroups[examId].sections.push({
+          name: section.name || 'Unknown Section',
+          score: formattedScore,
+          maxScore: maxScore,
+          date: score.taken_date,
+          scoreId: score.id,
+          sectionId: score.section?.id || score.section_id,
+          isIELTS: isIELTS
+        });
+        
+        examGroups[examId].total += Number(score.score || 0);
+        examGroups[examId].maxTotal += Number(section.max_score || 0);
+        
+        if (score.taken_date && (!examGroups[examId].latestDate || score.taken_date > examGroups[examId].latestDate)) {
+          examGroups[examId].latestDate = score.taken_date;
+        }
+      });
+      
+      const examList = Object.values(examGroups);
+      
+      // Update overview stats
+      updateScoresOverview(examList);
+      
+      // Show/hide seed prompt
+      if (examList.length === 0) {
+        seedPromptEl.classList.remove('hidden');
+        listEl.innerHTML = '';
+        return;
+      } else {
+        seedPromptEl.classList.add('hidden');
+      }
+      
+      // Apply search and sort
+      const searchTerm = qs('#scoresSearch')?.value?.toLowerCase() || '';
+      const sortBy = qs('#scoresSort')?.value || 'date_desc';
+      
+      let filteredExams = examList.filter(exam => 
+        exam.name.toLowerCase().includes(searchTerm)
+      );
+      
+      // Sort exams
+      filteredExams.sort((a, b) => {
+        switch(sortBy) {
+          case 'date_asc':
+            return (a.latestDate || '').localeCompare(b.latestDate || '');
+          case 'date_desc':
+            return (b.latestDate || '').localeCompare(a.latestDate || '');
+          case 'score_desc':
+            return b.total - a.total;
+          case 'exam_name':
+            return a.name.localeCompare(b.name);
+          default:
+            return (b.latestDate || '').localeCompare(a.latestDate || '');
+        }
+      });
+      
+      // Check density mode
+      const isDense = qs('#scoresDensityBtn')?.classList.contains('active') || false;
+      listEl.className = isDense ? 'scores-grid dense' : 'scores-grid';
+      
+      // Render exam cards
+      listEl.innerHTML = filteredExams.map(exam => renderExamCard(exam)).join('');
+      
+      // Update preview
+      updateScoresPreview(examList);
+    }
+    
+    function updateScoresOverview(examList) {
+      const totalCount = examList.length;
+      let bestScore = null;
+      let bestExam = '';
+      let latestExam = '';
+      let latestDate = null;
+      
+      examList.forEach(exam => {
+        // Find best score (highest percentage)
+        const percentage = exam.maxTotal > 0 ? (exam.total / exam.maxTotal) * 100 : 0;
+        if (!bestScore || percentage > bestScore.percentage) {
+          const isIELTS = exam.slug === 'ielts' || exam.name.toLowerCase().includes('ielts');
+          const formatTotal = isIELTS ? exam.total.toFixed(1) : exam.total;
+          const formatMax = isIELTS ? exam.maxTotal.toFixed(1) : exam.maxTotal;
+          bestScore = {
+            percentage,
+            display: exam.maxTotal > 0 ? `${formatTotal}/${formatMax}` : formatTotal,
+            exam: exam.name
+          };
+        }
+        
+        // Find latest exam
+        if (exam.latestDate && (!latestDate || exam.latestDate > latestDate)) {
+          latestDate = exam.latestDate;
+          latestExam = exam.name;
+        }
+      });
+      
+      qs('#totalExamsCount').textContent = totalCount;
+      qs('#highestScore').textContent = bestScore ? bestScore.display : '—';
+      qs('#latestExam').textContent = latestExam || '—';
+    }
+    
+    function renderExamCard(exam) {
+      const isIELTS = exam.slug === 'ielts' || exam.name.toLowerCase().includes('ielts');
+      const formatTotal = isIELTS ? exam.total.toFixed(1) : exam.total;
+      const formatMax = isIELTS ? exam.maxTotal.toFixed(1) : exam.maxTotal;
+      
+      const examIcon = getExamIcon(exam.slug || exam.name.toLowerCase());
+      const maxDisplay = exam.maxTotal > 0 ? ` / ${formatMax}` : '';
+      
+      // Find the exam definition to check available sections
+      const examDef = academicExams.find(e => e.id === exam.id);
+      const availableSections = examDef?.sections || [];
+      const completedSectionIds = exam.sections.map(s => s.sectionId);
+      const missingSections = availableSections.filter(section => 
+        !exam.sections.find(s => s.name === section.name)
+      );
+      
+      // Calculate completion
+      const totalSections = availableSections.length;
+      const completedSections = exam.sections.length;
+      const isComplete = completedSections === totalSections;
+      const completionPercentage = totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0;
+      
+      const sectionsHtml = exam.sections.map(section => {
+        const maxDisplay = section.maxScore ? ` / ${section.maxScore}` : '';
+        const dateDisplay = section.date ? `<div class="score-section-date">${escapeHtml(String(section.date).split('T')[0])}</div>` : '';
+        
+        return `
+          <div class="score-section-item">
+            <div>
+              <div class="score-section-name">${escapeHtml(section.name)}</div>
+              ${dateDisplay}
+            </div>
+            <div class="score-section-value">${section.score}${maxDisplay}</div>
+          </div>
+        `;
+      }).join('');
+      
+      // Missing sections indicator
+      const missingSectionsHtml = missingSections.length > 0 ? `
+        <div class="missing-sections">
+          <div class="missing-sections-header">
+            <i class="fas fa-plus-circle"></i>
+            <span>Available to add:</span>
+          </div>
+          <div class="missing-sections-list">
+            ${missingSections.map(section => `
+              <button class="missing-section-btn" onclick="showScoreModal(null, ${exam.id}, ${section.id})">
+                <i class="fas fa-plus"></i>
+                ${escapeHtml(section.name)}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      ` : '';
+      
+      // Completion status
+      const completionBadge = isComplete ? 
+        `<div class="completion-badge complete">
+          <i class="fas fa-check-circle"></i>
+          Complete
+        </div>` :
+        `<div class="completion-badge incomplete">
+          <i class="fas fa-clock"></i>
+          ${completedSections}/${totalSections} sections
+        </div>`;
+      
+      return `
+        <div class="score-exam-card ${isComplete ? 'complete' : 'incomplete'}">
+          <div class="score-exam-header">
+            <div class="score-exam-title">
+              <div class="score-exam-icon">${examIcon}</div>
+              <div>
+                ${escapeHtml(exam.name)}
+                ${completionBadge}
+              </div>
+            </div>
+            <div class="score-exam-total">
+              <div class="score-total-number">${formatTotal}</div>
+              ${exam.maxTotal > 0 ? `<div class="score-total-max">${maxDisplay}</div>` : ''}
+              ${!isComplete ? `<div class="completion-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${completionPercentage}%"></div>
+                </div>
+              </div>` : ''}
+            </div>
+          </div>
+          
+          ${sectionsHtml ? `<div class="score-sections">${sectionsHtml}</div>` : ''}
+          
+          ${missingSectionsHtml}
+          
+          <div class="score-exam-actions">
+            ${!isComplete ? `
+              <button class="btn btn-primary btn-sm" onclick="showScoreModal(null, ${exam.id})">
+                <i class="fas fa-plus"></i> Add Section
+              </button>
+            ` : ''}
+            <button class="btn btn-ghost btn-sm" onclick="editExamScores(${exam.id})">
+              <i class="fas fa-pen"></i> ${isComplete ? 'Edit' : 'Manage'}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+    
+    function getExamIcon(examKey) {
+      const icons = {
+        'sat': '<i class="fas fa-graduation-cap"></i>',
+        'gre': '<i class="fas fa-user-graduate"></i>', 
+        'gmat': '<i class="fas fa-chart-line"></i>',
+        'ielts': '<i class="fas fa-globe"></i>',
+        'toefl': '<i class="fas fa-language"></i>'
+      };
+      
+      for (const [key, icon] of Object.entries(icons)) {
+        if (examKey.includes(key)) return icon;
+      }
+      
+      return '<i class="fas fa-medal"></i>';
+    }
+    
+    function editExamScores(examId) {
+      // For now, just show add modal - can be enhanced later
+      showScoreModal(null, examId);
+    }
+    
+    function updateScoresPreview(examList) {
+      try {
+        if (!examList.length) {
+          qsa('.preview-extras-scores').forEach(el => el.textContent = '—');
+          return;
+        }
+        
+        // Show best exam in preview
+        const bestExam = examList.reduce((best, exam) => {
+          const percentage = exam.maxTotal > 0 ? (exam.total / exam.maxTotal) * 100 : exam.total;
+          const bestPercentage = best.maxTotal > 0 ? (best.total / best.maxTotal) * 100 : best.total;
+          return percentage > bestPercentage ? exam : best;
+        }, examList[0]);
+        
+        const isIELTS = bestExam.slug === 'ielts' || bestExam.name.toLowerCase().includes('ielts');
+        const formatTotal = isIELTS ? bestExam.total.toFixed(1) : bestExam.total;
+        const formatMax = isIELTS ? bestExam.maxTotal.toFixed(1) : bestExam.maxTotal;
+        const maxDisplay = bestExam.maxTotal > 0 ? ` / ${formatMax}` : '';
+        
+        const txt = `${bestExam.name}: ${formatTotal}${maxDisplay}`;
+        qsa('.preview-extras-scores').forEach(el => el.textContent = txt);
+      } catch {}
+    }
+
+    // Add/Edit score modal
+    function showScoreModal(scoreId=null, presetExamId=null, presetSectionId=null){
+      const existing = scoreId ? (studentExamScores||[]).find(s=> s.id===scoreId) : null;
+      const m = qs('#modalContent');
+      const selectedExam = presetExamId || existing?.exam_id || existing?.exam?.id || (academicExams[0]?.id);
+      const ex = (academicExams||[]);
+      const examOptions = ex.map(e=>`<option value='${Number(e.id)}' ${Number(e.id)===Number(selectedExam)?'selected':''}>${escapeHtml(e.name)}</option>`).join('');
+      let initedSectionId = presetSectionId || existing?.section_id || existing?.section?.id || null;
+      const html = `
+        <div class='p-5'>
+          <h3 class='text-white font-semibold mb-4'>${existing?'Edit':'Add'} score</h3>
+          <form id='scoreForm' class='grid gap-3'>
+            <div class='grid sm:grid-cols-2 gap-3'>
+              <div>
+                <label class='op-label'>Exam *</label>
+                <select id='score_exam' name='exam_id' class='op-select' required>${examOptions}</select>
+              </div>
+              <div>
+                <label class='op-label'>Section *</label>
+                <select id='score_section' name='section_id' class='op-select' required></select>
+              </div>
+            </div>
+            <div class='grid sm:grid-cols-3 gap-3'>
+              <div>
+                <label class='op-label'>Score *</label>
+                <input id='score_value' name='score' type='number' class='op-input' required />
+                <div id='score_hint' class='op-help mt-1'></div>
+              </div>
+              <div>
+                <label class='op-label'>Taken on</label>
+                <input id='score_date' name='taken_date' type='date' class='op-input' value='${existing && existing.taken_date ? escapeAttr(String(existing.taken_date).split('T')[0]) : ''}'/>
+              </div>
+              <div>
+                <label class='op-label'>Notes</label>
+                <input id='score_notes' name='notes' class='op-input' value='${escapeAttr(existing?.notes||'')}'/>
+              </div>
+            </div>
+            <div class='flex justify-end gap-2 pt-2'>
+              <button type='button' class='btn btn-ghost' onclick='hideModal()'>Cancel</button>
+              <button type='submit' class='btn btn-primary'>${existing?'Update':'Save'}</button>
+            </div>
+          </form>
+        </div>`;
+      m.innerHTML = html; showModal();
+
+      const examSel = qs('#score_exam');
+      const secSel = qs('#score_section');
+      const scoreInput = qs('#score_value');
+      const hint = qs('#score_hint');
+
+      function fillSections(){
+        const exId = Number(examSel.value);
+        const exam = (academicExams||[]).find(e=> Number(e.id)===exId);
+        const secs = (exam?.sections||[]).slice().sort((a,b)=> (a.sort_order||0)-(b.sort_order||0));
+        secSel.innerHTML = `<option value=''>Select…</option>` + secs.map(s=>`<option value='${Number(s.id)}' ${initedSectionId===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('');
+        // apply constraints for first/selected section
+        const selId = Number(secSel.value || (initedSectionId || 0));
+        applyConstraints(exam, selId);
+      }
+
+      function applyConstraints(exam, sectionId){
+        const sec = (exam?.sections||[]).find(s=> Number(s.id)===Number(sectionId));
+        if (!sec){ scoreInput.removeAttribute('min'); scoreInput.removeAttribute('max'); scoreInput.removeAttribute('step'); hint.textContent = ''; return; }
+        scoreInput.min = Number(sec.min_score);
+        scoreInput.max = Number(sec.max_score);
+        scoreInput.step = Number(sec.step);
+        if (!existing) scoreInput.value = '';
+        
+        // Format hint properly for decimals
+        const isIELTS = exam?.slug === 'ielts' || exam?.name?.toLowerCase().includes('ielts');
+        const formatNum = (n) => isIELTS ? Number(n).toFixed(1) : Number(n);
+        const stepText = Number(sec.step) === 0.5 ? '0.5' : Number(sec.step);
+        hint.textContent = `Allowed: ${formatNum(sec.min_score)} – ${formatNum(sec.max_score)} (step ${stepText})`;
+      }
+
+      examSel.addEventListener('change', ()=>{ initedSectionId = null; fillSections(); });
+      secSel.addEventListener('change', ()=>{
+        const exId = Number(examSel.value);
+        const exam = (academicExams||[]).find(e=> Number(e.id)===exId);
+        applyConstraints(exam, Number(secSel.value));
+      });
+      fillSections();
+      if (existing && !initedSectionId){ initedSectionId = existing.section?.id || existing.section_id; }
+      if (existing){ scoreInput.value = Number(existing.score); }
+
+      qs('#scoreForm')?.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const exId = Number(examSel.value);
+        const secId = Number(secSel.value);
+        const score = Number(scoreInput.value);
+        if (!exId || !secId || Number.isNaN(score)){ showToast('Please complete all fields', 'error'); return; }
+        try{
+          // Upsert to avoid duplicate constraint
+          const already = (studentExamScores||[]).find(s=> (s.exam?.id||s.exam_id)===exId && (s.section?.id||s.section_id)===secId);
+          const payload = { exam_id: exId, section_id: secId, score, taken_date: qs('#score_date')?.value || null, notes: qs('#score_notes')?.value || '' };
+          let result;
+          if (existing){
+            result = await api.students.updateExamScore(existing.id, payload);
+            const idx = studentExamScores.findIndex(s=> s.id===existing.id); if (idx>-1) studentExamScores[idx]=result;            
+          } else if (already) {
+            result = await api.students.updateExamScore(already.id, payload);
+            const idx = studentExamScores.findIndex(s=> s.id===already.id); if (idx>-1) studentExamScores[idx]=result;
+          } else {
+            result = await api.students.addExamScore(payload);
+            studentExamScores.push(result);
+          }
+          hideModal();
+          showToast('Saved', 'success');
+          renderScoresTab();
+          updateScoresPreview();
+        } catch(err){ showToast(err.message||'Failed to save', 'error'); }
+      });
+    }
+
+  async function deleteExamScore(id){ if(!confirm('Delete score?')) return; try { await api.students.deleteExamScore(id); studentExamScores = studentExamScores.filter(s=> s.id!==id); renderScoresTab(); updateScoresPreview(); showToast('Deleted', 'success'); } catch(e){ showToast(e.message||'Failed', 'error'); } }
 
     function resolveMediaUrl(u){
       if(!u) return null;
@@ -800,14 +1365,15 @@
         } else { achEl.textContent = '—'; }
       }
       // Languages chips
-      const langEl = pv.querySelector('.preview-extras-lang');
+    const langEl = pv.querySelector('.preview-extras-lang');
       if (langEl){
         langEl.innerHTML = '';
         const langs = p.languages || [];
         if (Array.isArray(langs) && langs.length){
-          langs.slice(0,6).forEach(l=>{ const d = document.createElement('div'); d.className = 'chip'; d.textContent = `${l.language||''} ${l.proficiency?`(${l.proficiency})`:''}`.trim(); langEl.appendChild(d); });
+      langs.slice(0,6).forEach(l=>{ const d = document.createElement('div'); d.className = 'chip'; d.textContent = `${l.language||''} ${l.proficiency?`(${l.proficiency})`:''}`.trim(); langEl.appendChild(d); });
         }
       }
+    const scEl = pv.querySelector('.preview-extras-scores'); if (scEl) scEl.textContent = '—';
     }
 
     function populatePersonalForm(profile){
@@ -857,8 +1423,9 @@
     }
 
     async function loadTabData(tab){
-      try {
+  try {
   if (tab === 'education') { const r = await api.students.getEducation(); const list = r.results || r.data || r || []; educationDataCache = Array.isArray(list)?list:(list.results||[]); applyEducationControls(); }
+    if (tab === 'scores') { await loadAcademicData(); renderScoresTab(); }
         if (tab === 'experience') { const r = await api.students.getExperience(); const list = r.results || r.data || r || []; displayExperienceList(list); }
         if (tab === 'skills') { const r = await api.students.getSkills(); const list = r.results || r.data || r || []; displaySkillsList(list); }
         if (tab === 'projects') { const r = await api.students.getProjects(); const list = r.results || r.data || r || []; displayProjectsList(list); }
@@ -1425,7 +1992,9 @@
     window.editProject = editProject;
     window.editAchievement = editAchievement;
     window.editLanguage = editLanguage;
-    window.downloadResume = downloadResume;
+  window.downloadResume = downloadResume;
+  window.deleteExamScore = deleteExamScore;
+  window.showScoreModal = showScoreModal;
   </script>
   <script>
     // Lightweight HTML-to-PNG (same approach as card.html)

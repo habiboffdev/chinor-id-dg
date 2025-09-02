@@ -5,6 +5,8 @@ urlpatterns = [
     # Application CRUD
     path('', views.ApplicationListCreateView.as_view(), name='application-list-create'),
     path('<int:pk>/', views.ApplicationDetailView.as_view(), name='application-detail'),
+    # Organization-scoped listing (alias for clarity)
+    path('org/', views.OrganizationApplicationListView.as_view(), name='organization-application-list'),
     
     # Application Documents
     path('<int:application_id>/documents/', views.ApplicationDocumentListCreateView.as_view(), name='application-document-list-create'),

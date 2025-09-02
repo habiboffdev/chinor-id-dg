@@ -230,3 +230,78 @@ class SocialLink(models.Model):
     def __str__(self):
         lbl = self.label or self.get_platform_display()
         return f"{self.student.user.get_full_name() or self.student.user.email} — {lbl}"
+
+
+class Preference(models.Model):
+    """Catalog of student preferences/interests (e.g., internships, scholarships)."""
+    key = models.SlugField(max_length=40, unique=True)
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['key']
+
+    def __str__(self):
+        return f"{self.name} ({self.key})"
+
+
+class StudentPreference(models.Model):
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='preferences')
+    preference = models.ForeignKey(Preference, on_delete=models.CASCADE, related_name='student_preferences')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student', 'preference')
+
+    def __str__(self):
+        return f"{self.student.user.get_full_name() or self.student.user.email} — {self.preference.name}"
+
+
+# Academic Exams and Scores
+class AcademicExam(models.Model):
+    slug = models.SlugField(max_length=40, unique=True)
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = 'Academic Exam'
+        verbose_name_plural = 'Academic Exams'
+
+    def __str__(self):
+        return self.name
+
+
+class AcademicExamSection(models.Model):
+    exam = models.ForeignKey(AcademicExam, on_delete=models.CASCADE, related_name='sections')
+    name = models.CharField(max_length=100)
+    min_score = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    max_score = models.DecimalField(max_digits=6, decimal_places=2)
+    step = models.DecimalField(max_digits=6, decimal_places=2, default=1)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['sort_order', 'id']
+        unique_together = ('exam', 'name')
+
+    def __str__(self):
+        return f"{self.exam.name} · {self.name}"
+
+
+class StudentExamScore(models.Model):
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='exam_scores')
+    exam = models.ForeignKey(AcademicExam, on_delete=models.CASCADE, related_name='student_scores')
+    section = models.ForeignKey(AcademicExamSection, on_delete=models.CASCADE, related_name='student_scores')
+    score = models.DecimalField(max_digits=7, decimal_places=2)
+    taken_date = models.DateField(null=True, blank=True)
+    notes = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('student', 'section')
+        ordering = ['exam_id', 'section_id']
+
+    def __str__(self):
+        return f"{self.student.user.get_full_name() or self.student.user.email} · {self.exam.name} · {self.section.name}: {self.score}"

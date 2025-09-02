@@ -2,8 +2,14 @@ from rest_framework import generics, status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
+from django.conf import settings
+import hashlib
+import hmac
+import time
+from urllib.parse import parse_qsl
 from .serializers import (
     UserRegistrationSerializer, 
     UserSerializer, 
@@ -76,3 +82,119 @@ def logout_view(request):
     Logout view - client should delete the token
     """
     return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
+
+
+def verify_telegram_auth(auth_data):
+    """
+    Verify that the auth data received from Telegram is authentic.
+    """
+    check_hash = auth_data.pop('hash', None)
+    if not check_hash:
+        return False
+    
+    bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
+    if not bot_token:
+        return False
+    
+    # Create a data string
+    data_check_arr = []
+    for key, value in sorted(auth_data.items()):
+        data_check_arr.append(f'{key}={value}')
+    data_check_string = '\n'.join(data_check_arr)
+    
+    # Create secret key
+    secret_key = hashlib.sha256(bot_token.encode()).digest()
+    
+    # Calculate hash
+    hash_check = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
+    
+    # Check if the hash matches
+    if hash_check != check_hash:
+        return False
+    
+    # Check if auth data is not too old (5 minutes)
+    auth_date = int(auth_data.get('auth_date', 0))
+    if time.time() - auth_date > 300:  # 5 minutes
+        return False
+    
+    return True
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def telegram_auth(request):
+    """
+    Authenticate user with Telegram login data
+    """
+    try:
+        # Get Telegram login data from request
+        telegram_data = request.data
+        
+        # Verify the Telegram data integrity
+        if not verify_telegram_auth(telegram_data):
+            return Response(
+                {'error': 'Invalid Telegram authentication data'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        telegram_id = telegram_data.get('id')
+        username = telegram_data.get('username', '')
+        first_name = telegram_data.get('first_name', '')
+        last_name = telegram_data.get('last_name', '')
+        
+        # Try to find existing user by telegram_id
+        try:
+            user = User.objects.get(telegram_id=telegram_id)
+            # Update user info if needed
+            if username and not user.username.startswith('tg_'):
+                user.username = username
+                user.save()
+        except User.DoesNotExist:
+            # Create new user
+            username_base = username or f"tg_{telegram_id}"
+            # Ensure unique username
+            counter = 1
+            unique_username = username_base
+            while User.objects.filter(username=unique_username).exists():
+                unique_username = f"{username_base}_{counter}"
+                counter += 1
+            
+            user = User.objects.create_user(
+                username=unique_username,
+                telegram_id=telegram_id,
+                first_name=first_name,
+                last_name=last_name,
+                is_active=True
+            )
+        
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        access_token = refresh.access_token
+        
+        # Serialize user data
+        user_serializer = UserSerializer(user)
+        
+        return Response({
+            'access': str(access_token),
+            'refresh': str(refresh),
+            'user': user_serializer.data
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Authentication failed: {str(e)}'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def telegram_config(request):
+    """
+    Get Telegram bot configuration for frontend
+    """
+    from django.conf import settings
+    
+    return Response({
+        'bot_username': getattr(settings, 'TELEGRAM_BOT_USERNAME', None)
+    })

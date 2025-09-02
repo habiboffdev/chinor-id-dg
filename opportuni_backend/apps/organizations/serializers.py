@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Organization, OrganizationMember
+from apps.opportunities.models import Opportunity
+from apps.applications.models import Application
 
 User = get_user_model()
 
@@ -26,8 +28,10 @@ class OrganizationSerializer(serializers.ModelSerializer):
         return obj.members.count()
     
     def get_opportunity_count(self, obj):
-        # This will be implemented when we create the Opportunities app
-        return 0
+        try:
+            return obj.opportunities.count()
+        except Exception:
+            return 0
 
 
 class OrganizationUpdateSerializer(serializers.ModelSerializer):
@@ -59,36 +63,52 @@ class OrganizationDashboardSerializer(serializers.ModelSerializer):
     total_applications = serializers.SerializerMethodField()
     pending_applications = serializers.SerializerMethodField()
     accepted_applications = serializers.SerializerMethodField()
+    interviews_scheduled = serializers.SerializerMethodField()
     member_count = serializers.SerializerMethodField()
     recent_applications = serializers.SerializerMethodField()
     
     class Meta:
         model = Organization
         fields = [
-            'name', 'organization_type', 'total_opportunities', 
-            'total_applications', 'pending_applications', 
-            'accepted_applications', 'member_count', 'recent_applications'
+            'name', 'organization_type', 'total_opportunities',
+            'total_applications', 'pending_applications', 'accepted_applications',
+            'interviews_scheduled', 'member_count', 'recent_applications'
         ]
     
     def get_total_opportunities(self, obj):
-        # This will be implemented when we create the Opportunities app
-        return 0
+        return Opportunity.objects.filter(organization=obj).count()
     
     def get_total_applications(self, obj):
-        # This will be implemented when we create the Applications app
-        return 0
+        return Application.objects.filter(opportunity__organization=obj).count()
     
     def get_pending_applications(self, obj):
-        # This will be implemented when we create the Applications app
-        return 0
+        return Application.objects.filter(opportunity__organization=obj, status='pending').count()
     
     def get_accepted_applications(self, obj):
-        # This will be implemented when we create the Applications app
-        return 0
+        return Application.objects.filter(opportunity__organization=obj, status='accepted').count()
+
+    def get_interviews_scheduled(self, obj):
+        return Application.objects.filter(opportunity__organization=obj, status='interview_scheduled').count()
     
     def get_member_count(self, obj):
         return obj.members.count()
     
     def get_recent_applications(self, obj):
-        # This will be implemented when we create the Applications app
-        return []
+        qs = Application.objects.filter(opportunity__organization=obj).select_related(
+            'student__user', 'opportunity'
+        ).order_by('-applied_at')[:6]
+        out = []
+        for app in qs:
+            user = getattr(app.student, 'user', None)
+            out.append({
+                'id': app.id,
+                'status': app.status,
+                'applied_at': app.applied_at,
+                'student_first_name': getattr(user, 'first_name', ''),
+                'student_last_name': getattr(user, 'last_name', ''),
+                'student_name': user.get_full_name() if user else '',
+                'student_avatar': getattr(getattr(app.student, 'avatar', None), 'url', None) if hasattr(app.student, 'avatar') else None,
+                'opportunity_id': app.opportunity_id,
+                'opportunity_title': app.opportunity.title if app.opportunity else '',
+            })
+        return out

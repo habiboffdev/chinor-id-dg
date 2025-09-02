@@ -80,3 +80,4 @@ dump.rdb
 # Temporary files
 *.tmp
 *.temp
+*/media

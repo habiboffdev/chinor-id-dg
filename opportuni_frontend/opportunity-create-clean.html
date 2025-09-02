@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Opportunity - Opportuni</title>
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/org.css">
+  <link rel="stylesheet" href="assets/css/wizard-create.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="org-layout">
+
+  <!-- Universal Organization Navbar -->
+  <nav class="org__navbar">
+    <div class="org__navbar__wrapper">
+      <div class="org__navbar__left">
+        <a href="#" class="org__navbar__brand">
+          Opportuni <span class="brand__accent">org</span>
+        </a>
+        <div class="org__navbar__links">
+          <a href="organization/dashboard.html" class="org__navbar__link">Dashboard</a>
+          <a href="organization/opportunities.html" class="org__navbar__link org__navbar__link--active">Opportunities</a>
+          <a href="organization/applications.html" class="org__navbar__link">Applications</a>
+          <a href="organization/students.html" class="org__navbar__link">Students</a>
+          <a href="organization/communications.html" class="org__navbar__link">Communications</a>
+        </div>
+      </div>
+      <div class="org__navbar__right">
+        <button class="org__navbar__icon" type="button" title="Notifications">
+          <i class="fas fa-bell"></i>
+          <span class="badge">3</span>
+        </button>
+        <div class="user__menu">
+          <button class="user__trigger" type="button" aria-expanded="false">
+            <img src="assets/images/avatar-placeholder.png" alt="User" class="user__avatar">
+            <span class="user__name">TechCorp</span>
+            <i class="fas fa-chevron-down user__caret"></i>
+          </button>
+          <div class="user__dropdown" hidden>
+            <a href="organization/profile.html" class="user__item">
+              <i class="fas fa-user"></i>
+              <span>Profile</span>
+            </a>
+            <a href="organization/settings.html" class="user__item">
+              <i class="fas fa-cog"></i>
+              <span>Settings</span>
+            </a>
+            <div class="user__divider"></div>
+            <a href="login.html" class="user__item">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="org__main">
+    <div class="wizard-container">
+      <!-- Header -->
+      <div class="wizard-header">
+        <a href="organization/opportunities.html" class="btn btn--ghost">
+          <i class="fas fa-arrow-left"></i>
+          Back to Opportunities
+        </a>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn--ghost" onclick="wizardApp.saveDraft()">
+          <i class="fas fa-save"></i>
+          Save Draft
+        </button>
+      </div>
+
+      <!-- Wizard Card -->
+      <div class="wizard-card">
+        <!-- Progress -->
+        <div class="wizard-progress">
+          <div class="progress-info">
+            <span id="progress-text">Step 1 of 8</span>
+            <span id="progress-status">Basic Information</span>
+          </div>
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+        </div>
+
+        <!-- Title & Hint -->
+        <h1 id="wizard-title" class="wizard-title">Tell us about your opportunity</h1>
+        <p id="wizard-hint" class="wizard-hint">Let's start with the basics - what kind of opportunity are you offering?</p>
+
+        <!-- Dynamic Content Area -->
+        <div id="wizard-content" class="wizard-body">
+          <!-- Content injected by JS -->
+        </div>
+
+        <!-- Actions -->
+        <div class="wizard-actions">
+          <button type="button" id="btn-prev" class="btn btn--ghost" onclick="wizardApp.prevStep()" disabled>
+            <i class="fas fa-chevron-left"></i>
+            Previous
+          </button>
+          <div class="spacer"></div>
+          <button type="button" id="btn-next" class="btn btn--primary" onclick="wizardApp.nextStep()">
+            Next
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Hidden Form for Data Collection -->
+  <form id="opportunity-form" style="display: none;">
+    <!-- Basic Info -->
+    <input type="text" name="title" id="form_title">
+    <textarea name="description" id="form_description"></textarea>
+    <select name="type" id="form_type">
+      <option value="">Select type...</option>
+      <option value="internship">Internship</option>
+      <option value="job">Job</option>
+      <option value="scholarship">Scholarship</option>
+      <option value="competition">Competition</option>
+      <option value="volunteer">Volunteer</option>
+      <option value="event">Event</option>
+    </select>
+
+    <!-- Dates -->
+    <input type="datetime-local" name="application_deadline" id="form_application_deadline">
+    <input type="datetime-local" name="start_date" id="form_start_date">
+    <input type="datetime-local" name="end_date" id="form_end_date">
+
+    <!-- Details -->
+    <input type="text" name="location" id="form_location">
+    <select name="location_type" id="form_location_type">
+      <option value="on_site">On-site</option>
+      <option value="remote">Remote</option>
+      <option value="hybrid">Hybrid</option>
+    </select>
+    <input type="number" name="compensation_amount" id="form_compensation_amount">
+    <select name="compensation_type" id="form_compensation_type">
+      <option value="">Select type...</option>
+      <option value="stipend">Stipend</option>
+      <option value="salary">Salary</option>
+      <option value="hourly">Hourly</option>
+      <option value="scholarship">Scholarship</option>
+      <option value="unpaid">Unpaid</option>
+    </select>
+
+    <!-- Eligibility -->
+    <input type="number" name="min_gpa" id="form_min_gpa" step="0.1" min="0" max="4">
+    <input type="text" name="required_major" id="form_required_major">
+    <input type="text" name="min_year" id="form_min_year">
+    <input type="text" name="max_year" id="form_max_year">
+
+    <!-- Advanced -->
+    <input type="number" name="max_applications" id="form_max_applications">
+    <input type="checkbox" name="featured" id="form_featured">
+    <input type="checkbox" name="urgent" id="form_urgent">
+    <textarea name="application_instructions" id="form_application_instructions"></textarea>
+  </form>
+
+  <!-- Scripts -->
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/org-navbar.js"></script>
+  <script src="assets/js/wizard-create.js"></script>
+
+</body>
+</html>

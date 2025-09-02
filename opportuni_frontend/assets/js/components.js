@@ -2,10 +2,16 @@
 
 // Toast notification system
 function showToast(message, type = 'info', duration = 5000) {
-    const toastContainer = Utils.$('#toast-container');
+    let toastContainer = Utils.$('#toast-container') || Utils.$('#toastContainer');
     if (!toastContainer) {
-        console.error('Toast container not found');
-        return;
+        // Create a default toast container in top-right if missing
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.top = '1rem';
+        toastContainer.style.right = '1rem';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
     }
 
     const toast = Utils.createElement('div', `toast-enter bg-white border-l-4 p-4 rounded-lg shadow-lg max-w-sm ${getToastStyles(type)}`);

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opportunities - Opportuni</title>
+  
+  <!-- Fonts (load first for FOUT prevention) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../assets/css/theme.css" />
+  <link rel="stylesheet" href="../assets/css/org.css" />
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body class="theme-opportuni">
+
+  <!-- Universal Org Navbar mount point -->
+  <div id="org-navbar"></div>
+
+  <!-- Main Container -->
+  <main class="org__main">
+    <div class="page-container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title-section">
+          <h1 class="page-title">Opportunities</h1>
+          <p class="page-subtitle">Create and manage your organization's opportunities</p>
+        </div>
+        <div class="page-actions">
+          <a href="opportunity-create.html" class="btn btn--primary">
+            <i class="fas fa-plus"></i>
+            Create Opportunity
+          </a>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="page-content">
+        <div class="org-card">
+          <div class="org-card__header">
+            <h2 class="org-card__title">Your Opportunities</h2>
+            <div class="org-card__actions">
+              <button type="button" class="btn btn--ghost btn--small">
+                <i class="fas fa-filter"></i>
+                Filter
+              </button>
+            </div>
+          </div>
+          <div class="org-card__body">
+            <div class="empty-state">
+              <div class="empty-state__icon">
+                <i class="fas fa-briefcase"></i>
+              </div>
+              <h3 class="empty-state__title">No opportunities yet</h3>
+              <p class="empty-state__text">
+                Create your first opportunity to start connecting with talented students.
+              </p>
+              <a href="opportunity-create.html" class="btn btn--primary">
+                <i class="fas fa-plus"></i>
+                Create Your First Opportunity
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- Scripts -->
+  <script>
+    // API Configuration
+    if (!window.API_BASE_URL) {
+      try {
+        const origin = window.location.origin;
+        window.API_BASE_URL = origin.replace(':8080', ':8000') + '/api';
+      } catch (e) { 
+        window.API_BASE_URL = '/api'; 
+      }
+    }
+  </script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/org-navbar.js"></script>
+  <script src="../assets/js/opportunities-page.js"></script>
+  
+  <!-- Enable debug mode -->
+  <script>
+    window.DEBUG = true;
+    console.log('🚀 opportunities.html loading...');
+  </script>
+  
+  <!-- Mount navbar and initialize page -->
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try { 
+        window.OrgNavbar?.mount?.(); 
+      } catch(e) {
+        console.error('Failed to mount navbar:', e);
+      }
+      
+      // Initialize opportunities page
+      try {
+        const opportunitiesPage = new OpportunitiesPage();
+        await opportunitiesPage.init();
+        window.opportunitiesPage = opportunitiesPage; // For debugging
+      } catch(e) {
+        console.error('Failed to initialize opportunities page:', e);
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -104,6 +104,31 @@ class ApplicationListCreateView(generics.ListCreateAPIView):
                 )
 
 
+class OrganizationApplicationListView(generics.ListAPIView):
+    """List applications scoped to the current organization with filters."""
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ApplicationListSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = ApplicationFilter
+    search_fields = ['student__user__first_name', 'student__user__last_name', 'opportunity__title']
+    ordering_fields = ['applied_at', 'updated_at', 'status']
+    ordering = ['-applied_at']
+
+    def get_queryset(self):
+        if self.request.user.user_type != 'organization':
+            return Application.objects.none()
+        try:
+            organization = Organization.objects.get(user=self.request.user)
+        except Organization.DoesNotExist:
+            return Application.objects.none()
+        qs = Application.objects.filter(opportunity__organization=organization)
+        # Additional shortcut filter by opportunity id
+        opp_id = self.request.query_params.get('opportunity')
+        if opp_id:
+            qs = qs.filter(opportunity_id=opp_id)
+        return qs
+
+
 class ApplicationDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     

@@ -44,11 +44,15 @@
 
   /* Right cluster */
   .student-nav .menu-right{display:flex;align-items:center;gap:12px}
-  .student-nav .btn-icon{display:inline-flex;align-items:center;justify-content:center;gap:8px;color:var(--mist-300);border-radius:12px;padding:8px;background:transparent;border:1px solid var(--slate-400);cursor:pointer;position:relative}
+  .student-nav .btn-icon{display:inline-flex;align-items:center;justify-content:center;gap:8px;color:var(--mist-300);border-radius:12px;padding:6px;background:transparent;border:1px solid var(--slate-400);cursor:pointer;position:relative}
   .student-nav .btn-icon i{font-size:1rem}
   .student-nav .btn-icon:hover{filter:brightness(1.08);background:var(--ink-800)}
   .student-nav .btn-icon i.fa-chevron-down{ margin-left: 6px }
-  .student-nav #notification-count{position:absolute;top:-6px;right:-6px;color:#fff;font-size:12px;border-radius:999px;height:20px;width:20px;display:flex;align-items:center;justify-content:center}
+  /* Badge: nudge inward and allow 1–3 digits without overflow */
+  .student-nav #notification-count{position:absolute;top:-4px;right:-4px;color:#fff;font-size:12px;border-radius:999px;height:20px;min-width:20px;width:auto;padding:0 6px;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  /* Tighten right cluster spacing to avoid awkward gap */
+  .student-nav .menu-right{ gap: 4px }
+  @media (min-width:768px){ .student-nav .menu-right{ gap: 6px } }
   .student-nav .user-avatar{display:block;height:32px;width:32px;border-radius:999px;object-fit:cover}
   .student-nav .user-name{display:none}
   /* Hide user menu by default until auth initializes */
@@ -57,10 +61,13 @@
 
       /* Dropdowns */
       .student-nav .dd-wrap{position:relative}
-      .student-nav .dropdown{position:absolute;right:0;top:calc(100% + 8px);min-width:12rem;background:var(--ink-900);border:1px solid var(--slate-400);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:80}
+  .student-nav .dropdown{position:absolute;right:0;top:calc(100% + 8px);min-width:14rem;background:var(--ink-900);border:1px solid var(--slate-400);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:80}
       .student-nav .dropdown.hidden{display:none}
-      .student-nav .dropdown a,.student-nav .dropdown button{display:block;width:100%;text-align:left;padding:10px 14px;color:var(--mist-200)}
-      .student-nav .dropdown a:hover,.student-nav .dropdown button:hover{background:var(--ink-800)}
+  .student-nav .dropdown a,.student-nav .dropdown button{display:block;width:100%;text-align:left;padding:14px 16px;color:var(--mist-100);line-height:1.35;font-size:14px}
+  .student-nav .dropdown a:hover,.student-nav .dropdown button:hover{background:var(--ink-800)}
+  /* Make the bottom action (Sign out) feel deliberate and not cramped */
+  .student-nav .dropdown .danger{display:block;width:100%;color:#f3f4f6;font-weight:700;border-top:1px solid var(--slate-400);border-bottom-left-radius:12px;border-bottom-right-radius:12px;padding:16px 16px;margin-top:2px}
+  .student-nav .dropdown .danger:hover{background:rgba(248,113,113,0.14);color:#fee2e2}
 
       /* Mobile */
       .student-nav .hamburger{display:none;color:var(--mist-300)}
@@ -115,8 +122,8 @@
           <div class="menu-right">
             <div class="dd-wrap">
               <button class="btn-icon p-2" data-action="toggle-notifications" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-bell text-xl"></i>
-                <span id="notification-count" class="absolute -top-1 -right-1 text-white text-xs rounded-full h-5 w-5 hidden items-center justify-center" style="background: var(--promo);">0</span>
+                <i class="fas fa-bell"></i>
+                <span id="notification-count" class="hidden" style="background: var(--promo);">0</span>
               </button>
               <div id="nav-notifications" class="dropdown hidden w-80">
                 <div class="p-3" style="border-bottom:1px solid var(--slate-400)"><strong>Notifications</strong></div>
@@ -135,9 +142,8 @@
                 <div class="py-1">
                   <a href="/profile.html"><i class="fas fa-user mr-2"></i>Profile</a>
                   <a href="/settings.html"><i class="fas fa-cog mr-2"></i>Settings</a>
-                  <hr style="border-color: var(--slate-400)">
-                  <button data-action="logout"><i class="fas fa-sign-out-alt mr-2"></i>Sign Out</button>
                 </div>
+                <button class="danger w-full text-left" data-action="logout"><i class="fas fa-sign-out-alt mr-2"></i>Sign Out</button>
               </div>
             </div>
 

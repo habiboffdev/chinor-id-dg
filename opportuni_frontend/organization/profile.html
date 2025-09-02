@@ -4,60 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organization Profile - Opportuni</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/theme.css">
+    <link rel="stylesheet" href="../assets/css/org.css">
+    <link rel="stylesheet" href="../assets/css/layout-shim.css">
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-<body class="min-h-screen" style="background: var(--ink-900);">
-    <!-- Navigation -->
-    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <a href="dashboard.html" class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--brand-primary);">
-                            <i class="fas fa-graduation-cap text-white text-sm"></i>
-                        </div>
-                        <span class="text-xl font-bold" style="color: var(--accent-2);">Opportuni</span>
-                    </a>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <button id="notificationBtn" class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-bell text-lg"></i>
-                        <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
-                    </button>
-                    
-                    <div class="relative">
-                        <button id="userMenuBtn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: var(--brand-primary);">
-                                <i class="fas fa-building text-white text-sm"></i>
-                            </div>
-                            <span id="orgName" class="text-gray-700 font-medium">Organization</span>
-                            <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
-                        </button>
-                        <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-10">
-                            <a href="profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
-                                <i class="fas fa-user mr-2"></i>Profile
-                            </a>
-                            <a href="students.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
-                                <i class="fas fa-users mr-2"></i>Students
-                            </a>
-                            <a href="applications.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
-                                <i class="fas fa-file-alt mr-2"></i>Applications
-                            </a>
-                            <a href="communications.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 border-b border-gray-100">
-                                <i class="fas fa-comments mr-2"></i>Communications
-                            </a>
-                            <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="theme-opportuni" style="min-height:100vh; background: var(--ink-900);">
+    <!-- Universal Org Navbar mount point -->
+    <div id="org-navbar"></div>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -226,6 +181,8 @@
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/components.js"></script>
     <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/org-navbar.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',()=>{ try{ window.OrgNavbar?.mount?.(); }catch(e){} });</script>
     <script>
         // Organization Profile Page Logic
         document.addEventListener('DOMContentLoaded', async function() {

@@ -54,7 +54,7 @@ class API {
         if (this.debug) {
             const safeHeaders = { ...config.headers };
             if (safeHeaders.Authorization) safeHeaders.Authorization = 'Bearer [redacted]';
-            if (window.Logger) Logger.info('API Request', { url, method: config.method || 'GET', headers: safeHeaders, hasToken: !!this.token });
+            if (window.Logger) Logger.info('API Request', { url, method: config.method || 'GET', headers: safeHeaders, hasToken: !!this.token, endpoint });
         }
 
         try {
@@ -70,10 +70,10 @@ class API {
                 data = await response.text();
             }
 
-            if (!response.ok) {
+        if (!response.ok) {
                 // Log detailed error information for debugging
                 if (this.debug && window.Logger) {
-                    Logger.error('API Error', new Error(`HTTP ${response.status} ${response.statusText}`));
+            Logger.error('API Error', new Error(`HTTP ${response.status} ${response.statusText}`), { url, endpoint, status: response.status, statusText: response.statusText, data });
                 }
                 
                 // Try to extract meaningful error message
@@ -100,7 +100,7 @@ class API {
 
             return data;
         } catch (error) {
-            if (this.debug && window.Logger) Logger.error('API Request Error', error);
+            if (this.debug && window.Logger) Logger.error('API Request Error', error, { endpoint });
             throw error;
         }
     }
@@ -404,6 +404,29 @@ class API {
             return this.get('/students/application-stats/');
         },
 
+        // Academic exams & scores
+        getExams: async () => {
+            return this.get('/students/exams/');
+        },
+        getExamSections: async (examId) => {
+            return this.get(`/students/exams/${examId}/sections/`);
+        },
+        getExamScores: async () => {
+            return this.get('/students/exam-scores/');
+        },
+        addExamScore: async (payload) => {
+            return this.post('/students/exam-scores/', payload);
+        },
+        updateExamScore: async (id, payload) => {
+            return this.put(`/students/exam-scores/${id}/`, payload);
+        },
+        deleteExamScore: async (id) => {
+            return this.delete(`/students/exam-scores/${id}/`);
+        },
+        seedDefaultExams: async () => {
+            return this.post('/students/exams/seed-defaults/');
+        },
+
         // Public Opportuni Card (no auth required)
         getPublicCard: async (studentId) => {
             return this.get(`/students/card/${encodeURIComponent(studentId)}/`);
@@ -439,12 +462,48 @@ class API {
 
         // Get dashboard stats
         getDashboardStats: async () => {
-            return this.get('/organizations/dashboard-stats/');
+            // Backend provides dashboard data at /organizations/dashboard/
+            return this.get('/organizations/dashboard/');
+        },
+
+        // Get application stats for current organization
+        getApplicationStats: async () => {
+            return this.get('/applications/stats/');
+        },
+
+        // Get organization opportunities (active by default via dedicated endpoint)
+        getOpportunities: async (params = {}) => {
+            // Prefer org-scoped active endpoint when no explicit scope provided
+            const useOrgActive = params && ('is_active' in params || Object.keys(params).length === 0);
+            return useOrgActive
+                ? this.get('/opportunities/mine/active/', params)
+                : this.get('/opportunities/', params);
+        },
+
+        // Get applications list (maps date filters to backend expectations)
+        getApplications: async (params = {}) => {
+            const { date_from, date_to, ...rest } = params || {};
+            const mapped = { ...rest };
+            if (date_from) {
+                // Backend expects applied_after as DateTime; send ISO start of day
+                mapped.applied_after = new Date(date_from).toISOString();
+            }
+            if (date_to) {
+                // Backend expects applied_before as DateTime; send ISO end of day
+                const end = new Date(date_to);
+                end.setHours(23,59,59,999);
+                mapped.applied_before = end.toISOString();
+            }
+            // Use org-scoped listing for clarity
+            return this.get('/applications/org/', mapped);
         },
 
         // Search organizations
         search: async (query, filters = {}) => {
-            return this.get('/organizations/search/', { q: query, ...filters });
+            // Backend lists organizations at /organizations/?search=...
+            const params = { ...(filters || {}) };
+            if (query) params.search = query;
+            return this.get('/organizations/', params);
         }
     };
 
@@ -523,6 +582,11 @@ class API {
             return this.put(`/applications/${id}/`, applicationData);
         },
 
+        // Update only status (convenience)
+        updateStatus: async (id, payload) => {
+            return this.put(`/applications/${id}/`, payload);
+        },
+
         // Withdraw application
         withdraw: async (id) => {
             return this.post(`/applications/${id}/withdraw/`);
@@ -536,6 +600,11 @@ class API {
         // Upload application document
         uploadDocument: async (file) => {
             return this.uploadFile('/applications/upload-document/', file);
+        },
+
+        // Bulk update application statuses (organization only)
+        bulkUpdateStatus: async (application_ids = [], status, reason = '') => {
+            return this.post('/applications/bulk-update/', { application_ids, status, reason });
         }
     };
 
@@ -563,12 +632,13 @@ class API {
 
         // Send email
         sendEmail: async (emailData) => {
-            return this.post('/communications/send-email/', emailData);
+            // Backend exposes bulk send at /communications/send-bulk/
+            return this.post('/communications/send-bulk/', emailData);
         },
 
-        // Get email history
+        // Get message/email history (backend exposes as messages)
         getEmailHistory: async (params = {}) => {
-            return this.get('/communications/emails/', params);
+            return this.get('/communications/messages/', params);
         }
     };
 
@@ -581,22 +651,30 @@ class API {
 
         // Mark notification as read
         markAsRead: async (id) => {
-            return this.patch(`/notifications/${id}/`, { is_read: true });
+            // Backend exposes explicit read endpoint
+            return this.request(`/notifications/${id}/read/`, { method: 'PUT' });
         },
 
         // Mark all notifications as read
         markAllAsRead: async () => {
-            return this.post('/notifications/mark-all-read/');
+            return this.request('/notifications/mark-all-read/', { method: 'PUT' });
         },
 
-        // Delete notification
+        // Delete notification (use explicit delete endpoint)
         delete: async (id) => {
-            return this.delete(`/notifications/${id}/`);
+            return this.request(`/notifications/${id}/delete/`, { method: 'DELETE' });
+        },
+
+        // Optional: get notification settings
+        getSettings: async () => {
+            return this.get('/notifications/settings/');
         },
 
         // Get unread count
         getUnreadCount: async () => {
-            return this.get('/notifications/unread-count/');
+            const stats = await this.get('/notifications/stats/');
+            // Normalize to { count } for callers
+            return { count: stats.unread_notifications ?? 0 };
         }
     };
 }

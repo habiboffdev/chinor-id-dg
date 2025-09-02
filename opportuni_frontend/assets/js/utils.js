@@ -27,13 +27,25 @@ if (typeof window !== 'undefined' && typeof window.API_BASE_URL === 'string' && 
 // Global debug flag (set to true in dev HTML if needed)
 window.DEBUG = window.DEBUG ?? isDevLike;
 
-// Safe Logger to avoid leaking sensitive info
+// Safe Logger to avoid leaking sensitive info + keep a small ring buffer for sharing logs
 const Logger = (() => {
     // Capture original console to avoid recursion if window.console is overridden later
     const rawConsole = (typeof window !== 'undefined' && window.console) ? window.console : {
         log: () => {}, info: () => {}, debug: () => {}, warn: () => {}, error: () => {}
     };
     const enabled = !!window.DEBUG;
+    // In-memory ring buffer (bounded) for easy sharing
+    const CAP = 500;
+    const buf = [];
+    const pushBuf = (level, args) => {
+        try {
+            const ts = new Date().toISOString();
+            const safe = args.map(sanitize);
+            const line = `[${ts}] ${level.toUpperCase()} ${safe.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ')}`;
+            buf.push(line);
+            if (buf.length > CAP) buf.shift();
+        } catch { /* noop */ }
+    };
 
     const maskEmail = (email) => {
         if (typeof email !== 'string') return email;
@@ -73,6 +85,8 @@ const Logger = (() => {
     };
 
     const wrap = (level) => (...args) => {
+        // Always buffer logs (sanitized), even if console printing is disabled
+        pushBuf(level, args);
         if (level === 'error') {
             // Always log a minimal error; include details only when DEBUG
             const [msg, err, ...rest] = args;
@@ -96,12 +110,22 @@ const Logger = (() => {
         debug: wrap('debug'),
         info: wrap('info'),
         warn: wrap('warn'),
-        error: wrap('error')
+        error: wrap('error'),
+        dump: () => buf.join('\n'),
+        clear: () => { buf.length = 0; },
     };
 })();
 
 // Expose Logger globally
 window.Logger = Logger;
+
+// Global error hooks to capture unexpected issues
+window.addEventListener('error', (e) => {
+    try { Logger.error('UncaughtError', e.error || e.message || e); } catch {}
+});
+window.addEventListener('unhandledrejection', (e) => {
+    try { Logger.error('UnhandledRejection', e.reason || e); } catch {}
+});
 
 // Utility functions
 const Utils = {
