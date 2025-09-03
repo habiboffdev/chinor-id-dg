@@ -45,3 +45,7 @@ django-debug-toolbar>=4.0.0,<5.0
 # Additional dependencies that might help
 setuptools>=65.0.0
 wheel>=0.40.0
+
+pyTelegramBotAPI>=4.17.0,<5.0
+python-dotenv>=1.0.1,<2.0
+requests>=2.32.3,<3.0
