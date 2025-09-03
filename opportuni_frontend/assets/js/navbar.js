@@ -16,6 +16,22 @@
   style.textContent = `
       /* Root bar */
       .hidden{display:none!important}
+      
+      /* Utility classes needed for navbar HTML */
+      .flex { display: flex; }
+      .items-center { align-items: center; }
+      .gap-2 { gap: 0.5rem; }
+      .p-2 { padding: 0.5rem; }
+      .rounded-lg { border-radius: 0.5rem; }
+      .h-8 { height: 2rem; }
+      .w-8 { width: 2rem; }
+      .rounded-full { border-radius: 9999px; }
+      .hidden { display: none !important; }
+      .md\\:block { display: block; }
+      @media (min-width: 768px) {
+        .md\\:block { display: block; }
+      }
+      
   .student-nav{position:sticky;top:0;background:var(--ink-900);isolation:isolate;z-index:70;box-shadow: 0 1px 0 rgba(255,255,255,0.06)}
       .student-nav::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--slate-400);z-index:0}
       .student-nav .nav-wrap{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:0 16px}
@@ -98,7 +114,7 @@
     ensureStyles();
     const root = document.getElementById(NAV_ID);
     const host = root || document.body;
-
+    console.log(currentPath())
     const nav = document.createElement('nav');
     nav.className = 'student-nav shadow-lg';
     nav.innerHTML = html`
@@ -131,7 +147,7 @@
                 <div class="p-3" style="border-top:1px solid var(--slate-400)"><a href="/notifications.html" style="color: var(--accent-3);">View all</a></div>
               </div>
             </div>
-
+            ${ !currentPath().endsWith('profile.html') ? `
             <div class="dd-wrap user-menu">
               <button class="flex items-center gap-2 p-2 rounded-lg btn-icon" data-action="toggle-user" aria-haspopup="true" aria-expanded="false">
                 <img class="user-avatar h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=ffffff" alt="User Avatar">
@@ -145,7 +161,8 @@
                 </div>
                 <button class="danger w-full text-left" data-action="logout"><i class="fas fa-sign-out-alt mr-2"></i>Sign Out</button>
               </div>
-            </div>
+            </div>`
+            : ' '}
 
             <div class="auth-buttons flex items-center gap-2">
               <a href="/login.html" class="btn btn--ghost">Sign in</a>

@@ -534,6 +534,15 @@ class API {
             return this.post('/opportunities/', opportunityData);
         },
 
+        // Create opportunity with file upload
+        createWithFile: async (formData) => {
+            return this.request('/opportunities/', {
+                method: 'POST',
+                body: formData,
+                contentType: null // Let browser set Content-Type for FormData
+            });
+        },
+
         // Update opportunity
         update: async (id, opportunityData) => {
             return this.put(`/opportunities/${id}/`, opportunityData);
@@ -570,6 +579,11 @@ class API {
         // Get applications list
         getList: async (params = {}) => {
             return this.get('/applications/', params);
+        },
+
+        // Check if user has applied to specific opportunity
+        checkStatus: async (opportunityId) => {
+            return this.get(`/applications/check-status/${opportunityId}/`);
         },
 
         // Get application by ID
@@ -685,6 +699,14 @@ class API {
             const stats = await this.get('/notifications/stats/');
             // Normalize to { count } for callers
             return { count: stats.unread_notifications ?? 0 };
+        }
+    };
+
+    // Skills endpoints
+    skills = {
+        // Get all available skills
+        getAvailable: async () => {
+            return this.get('/students/skills/available/');
         }
     };
 }

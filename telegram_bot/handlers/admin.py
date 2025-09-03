@@ -89,7 +89,15 @@ def format_opportunity_for_channel(opportunity) -> str:
         if opportunity.is_remote:
             location_text += " (Remote)"
         lines.append(f"{location_icon} <b>Location:</b> {location_text}")
-    
+    if opportunity.age_min or opportunity.age_max:
+        age_text = "Age: "
+        if opportunity.age_min and opportunity.age_max:
+            age_text += f"{opportunity.age_min}-{opportunity.age_max}"
+        elif opportunity.age_min:
+            age_text += f"{opportunity.age_min}+"
+        elif opportunity.age_max:
+            age_text += f"up to {opportunity.age_max}"
+        lines.append(f"🎂 <b>{age_text}</b>")
     lines.append("")
     
     # Description (truncated if too long)
@@ -101,7 +109,7 @@ def format_opportunity_for_channel(opportunity) -> str:
     
     # Requirements
     if opportunity.required_major:
-        lines.append(f"🎓 <b>Major:</b> {opportunity.required_major}")
+        lines.append(f"🎓 <b>Recommended major:</b> {opportunity.required_major}")
     
     if opportunity.graduation_year_min or opportunity.graduation_year_max:
         year_text = "Graduation Year: "
@@ -132,8 +140,8 @@ def format_opportunity_for_channel(opportunity) -> str:
         lines.append(f"👥 <b>Applications:</b> {opportunity.application_count}")
     
     lines.append("")
-    lines.append("🔗 <b>Apply now on Opportuni!</b>")
-    
+    lines.append("🔗 <b>Apply now on <a href=\"https://opportuni.app\">Opportuni!</a></b>")
+
     return "\n".join(lines)
 
 
@@ -162,16 +170,27 @@ def post_opportunity_to_channel(bot: telebot.TeleBot, opportunity, channel_id: s
         
         # Create keyboard
         keyboard = create_opportunity_keyboard(opportunity, webapp_url)
-        
+        image = None    
+        if opportunity.cover_image:
+            image = opportunity.cover_image.url
         # Send to channel
-        bot.send_message(
-            chat_id=channel_id,
-            text=message_text,
-            parse_mode='HTML',
-            reply_markup=keyboard,
-            disable_web_page_preview=True
-        )
-        
+        if image is None:
+            bot.send_message(
+                chat_id=channel_id,
+                text=message_text,
+                parse_mode='HTML',
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
+            )
+        else:
+            bot.send_photo(
+                chat_id=channel_id,
+                photo=image,
+                caption=message_text,
+                parse_mode='HTML',
+                reply_markup=keyboard,
+
+            )
         return True
     except Exception as e:
         print(f"[admin] Failed to post opportunity {opportunity.id} to channel: {e}")

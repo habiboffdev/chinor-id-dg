@@ -75,6 +75,18 @@ html, body { height: 100%; }
 .btn--lg { padding: 14px 20px; font-size: 1.05rem; }
 .btn--xl { padding: 16px 24px; font-size: 1.125rem; }
 
+/* Icon-only button for close buttons, etc */
+.btn--icon { 
+  width: 32px; 
+  height: 32px; 
+  padding: 0; 
+  border-radius: 50%; 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-size: 0.875rem; 
+}
+
 /* Buttons: variants */
 .btn--primary { background: var(--accent-1); color: #0B1009; box-shadow: none; }
 .btn--primary:hover { box-shadow: 0 0 24px rgba(200,255,0,0.35); transform: translateY(-1px); }

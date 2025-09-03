@@ -301,10 +301,33 @@ class WizardApp {
         </div>
       </div>
 
+      <div class="step-grid">
+        <div class="step-field">
+          <label for="step_age_min">Minimum Age</label>
+          <input type="number" id="step_age_min" class="step-input" 
+                 placeholder="18" min="16" max="100">
+        </div>
+        <div class="step-field">
+          <label for="step_age_max">Maximum Age</label>
+          <input type="number" id="step_age_max" class="step-input" 
+                 placeholder="30" min="16" max="100">
+        </div>
+      </div>
+
+      <div class="step-field">
+        <label for="step_cover_image">Cover Image</label>
+        <input type="file" id="step_cover_image" class="step-input" 
+               accept="image/*">
+        <div class="step-tip">
+          <i class="fas fa-image"></i>
+          <span>Upload an image to make your opportunity stand out. Recommended size: 1200x630px</span>
+        </div>
+      </div>
+
       <div class="builder-section">
         <div class="builder-header">
           <span class="builder-title">Additional Requirements</span>
-          <button type="button" class="btn btn--ghost btn-small" onclick="wizardApp.addRequirement()">
+          <button type="button" class="btn btn--ghost btn-small" onclick="wizardApp.showRequirementModal()">
             <i class="fas fa-plus"></i> Add
           </button>
         </div>
@@ -327,7 +350,7 @@ class WizardApp {
       <div class="builder-section">
         <div class="builder-header">
           <span class="builder-title">Custom Questions</span>
-          <button type="button" class="btn btn--ghost btn-small" onclick="wizardApp.addQuestion()">
+          <button type="button" class="btn btn--ghost btn-small" onclick="wizardApp.showQuestionModal()">
             <i class="fas fa-plus"></i> Add Question
           </button>
         </div>
@@ -349,7 +372,7 @@ class WizardApp {
       <div class="builder-section">
         <div class="builder-header">
           <span class="builder-title">Required Skills</span>
-          <button type="button" class="btn btn--ghost btn-small" onclick="wizardApp.addSkill()">
+          <button type="button" class="btn btn--ghost btn-small" onclick="wizardApp.showSkillModal()">
             <i class="fas fa-plus"></i> Add Skill
           </button>
         </div>
@@ -407,6 +430,13 @@ class WizardApp {
         this.data.required_major = document.getElementById('step_required_major')?.value || '';
         this.data.min_year = document.getElementById('step_min_year')?.value || '';
         this.data.max_year = document.getElementById('step_max_year')?.value || '';
+        this.data.age_min = document.getElementById('step_age_min')?.value || null;
+        this.data.age_max = document.getElementById('step_age_max')?.value || null;
+        // Handle file upload
+        const coverImageFile = document.getElementById('step_cover_image')?.files[0];
+        if (coverImageFile) {
+          this.data.cover_image_file = coverImageFile;
+        }
         break;
       case 6:
         this.data.application_instructions = document.getElementById('step_application_instructions')?.value || '';
@@ -446,6 +476,8 @@ class WizardApp {
           if (this.data.required_major) document.getElementById('step_required_major').value = this.data.required_major;
           if (this.data.min_year) document.getElementById('step_min_year').value = this.data.min_year;
           if (this.data.max_year) document.getElementById('step_max_year').value = this.data.max_year;
+          if (this.data.age_min) document.getElementById('step_age_min').value = this.data.age_min;
+          if (this.data.age_max) document.getElementById('step_age_max').value = this.data.age_max;
           this.renderRequirements();
           break;
         case 6:
@@ -476,12 +508,237 @@ class WizardApp {
   }
 
   // Builders
-  addRequirement() {
-    const text = prompt('Enter requirement:');
-    if (text?.trim()) {
-      this.requirements.push(text.trim());
-      this.renderRequirements();
+  showRequirementModal() {
+    this.showModal('Add Requirement', `
+      <div class="modal-field">
+        <label for="modal_requirement_text">Requirement *</label>
+        <input type="text" id="modal_requirement_text" class="step-input" 
+               placeholder="e.g. Must be enrolled in a university" required>
+      </div>
+      <div class="modal-field">
+        <div class="step-checkbox">
+          <input type="checkbox" id="modal_requirement_mandatory" checked>
+          <label for="modal_requirement_mandatory">This is a mandatory requirement</label>
+        </div>
+      </div>
+    `, () => {
+      const text = document.getElementById('modal_requirement_text')?.value?.trim();
+      const isMandatory = document.getElementById('modal_requirement_mandatory')?.checked;
+      
+      if (text) {
+        this.requirements.push({
+          text: text,
+          is_mandatory: isMandatory
+        });
+        this.renderRequirements();
+        this.closeModal();
+      } else {
+        alert('Please enter a requirement.');
+      }
+    });
+  }
+
+  showQuestionModal() {
+    this.showModal('Add Custom Question', `
+      <div class="modal-field">
+        <label for="modal_question_text">Question *</label>
+        <textarea id="modal_question_text" class="step-input step-textarea" 
+                  placeholder="e.g. Why are you interested in this opportunity?" required></textarea>
+      </div>
+      <div class="modal-field">
+        <label for="modal_question_type">Question Type</label>
+        <select id="modal_question_type" class="step-input">
+          <option value="text">Short Text</option>
+          <option value="textarea">Long Text</option>
+          <option value="number">Number</option>
+          <option value="email">Email</option>
+          <option value="url">URL</option>
+          <option value="date">Date</option>
+          <option value="file">File Upload</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="modal_question_placeholder">Placeholder (optional)</label>
+        <input type="text" id="modal_question_placeholder" class="step-input" 
+               placeholder="Hint text for students">
+      </div>
+      <div class="modal-field">
+        <div class="step-checkbox">
+          <input type="checkbox" id="modal_question_required">
+          <label for="modal_question_required">This question is required</label>
+        </div>
+      </div>
+    `, () => {
+      const text = document.getElementById('modal_question_text')?.value?.trim();
+      const type = document.getElementById('modal_question_type')?.value;
+      const placeholder = document.getElementById('modal_question_placeholder')?.value?.trim();
+      const isRequired = document.getElementById('modal_question_required')?.checked;
+      
+      if (text) {
+        this.questions.push({
+          question: text,
+          question_type: type,
+          placeholder: placeholder,
+          is_required: isRequired
+        });
+        this.renderQuestions();
+        this.closeModal();
+      } else {
+        alert('Please enter a question.');
+      }
+    });
+  }
+
+  showSkillModal() {
+    console.log('Loading skills from API...');
+    
+    // Load available skills first
+    window.api.skills.getAvailable().then(response => {
+      console.log('Skills API response:', response);
+      
+      // Handle paginated response - extract results array
+      const availableSkills = response.results || response;
+      
+      if (!availableSkills || !Array.isArray(availableSkills) || availableSkills.length === 0) {
+        console.warn('No skills available or invalid response format');
+        this.showFallbackSkillModal();
+        return;
+      }
+      
+      console.log('Available skills loaded:', availableSkills);
+      
+      const skillOptions = availableSkills.map(skill => 
+        `<option value="${skill.id}" data-name="${skill.name}">${skill.name} (${skill.category})</option>`
+      ).join('');
+      
+      this.showModal('Add Required Skill', `
+        <div class="modal-field">
+          <label for="modal_skill_select">Select Skill *</label>
+          <select id="modal_skill_select" class="step-input" required>
+            <option value="">Choose a skill...</option>
+            ${skillOptions}
+          </select>
+        </div>
+        <div class="modal-field">
+          <label for="modal_skill_level">Required Proficiency Level</label>
+          <select id="modal_skill_level" class="step-input">
+            <option value="">Any level</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+            <option value="expert">Expert</option>
+          </select>
+        </div>
+      `, () => {
+        const skillSelect = document.getElementById('modal_skill_select');
+        const selectedOption = skillSelect.options[skillSelect.selectedIndex];
+        const level = document.getElementById('modal_skill_level')?.value;
+        
+        if (selectedOption && selectedOption.value) {
+          this.skills.push({
+            id: selectedOption.value,
+            name: selectedOption.dataset.name,
+            level: level
+          });
+          this.renderSkills();
+          this.closeModal();
+        } else {
+          alert('Please select a skill.');
+        }
+      });
+    }).catch(error => {
+      console.error('Failed to load skills:', error);
+      this.showFallbackSkillModal();
+    });
+  }
+
+  showFallbackSkillModal() {
+    // Fallback to text input
+    this.showModal('Add Required Skill', `
+      <div class="modal-field">
+        <label for="modal_skill_name">Skill or Qualification *</label>
+        <input type="text" id="modal_skill_name" class="step-input" 
+               placeholder="e.g. JavaScript, Project Management, Public Speaking" required>
+        <div class="step-tip">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>Could not load available skills. Please enter the skill name manually.</span>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label for="modal_skill_level">Proficiency Level</label>
+        <select id="modal_skill_level" class="step-input">
+          <option value="">Any level</option>
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+          <option value="expert">Expert</option>
+        </select>
+      </div>
+    `, () => {
+      const name = document.getElementById('modal_skill_name')?.value?.trim();
+      const level = document.getElementById('modal_skill_level')?.value;
+      
+      if (name) {
+        this.skills.push({
+          name: name,
+          level: level
+        });
+        this.renderSkills();
+        this.closeModal();
+      } else {
+        alert('Please enter a skill name.');
+      }
+    });
+  }
+
+  showModal(title, content, onConfirm) {
+    // Remove existing modal
+    this.closeModal();
+    
+    const modal = document.createElement('div');
+    modal.className = 'wizard-modal';
+    modal.innerHTML = `
+      <div class="wizard-modal-backdrop" onclick="wizardApp.closeModal()"></div>
+      <div class="wizard-modal-content">
+        <div class="wizard-modal-header">
+          <h3>${title}</h3>
+          <button type="button" class="wizard-modal-close" onclick="wizardApp.closeModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="wizard-modal-body">
+          ${content}
+        </div>
+        <div class="wizard-modal-footer">
+          <button type="button" class="btn btn--ghost" onclick="wizardApp.closeModal()">
+            Cancel
+          </button>
+          <button type="button" class="btn btn--primary" id="modal-confirm">
+            Add
+          </button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.getElementById('modal-confirm').onclick = onConfirm;
+    
+    // Focus first input
+    setTimeout(() => {
+      const firstInput = modal.querySelector('input, textarea, select');
+      if (firstInput) firstInput.focus();
+    }, 100);
+  }
+
+  closeModal() {
+    const modal = document.querySelector('.wizard-modal');
+    if (modal) {
+      modal.remove();
     }
+  }
+
+  addRequirement() {
+    this.showRequirementModal();
   }
 
   removeRequirement(index) {
@@ -495,7 +752,14 @@ class WizardApp {
     
     list.innerHTML = this.requirements.map((req, i) => `
       <li class="builder-item">
-        <span>${req}</span>
+        <div class="builder-content">
+          <span class="builder-text">${req.text || req}</span>
+          ${req.is_mandatory !== undefined ? `
+            <span class="builder-meta ${req.is_mandatory ? 'mandatory' : 'optional'}">
+              ${req.is_mandatory ? 'Mandatory' : 'Optional'}
+            </span>
+          ` : ''}
+        </div>
         <div class="builder-controls">
           <button type="button" class="btn btn--ghost btn-small" onclick="wizardApp.removeRequirement(${i})">
             <i class="fas fa-trash"></i>
@@ -506,11 +770,7 @@ class WizardApp {
   }
 
   addQuestion() {
-    const text = prompt('Enter question:');
-    if (text?.trim()) {
-      this.questions.push(text.trim());
-      this.renderQuestions();
-    }
+    this.showQuestionModal();
   }
 
   removeQuestion(index) {
@@ -524,7 +784,19 @@ class WizardApp {
     
     list.innerHTML = this.questions.map((q, i) => `
       <li class="builder-item">
-        <span>${q}</span>
+        <div class="builder-content">
+          <span class="builder-text">${q.question || q}</span>
+          <div class="builder-meta-row">
+            ${q.question_type ? `
+              <span class="builder-meta type">${q.question_type}</span>
+            ` : ''}
+            ${q.is_required !== undefined ? `
+              <span class="builder-meta ${q.is_required ? 'required' : 'optional'}">
+                ${q.is_required ? 'Required' : 'Optional'}
+              </span>
+            ` : ''}
+          </div>
+        </div>
         <div class="builder-controls">
           <button type="button" class="btn btn--ghost btn-small" onclick="wizardApp.removeQuestion(${i})">
             <i class="fas fa-trash"></i>
@@ -535,11 +807,7 @@ class WizardApp {
   }
 
   addSkill() {
-    const text = prompt('Enter skill or qualification:');
-    if (text?.trim()) {
-      this.skills.push(text.trim());
-      this.renderSkills();
-    }
+    this.showSkillModal();
   }
 
   removeSkill(index) {
@@ -553,7 +821,12 @@ class WizardApp {
     
     list.innerHTML = this.skills.map((skill, i) => `
       <li class="builder-item">
-        <span>${skill}</span>
+        <div class="builder-content">
+          <span class="builder-text">${skill.name || skill}</span>
+          ${skill.level ? `
+            <span class="builder-meta level">${skill.level}</span>
+          ` : ''}
+        </div>
         <div class="builder-controls">
           <button type="button" class="btn btn--ghost btn-small" onclick="wizardApp.removeSkill(${i})">
             <i class="fas fa-trash"></i>
@@ -586,12 +859,51 @@ class WizardApp {
         <div class="review-value">${this.data.application_deadline || 'Not set'}</div>
       </div>
       <div class="review-item">
+        <div class="review-label">Timeline</div>
+        <div class="review-value">
+          ${this.data.start_date ? `Start: ${this.data.start_date}` : 'Start: Not set'}
+          ${this.data.end_date ? ` | End: ${this.data.end_date}` : ''}
+        </div>
+      </div>
+      <div class="review-item">
         <div class="review-label">Location</div>
         <div class="review-value">${this.data.location || 'Not set'} (${this.data.location_type || 'Not set'})</div>
       </div>
       <div class="review-item">
         <div class="review-label">Compensation</div>
         <div class="review-value">$${this.data.compensation_amount || '0'} ${this.data.compensation_type || ''}</div>
+      </div>
+      <div class="review-item">
+        <div class="review-label">GPA Requirement</div>
+        <div class="review-value">${this.data.min_gpa ? `Minimum ${this.data.min_gpa}` : 'No requirement'}</div>
+      </div>
+      <div class="review-item">
+        <div class="review-label">Year Level</div>
+        <div class="review-value">
+          ${this.data.min_year || this.data.max_year ? 
+            `${this.data.min_year || 'Any'} to ${this.data.max_year || 'Any'}` : 
+            'No requirement'}
+        </div>
+      </div>
+      <div class="review-item">
+        <div class="review-label">Age Range</div>
+        <div class="review-value">
+          ${this.data.age_min || this.data.age_max ? 
+            `${this.data.age_min || 'Any'} to ${this.data.age_max || 'Any'} years` : 
+            'No requirement'}
+        </div>
+      </div>
+      <div class="review-item">
+        <div class="review-label">Major</div>
+        <div class="review-value">${this.data.required_major || 'Any major'}</div>
+      </div>
+      <div class="review-item">
+        <div class="review-label">Cover Image</div>
+        <div class="review-value">${this.data.cover_image_file ? `✓ ${this.data.cover_image_file.name}` : 'No image'}</div>
+      </div>
+      <div class="review-item">
+        <div class="review-label">Max Applications</div>
+        <div class="review-value">${this.data.max_applications || 'Unlimited'}</div>
       </div>
       <div class="review-item">
         <div class="review-label">Requirements</div>
@@ -604,6 +916,14 @@ class WizardApp {
       <div class="review-item">
         <div class="review-label">Skills</div>
         <div class="review-value">${this.skills.length} items</div>
+      </div>
+      <div class="review-item">
+        <div class="review-label">Settings</div>
+        <div class="review-value">
+          ${this.data.featured ? '⭐ Featured' : ''} 
+          ${this.data.urgent ? '⚡ Urgent' : ''}
+          ${!this.data.featured && !this.data.urgent ? 'Standard listing' : ''}
+        </div>
       </div>
     `;
   }
@@ -686,6 +1006,44 @@ class WizardApp {
 
       this.saveCurrentStepData();
       
+      // Process skills first - convert skill names to IDs
+      let skillIds = [];
+      if (this.skills.length > 0) {
+        try {
+          // Get available skills
+          const response = await window.api.skills.getAvailable();
+          const availableSkills = response.results || response;
+          
+          if (!Array.isArray(availableSkills)) {
+            console.warn('Invalid skills response format, skipping skills processing');
+          } else {
+            // For each skill in our list, find matching ID
+            for (const skill of this.skills) {
+              if (skill.id) {
+                // Skill already has ID (selected from dropdown)
+                skillIds.push(parseInt(skill.id));
+              } else {
+                // Skill is name-based (fallback text input)
+                const skillName = skill.name || skill;
+                const existingSkill = availableSkills.find(s => 
+                  s.name.toLowerCase() === skillName.toLowerCase()
+                );
+                
+                if (existingSkill) {
+                  skillIds.push(existingSkill.id);
+                } else {
+                  console.warn(`Skill "${skillName}" not found in available skills. Skipping.`);
+                }
+              }
+            }
+          }
+        } catch (skillError) {
+          console.warn('Failed to process skills:', skillError);
+          // Continue without skills rather than failing entirely
+          skillIds = [];
+        }
+      }
+      
       // Prepare payload according to backend API structure
       const payload = {
         // Basic fields (step 1)
@@ -713,20 +1071,24 @@ class WizardApp {
         required_major: this.data.required_major || '',
         graduation_year_min: this.convertYearToNumber(this.data.min_year),
         graduation_year_max: this.convertYearToNumber(this.data.max_year),
+        age_min: this.data.age_min || null,
+        age_max: this.data.age_max || null,
         
         // Related objects
         requirements: this.requirements.map((req, index) => ({
-          requirement: req,
-          is_mandatory: true,
+          requirement: req.text || req,
+          is_mandatory: req.is_mandatory !== undefined ? req.is_mandatory : true,
           order: index
         })),
         additional_questions: this.questions.map((q, index) => ({
-          question: q,
-          question_type: 'textarea',
-          is_required: false,
+          question: q.question || q,
+          question_type: q.question_type || 'textarea',
+          is_required: q.is_required || false,
+          placeholder: q.placeholder || '',
           order: index
         })),
-        required_skills: [] // Will be populated with skill IDs later
+        // Use processed skill IDs
+        required_skills: skillIds
       };
 
       console.log('Submitting opportunity with payload:', payload);
@@ -737,22 +1099,55 @@ class WizardApp {
       btnNext.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
       btnNext.disabled = true;
       
-      // Submit via API
-      const response = await window.api.opportunities.create(payload);
-      
-      if (response && (response.id || response.success !== false)) {
-        // Success
-        this.showSuccessMessage();
-        setTimeout(() => {
-          window.location.href = 'opportunities.html';
-        }, 2000);
-      } else {
-        // Check for validation errors
-        if (response && response.errors) {
-          const errorMessages = this.formatValidationErrors(response.errors);
-          throw new Error(errorMessages);
+      // Handle file upload if present
+      if (this.data.cover_image_file) {
+        const formData = new FormData();
+        
+        // Add all payload fields to FormData
+        Object.entries(payload).forEach(([key, value]) => {
+          if (key === 'requirements' || key === 'additional_questions') {
+            formData.append(key, JSON.stringify(value));
+          } else if (value !== null && value !== undefined) {
+            formData.append(key, value);
+          }
+        });
+        
+        // Add cover image
+        formData.append('cover_image', this.data.cover_image_file);
+        
+        // Submit with file upload
+        const response = await window.api.opportunities.createWithFile(formData);
+        
+        if (response && (response.id || response.success !== false)) {
+          this.showSuccessMessage();
+          setTimeout(() => {
+            window.location.href = 'opportunities.html';
+          }, 2000);
+        } else {
+          if (response && response.errors) {
+            const errorMessages = this.formatValidationErrors(response.errors);
+            throw new Error(errorMessages);
+          }
+          throw new Error(response?.error || response?.message || response?.detail || 'Failed to create opportunity');
         }
-        throw new Error(response?.error || response?.message || response?.detail || 'Failed to create opportunity');
+      } else {
+        // Submit via API without file upload
+        const response = await window.api.opportunities.create(payload);
+        
+        if (response && (response.id || response.success !== false)) {
+          // Success
+          this.showSuccessMessage();
+          setTimeout(() => {
+            window.location.href = 'opportunities.html';
+          }, 2000);
+        } else {
+          // Check for validation errors
+          if (response && response.errors) {
+            const errorMessages = this.formatValidationErrors(response.errors);
+            throw new Error(errorMessages);
+          }
+          throw new Error(response?.error || response?.message || response?.detail || 'Failed to create opportunity');
+        }
       }
     } catch (error) {
       console.error('Submit error:', error);

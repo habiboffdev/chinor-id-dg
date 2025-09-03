@@ -464,3 +464,35 @@ def upload_application_document(request):
             {'error': f'Failed to upload file: {str(e)}'}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def check_application_status(request, opportunity_id):
+    """
+    Check if the current user has already applied to a specific opportunity.
+    Returns application details if found, or null if not found.
+    """
+    if request.user.user_type != 'student':
+        return Response({'error': 'Only students can check application status'}, 
+                       status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        student_profile = StudentProfile.objects.get(user=request.user)
+        application = Application.objects.filter(
+            student=student_profile,
+            opportunity_id=opportunity_id
+        ).first()
+        
+        if application:
+            serializer = ApplicationListSerializer(application)
+            return Response(serializer.data)
+        else:
+            return Response(None)
+            
+    except StudentProfile.DoesNotExist:
+        return Response({'error': 'Student profile not found'}, 
+                       status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, 
+                       status=status.HTTP_500_INTERNAL_SERVER_ERROR)

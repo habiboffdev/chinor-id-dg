@@ -550,7 +550,7 @@ async function viewOpportunity(opportunityId) {
     try {
         console.log('Redirecting to opportunity details page for ID:', opportunityId);
         // Redirect to opportunity details page
-        window.location.href = `opportunity-details.html?id=${opportunityId}`;
+        window.location.href = `opportunity-detail.html?id=${opportunityId}`;
     } catch (error) {
         showToast('Error loading opportunity details', 'error');
         console.error('Opportunity navigation error:', error);

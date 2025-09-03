@@ -8,6 +8,9 @@ urlpatterns = [
     # Organization-scoped listing (alias for clarity)
     path('org/', views.OrganizationApplicationListView.as_view(), name='organization-application-list'),
     
+    # Check if user has applied to specific opportunity
+    path('check-status/<int:opportunity_id>/', views.check_application_status, name='check-application-status'),
+    
     # Application Documents
     path('<int:application_id>/documents/', views.ApplicationDocumentListCreateView.as_view(), name='application-document-list-create'),
     

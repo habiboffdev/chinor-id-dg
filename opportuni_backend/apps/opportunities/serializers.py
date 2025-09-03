@@ -37,7 +37,7 @@ class OpportunitySerializer(serializers.ModelSerializer):
             'id', 'organization', 'title', 'description', 'opportunity_type',
             'status', 'application_deadline', 'start_date', 'end_date',
             'required_skills', 'min_gpa', 'required_major', 'graduation_year_min',
-            'graduation_year_max', 'location', 'is_remote', 'compensation',
+            'graduation_year_max', 'age_min', 'age_max', 'location', 'is_remote', 'compensation',
             'benefits', 'cover_image', 'max_applications', 'featured', 'created_at',
             'updated_at', 'requirements', 'additional_questions', 'application_count', 
             'can_apply', 'is_deadline_passed', 'days_until_deadline'
@@ -67,8 +67,8 @@ class OpportunityCreateUpdateSerializer(serializers.ModelSerializer):
             'title', 'description', 'opportunity_type', 'status',
             'application_deadline', 'start_date', 'end_date',
             'required_skills', 'min_gpa', 'required_major',
-            'graduation_year_min', 'graduation_year_max', 'location',
-            'is_remote', 'compensation', 'benefits', 'max_applications',
+            'graduation_year_min', 'graduation_year_max', 'age_min', 'age_max', 'location',
+            'is_remote', 'compensation', 'benefits', 'cover_image', 'max_applications',
             'featured', 'requirements', 'additional_questions'
         ]
     

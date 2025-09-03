@@ -12,6 +12,7 @@ class Opportunity(models.Model):
         ('job', 'Job'),
         ('workshop', 'Workshop'),
         ('conference', 'Conference'),
+        ('event', 'Event'),
     )
     
     STATUS_CHOICES = (
@@ -38,7 +39,8 @@ class Opportunity(models.Model):
     required_major = models.CharField(max_length=100, blank=True)
     graduation_year_min = models.IntegerField(null=True, blank=True)
     graduation_year_max = models.IntegerField(null=True, blank=True)
-    
+    age_min = models.IntegerField(null=True, blank=True)
+    age_max = models.IntegerField(null=True, blank=True)
     # Details
     location = models.CharField(max_length=200)
     is_remote = models.BooleanField(default=False)

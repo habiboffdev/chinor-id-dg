@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Applications - Opportuni</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/theme.css">
     <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
     /* Utils */
     .line-clamp-2 {
@@ -27,11 +27,628 @@
             overflow: hidden;
         }
         
-        /* Ensure proper text wrapping in modals */
-        .modal-content {
+        /* Professional Application Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .modal-overlay:not(.hidden) {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-container {
+            background: var(--ink-900);
+            border: 1px solid var(--slate-400);
+            border-radius: 16px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay:not(.hidden) .modal-container {
+            transform: scale(1) translateY(0);
+        }
+        
+        .modal-header {
+            background: var(--ink-1000);
+            border-bottom: 1px solid var(--slate-400);
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--white-0);
+            margin: 0;
+        }
+        
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--mist-300);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close-btn:hover {
+            background: var(--slate-600);
+            color: var(--white-0);
+        }
+        
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            max-height: calc(90vh - 140px);
+        }
+        
+        /* Application Content Styles */
+        .app-hero-card {
+            background: linear-gradient(135deg, var(--accent-2) 0%, var(--accent-1) 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .app-hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: translate(25%, -25%);
+        }
+        
+        .app-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .app-hero-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ink-900);
+            margin-bottom: 0.5rem;
+        }
+        
+        .app-hero-org {
+            font-size: 1.125rem;
+            color: rgba(7, 10, 15, 0.8);
+            margin-bottom: 1rem;
+        }
+        
+        .app-hero-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .app-hero-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(7, 10, 15, 0.7);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .app-section {
+            background: var(--ink-800);
+            border: 1px solid var(--slate-600);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .app-section-title {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--white-0);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .app-section-icon {
+            color: var(--accent-1);
+            font-size: 1rem;
+        }
+        
+        .modal-container {
+            background: var(--ink-900);
+            border: 1px solid var(--slate-400);
+            border-radius: 16px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay:not(.hidden) .modal-container {
+            transform: scale(1) translateY(0);
+        }
+        
+        .modal-header {
+            background: var(--ink-1000);
+            border-bottom: 1px solid var(--slate-400);
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--white-0);
+            margin: 0;
+        }
+        
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--mist-300);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close-btn:hover {
+            background: var(--slate-600);
+            color: var(--white-0);
+        }
+        
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            max-height: calc(90vh - 120px);
+        }
+        
+        /* Application Content Styles */
+        .app-hero-card {
+            background: linear-gradient(135deg, var(--accent-2) 0%, var(--accent-1) 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .app-hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: translate(25%, -25%);
+        }
+        
+        .app-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .app-hero-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ink-900);
+            margin-bottom: 0.5rem;
+        }
+        
+        .app-hero-org {
+            font-size: 1.125rem;
+            color: rgba(7, 10, 15, 0.8);
+            margin-bottom: 1rem;
+        }
+        
+        .app-hero-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .app-hero-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(7, 10, 15, 0.7);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .app-section {
+            background: var(--ink-800);
+            border: 1px solid var(--slate-600);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .app-section-title {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--white-0);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .app-section-icon {
+            color: var(--accent-1);
+            font-size: 1rem;
+        }
+        
+        .app-info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+        
+        .app-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--slate-600);
+        }
+        
+        .app-info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .app-info-label {
+            color: var(--mist-300);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .app-info-value {
+            color: var(--mist-200);
+            font-weight: 600;
+            text-align: right;
+        }
+        
+        .app-answer-card {
+            background: var(--slate-600);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .app-answer-question {
+            font-weight: 600;
+            color: var(--mist-200);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+        
+        .app-answer-text {
+            color: var(--mist-300);
+            line-height: 1.6;
+            white-space: pre-wrap;
             word-wrap: break-word;
-            overflow-wrap: break-word;
-            hyphens: auto;
+        }
+        
+        .app-status-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .app-status-timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 1rem;
+            bottom: 1rem;
+            width: 2px;
+            background: var(--slate-600);
+        }
+        
+        .app-status-item {
+            position: relative;
+            padding: 1rem 0;
+            margin-left: -0.5rem;
+        }
+        
+        .app-status-dot {
+            position: absolute;
+            left: 0;
+            top: 1.25rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 1;
+        }
+        
+        .app-status-content {
+            padding-left: 3rem;
+        }
+        
+        .app-status-title {
+            font-weight: 600;
+            color: var(--mist-200);
+            margin-bottom: 0.25rem;
+        }
+        
+        .app-status-note {
+            color: var(--mist-300);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+            line-height: 1.5;
+        }
+        
+        .app-status-date {
+            color: var(--mist-300);
+            font-size: 0.75rem;
+        }
+        
+        /* Status Colors */
+        .status-pending .app-status-dot {
+            background: var(--warning);
+            color: var(--ink-900);
+        }
+        
+        .status-accepted .app-status-dot {
+            background: var(--success);
+            color: var(--ink-900);
+        }
+        
+        .status-rejected .app-status-dot {
+            background: var(--danger);
+            color: var(--white-0);
+        }
+        
+        .status-withdrawn .app-status-dot {
+            background: var(--mist-300);
+            color: var(--ink-900);
+        }
+        
+        /* Document Links */
+        .app-document-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-2);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            background: rgba(108, 99, 255, 0.1);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .app-document-link:hover {
+            background: rgba(108, 99, 255, 0.2);
+            color: var(--accent-1);
+        }
+        
+        /* Actions Styles */
+        .app-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .modal-container {
+                margin: 1rem;
+                max-height: 95vh;
+            }
+            
+            .modal-header {
+                padding: 1.5rem;
+            }
+            
+            .modal-body {
+                padding: 1.5rem;
+            }
+            
+            .app-hero-card {
+                padding: 1.5rem;
+            }
+            
+            .app-hero-meta {
+                gap: 1rem;
+            }
+        }
+        
+        .app-answer-question {
+            font-weight: 600;
+            color: var(--mist-200);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+        
+        .app-answer-text {
+            color: var(--mist-300);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .app-status-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .app-status-timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 1rem;
+            bottom: 1rem;
+            width: 2px;
+            background: var(--slate-600);
+        }
+        
+        .app-status-item {
+            position: relative;
+            padding: 1rem 0;
+            margin-left: -0.5rem;
+        }
+        
+        .app-status-dot {
+            position: absolute;
+            left: 0;
+            top: 1.25rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 1;
+        }
+        
+        .app-status-content {
+            padding-left: 3rem;
+        }
+        
+        .app-status-title {
+            font-weight: 600;
+            color: var(--mist-200);
+            margin-bottom: 0.25rem;
+        }
+        
+        .app-status-note {
+            color: var(--mist-300);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+            line-height: 1.5;
+        }
+        
+        .app-status-date {
+            color: var(--mist-300);
+            font-size: 0.75rem;
+        }
+        
+        /* Status Colors */
+        .status-pending .app-status-dot {
+            background: var(--warning);
+            color: var(--ink-900);
+        }
+        
+        .status-accepted .app-status-dot {
+            background: var(--success);
+            color: var(--ink-900);
+        }
+        
+        .status-rejected .app-status-dot {
+            background: var(--danger);
+            color: var(--white-0);
+        }
+        
+        .status-withdrawn .app-status-dot {
+            background: var(--mist-300);
+            color: var(--ink-900);
+        }
+        
+        /* Document Links */
+        .app-document-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-2);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            background: rgba(108, 99, 255, 0.1);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .app-document-link:hover {
+            background: rgba(108, 99, 255, 0.2);
+            color: var(--accent-1);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .modal-container {
+                margin: 1rem;
+                max-height: 95vh;
+            }
+            
+            .modal-header {
+                padding: 1.5rem;
+            }
+            
+            .modal-body {
+                padding: 1.5rem;
+            }
+            
+            .app-hero-card {
+                padding: 1.5rem;
+            }
+            
+            .app-hero-meta {
+                gap: 1rem;
+            }
+            
+            .app-info-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         /* Smooth transitions */
@@ -197,15 +814,15 @@
     </main>
 
     <!-- Application Detail Modal -->
-    <div id="applicationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="modal-content" style="background: var(--ink-900); border:1px solid var(--slate-400); border-radius: 12px; max-width: 960px; width: 100%; margin: 0 16px; max-height: 90vh; overflow: hidden;">
-            <div class="flex justify-between items-center p-6" style="border-bottom:1px solid var(--slate-400);">
-                <h3 class="text-xl font-semibold" style="color: var(--white-0);">Application Details</h3>
-                <button id="closeModalBtn" class="btn btn--ghost">
-                    <i class="fas fa-times text-xl"></i>
+    <div id="applicationModal" class="modal-overlay hidden">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">Application Details</h3>
+                <button id="closeModalBtn" class="modal-close-btn">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="applicationModalContent" class="p-6 overflow-y-auto custom-scrollbar modal-content">
+            <div id="applicationModalContent" class="modal-body">
                 <!-- Application details will be loaded here -->
             </div>
         </div>
@@ -576,109 +1193,113 @@
                 
                 const modalContent = document.getElementById('applicationModalContent');
                 modalContent.innerHTML = `
-                    <div class="space-y-6">
-                        <!-- Opportunity Info -->
-                        <div class="rounded-lg p-4" style="background: var(--ink-800); border:1px solid var(--slate-400);">
-                            <div class="flex items-start space-x-4">
-                                <div class="app-icon flex-shrink-0">
-                                    <i class="fas fa-building"></i>
+                    <!-- Hero Section -->
+                    <div class="app-hero-card">
+                        <div class="app-hero-content">
+                            <h4 class="app-hero-title">${escapeHtml(app.opportunity_title || app.opportunity?.title || 'Opportunity')}</h4>
+                            <p class="app-hero-org">${escapeHtml(app.organization_name || app.opportunity?.organization?.name || 'Organization')}</p>
+                            <div class="app-hero-meta">
+                                <div class="app-hero-meta-item">
+                                    <i class="fas fa-briefcase"></i>
+                                    <span>${escapeHtml(app.opportunity?.opportunity_type || 'Unknown')}</span>
                                 </div>
-                                <div class="flex-1 min-w-0 overflow-hidden">
-                                    <h4 class="text-lg font-semibold break-words" style="color: var(--white-0);">${escapeHtml(app.opportunity_title || app.opportunity?.title || 'Opportunity')}</h4>
-                                    <p class="break-words" style="color: var(--mist-300);">${escapeHtml(app.organization_name || app.opportunity?.organization?.name || 'Organization')}</p>
-                                    <div class="flex items-center space-x-4 text-sm mt-2 flex-wrap" style="color: var(--mist-300);">
-                                        <span class="break-words"><i class="fas fa-clock mr-1"></i>${escapeHtml(app.opportunity?.opportunity_type || 'Unknown')}</span>
-                                        <span class="break-words"><i class="fas fa-map-marker-alt mr-1"></i>${escapeHtml(app.opportunity?.location || 'Remote')}</span>
-                                        <span class="break-words"><i class="fas fa-calendar mr-1"></i>Deadline: ${formatDate(app.opportunity?.application_deadline)}</span>
-                                    </div>
+                                <div class="app-hero-meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${escapeHtml(app.opportunity?.location || 'Remote')}</span>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Application Details -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-hidden">
-                            <div class="overflow-hidden">
-                                <h5 class="font-medium mb-2" style="color: var(--white-0);">Application Info</h5>
-                                <div class="space-y-2 text-sm overflow-hidden">
-                                    <div class="flex justify-between">
-                                        <span style="color: var(--mist-300);">Applied on:</span>
-                                        <span class="font-medium" style="color: var(--mist-200);">${formatDate(app.applied_at)}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span style="color: var(--mist-300);">Status:</span>
-                                        <span>${getStatusBadge(app.status)}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span style="color: var(--mist-300);">Last Updated:</span>
-                                        <span class="font-medium" style="color: var(--mist-200);">${formatDate(app.updated_at)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="overflow-hidden">
-                                <h5 class="font-medium mb-2" style="color: var(--white-0);">Documents</h5>
-                                <div class="space-y-2 overflow-hidden">
-                                    ${app.resume ? `
-                                    <a href="${app.resume}" target="_blank" class="flex items-center text-sm" style="color: var(--accent-2);">
-                                        <i class="fas fa-file-pdf mr-2"></i>Resume
-                                    </a>
-                                    ` : '<p class="text-sm" style="color: var(--mist-300);">No resume attached</p>'}
+                                <div class="app-hero-meta-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Deadline: ${formatDate(app.opportunity?.application_deadline)}</span>
                                 </div>
                             </div>
                         </div>
-                        
-                        ${app.answers && app.answers.length > 0 ? `
-                        <div>
-                            <h5 class="font-medium mb-3" style="color: var(--white-0);">Application Answers</h5>
-                            <div class="space-y-4">
-                                ${app.answers.map(answer => {
-                                    const escapedQuestion = escapeHtml(answer.question_text || 'Question');
-                                    const escapedAnswer = escapeHtml(answer.answer_text || 'No answer provided');
-                                    const formattedAnswer = escapedAnswer.replace(/\n/g, '<br>');
-                                    
-                                    return `
-                                    <div class="rounded-lg p-4 break-words" style="background: var(--ink-800); border:1px solid var(--slate-400);">
-                                        <p class="font-medium mb-2 break-words" style="color: var(--mist-200);">${escapedQuestion}</p>
-                                        <div class="text-sm break-words whitespace-pre-wrap overflow-hidden" style="color: var(--mist-300);">
-                                            ${formattedAnswer}
-                                        </div>
-                                    </div>
-                                    `;
-                                }).join('')}
+                    </div>
+                    
+                    <!-- Application Information -->
+                    <div class="app-section">
+                        <h5 class="app-section-title">
+                            <i class="fas fa-info-circle app-section-icon"></i>
+                            Application Information
+                        </h5>
+                        <div class="app-info-grid">
+                            <div class="app-info-item">
+                                <span class="app-info-label">Applied on</span>
+                                <span class="app-info-value">${formatDate(app.applied_at)}</span>
+                            </div>
+                            <div class="app-info-item">
+                                <span class="app-info-label">Status</span>
+                                <span class="app-info-value">${getStatusBadge(app.status)}</span>
+                            </div>
+                            <div class="app-info-item">
+                                <span class="app-info-label">Last Updated</span>
+                                <span class="app-info-value">${formatDate(app.updated_at)}</span>
+                            </div>
+                            <div class="app-info-item">
+                                <span class="app-info-label">Resume</span>
+                                <span class="app-info-value">
+                                    ${app.resume ? `<a href="${app.resume}" target="_blank" class="app-document-link"><i class="fas fa-file-pdf"></i>View Resume</a>` : '<span style="color: var(--mist-300);">Not attached</span>'}
+                                </span>
                             </div>
                         </div>
-                        ` : ''}
-                        
-                        <!-- Status History -->
-                        ${app.status_history && app.status_history.length > 0 ? `
-                        <div>
-                            <h5 class="font-medium mb-3" style="color: var(--white-0);">Status History</h5>
-                            <div class="space-y-3">
-                                ${app.status_history.map(history => `
-                                    <div class=\"flex items-center space-x-3 p-3 rounded-lg\" style=\"background: var(--ink-800); border:1px solid var(--slate-400);\">
-                                        <div class=\"w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0\" style=\"${getStatusDotStyle(history.status)}\">
-                                            <i class=\"fas ${getStatusIcon(history.status)} text-xs\"></i>
-                                        </div>
-                                        <div class=\"flex-1\">
-                                            <p class=\"text-sm font-medium\" style=\"color: var(--mist-200);\">${formatStatusName(history.status)}</p>
-                                            ${history.note ? `<p class=\"text-sm break-words\" style=\"color: var(--mist-300);\">${escapeHtml(history.note)}</p>` : ''}
-                                            <p class=\"text-xs\" style=\"color: var(--mist-300);\">${formatDate(history.created_at)}</p>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
+                    </div>
+                    
+                    ${app.answers && app.answers.length > 0 ? `
+                    <!-- Application Answers -->
+                    <div class="app-section">
+                        <h5 class="app-section-title">
+                            <i class="fas fa-question-circle app-section-icon"></i>
+                            Application Answers
+                        </h5>
+                        <div class="app-answers-list">
+                            ${app.answers.map(answer => {
+                                const escapedQuestion = escapeHtml(answer.question_text || 'Question');
+                                const escapedAnswer = escapeHtml(answer.answer_text || 'No answer provided');
+                                const formattedAnswer = escapedAnswer.replace(/\n/g, '<br>');
+                                
+                                return `
+                                <div class="app-answer-card">
+                                    <div class="app-answer-question">${escapedQuestion}</div>
+                                    <div class="app-answer-text">${formattedAnswer}</div>
+                                </div>
+                                `;
+                            }).join('')}
                         </div>
-                        ` : ''}
-                        
-                        <!-- Actions -->
-                        <div class="flex justify-end space-x-3 pt-4" style="border-top:1px solid var(--slate-400);">
-                            ${['pending', 'under_review'].includes(app.status) ? `
-                            <button onclick="showWithdrawModal(${app.id}); hideApplicationModal();" class="btn btn--secondary" style="background: var(--danger);">
-                                <i class="fas fa-times mr-2"></i><span>Withdraw Application</span>
-                            </button>
-                            ` : ''}
-                            <button onclick="window.open('/opportunity-details.html?id=${app.opportunity?.id || ''}', '_blank')" class="btn btn--secondary">
-                                <i class="fas fa-external-link-alt mr-2"></i><span>View Opportunity</span>
-                            </button>
+                    </div>
+                    ` : ''}
+                    
+                    ${app.status_history && app.status_history.length > 0 ? `
+                    <!-- Status History -->
+                    <div class="app-section">
+                        <h5 class="app-section-title">
+                            <i class="fas fa-history app-section-icon"></i>
+                            Status History
+                        </h5>
+                        <div class="app-status-timeline">
+                            ${app.status_history.map(history => `
+                                <div class="app-status-item status-${history.status}">
+                                    <div class="app-status-dot">
+                                        <i class="fas ${getStatusIcon(history.status)}"></i>
+                                    </div>
+                                    <div class="app-status-content">
+                                        <div class="app-status-title">${formatStatusName(history.status)}</div>
+                                        ${history.note ? `<div class="app-status-note">${escapeHtml(history.note)}</div>` : ''}
+                                        <div class="app-status-date">${formatDate(history.created_at)}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <!-- Actions -->
+                    <div class="app-section">
+                        <h5 class="app-section-title">
+                            <i class="fas fa-cog app-section-icon"></i>
+                            Actions
+                        </h5>
+                        <div class="app-actions">
+                            ${app.opportunity?.id ? `<a href="opportunity-detail.html?id=${app.opportunity.id}" class="btn btn--secondary"><i class="fas fa-eye"></i><span>View Opportunity</span></a>` : ''}
+                            ${app.status === 'pending' ? `<button onclick="showWithdrawModal(${app.id})" class="btn btn--danger"><i class="fas fa-times"></i><span>Withdraw Application</span></button>` : ''}
                         </div>
                     </div>
                 `;
