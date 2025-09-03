@@ -6,9 +6,9 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  test:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,23 +23,64 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r opportuni_backend/requirements.txt
 
+      - name: Run Django checks
+        run: |
+          cd opportuni_backend
+          python manage.py check --deploy
+          
       - name: Run tests
         run: |
           cd opportuni_backend
           python manage.py test
 
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
       - name: Deploy to server
-        uses: appleboy/ssh-action@v0.1.10
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            cd /home/chinor-id-dg/MVP/chinor_id_new
+            echo "🚀 Starting deployment..."
+            
+            # Navigate to project directory
+            cd /home/chinor-id-dg/chinor_id_new
+            
+            # Pull latest changes
+            echo "📥 Pulling latest code..."
             git pull origin main
+            
+            # Activate virtual environment
+            echo "🔧 Setting up environment..."
             source venv/bin/activate
+            
+            # Install/update Python dependencies
+            echo "📦 Installing dependencies..."
+            pip install -r opportuni_backend/requirements.txt
+            
+            # Navigate to Django project
             cd opportuni_backend
+            
+            # Run migrations
+            echo "🗄️ Running database migrations..."
             python manage.py migrate --noinput
+            
+            # Collect static files
+            echo "📁 Collecting static files..."
             python manage.py collectstatic --noinput
+            
+            # Restart services
+            echo "🔄 Restarting services..."
             sudo supervisorctl restart opportuni
             sudo systemctl reload nginx
+            
+            # Check status
+            echo "✅ Checking service status..."
+            sudo supervisorctl status opportuni
+            
+            echo "🎉 Deployment completed successfully!"
