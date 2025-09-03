@@ -127,6 +127,32 @@
                 </div>
               </div>
             </div>
+            
+            <!-- Basic Education Information -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+              <div class="field float">
+                <div class="float-wrap">
+                  <input id="university" name="university" type="text" class="input input--line" placeholder=" " />
+                  <label class="float-label" for="university">University</label>
+                </div>
+                <p class="op-help">Your current or most recent university</p>
+              </div>
+              <div class="field float">
+                <div class="float-wrap">
+                  <input id="major" name="major" type="text" class="input input--line" placeholder=" " />
+                  <label class="float-label" for="major">Major/Faculty</label>
+                </div>
+                <p class="op-help">Your field of study</p>
+              </div>
+              <div class="field float">
+                <div class="float-wrap">
+                  <input id="graduationYear" name="graduationYear" type="number" min="2020" max="2035" class="input input--line" placeholder=" " />
+                  <label class="float-label" for="graduationYear">Graduation Year</label>
+                </div>
+                <p class="op-help">Expected or actual graduation year</p>
+              </div>
+            </div>
+            
             <div>
               <label class="op-label" for="bio">Bio</label>
               <textarea id="bio" name="bio" rows="4" class="op-textarea"></textarea>
@@ -668,7 +694,7 @@
       qs('#uploadResumeBtn')?.addEventListener('click', ()=> qs('#resume')?.click());
       qs('#resume')?.addEventListener('change', handleResumeUpload);
       // Live personal preview
-      qsa('#firstName,#lastName,#bio,#location,#portfolioUrl,#githubUrl').forEach(el=>{
+      qsa('#firstName,#lastName,#bio,#location,#portfolioUrl,#githubUrl,#university,#major,#graduationYear').forEach(el=>{
         el.addEventListener('input', syncPersonalPreview);
       });
       // Education controls
@@ -1377,7 +1403,7 @@
     }
 
     function populatePersonalForm(profile){
-      const map = { firstName: 'first_name', lastName: 'last_name', phone: 'phone', dateOfBirth: 'date_of_birth', location: 'location', bio: 'bio', portfolioUrl: 'portfolio_url' };
+      const map = { firstName: 'first_name', lastName: 'last_name', phone: 'phone', dateOfBirth: 'date_of_birth', location: 'location', bio: 'bio', portfolioUrl: 'portfolio_url', university: 'university', major: 'major', graduationYear: 'graduation_year' };
       Object.entries(map).forEach(([id, key])=>{ const el = qs('#'+id); if (el) el.value = profile[key] || ''; });
       // GitHub from Social Links (fallback to legacy field)
       const gh = (profile.social_links||[]).find(l=>l.platform==='github')?.url || profile.github_url || '';
@@ -1395,10 +1421,26 @@
       const bio = qs('#bio')?.value?.trim() || 'Write a short bio to introduce yourself.';
       const portfolio = qs('#portfolioUrl')?.value?.trim();
       const github = qs('#githubUrl')?.value?.trim();
+      
+      // Education fields
+      const university = qs('#university')?.value?.trim();
+      const major = qs('#major')?.value?.trim();
+      const gradYear = qs('#graduationYear')?.value?.trim();
+      
       qsa('.preview-panel .preview-name').forEach(el=> el.textContent = name);
       qsa('.preview-panel .preview-email').forEach(el=> el.textContent = email);
       qsa('.preview-panel .preview-location').forEach(el=> el.textContent = loc);
       qsa('.preview-panel .preview-bio').forEach(el=> el.textContent = bio);
+      
+      // Update education preview
+      qsa('.preview-panel .preview-extras-edu').forEach(eduEl => {
+        const eduParts = [];
+        if (university) eduParts.push(university);
+        if (major) eduParts.push(major);
+        if (gradYear) eduParts.push(`Class of ${gradYear}`);
+        eduEl.textContent = eduParts.length > 0 ? eduParts.join(' • ') : '—';
+      });
+      
       qsa('.preview-panel .preview-links').forEach(linksEl=>{
         const links = [];
         if (portfolio) links.push(`<a href=\"${escapeAttr(portfolio)}\" target=\"_blank\"><i class='fas fa-globe mr-2'></i>Portfolio</a>`);
@@ -1437,10 +1479,10 @@
     async function handlePersonalFormSubmit(e){
       e.preventDefault();
       const fd = new FormData(e.target); const d = Object.fromEntries(fd);
-      const mapped = { first_name: d.firstName, last_name: d.lastName, phone: d.phone, date_of_birth: d.dateOfBirth || null, location: d.location, bio: d.bio, portfolio_url: d.portfolioUrl };
-      Object.keys(mapped).forEach(k => { if (mapped[k] === undefined || mapped[k] === '') mapped[k] = k === 'date_of_birth' ? null : ''; });
+      const mapped = { first_name: d.firstName, last_name: d.lastName, phone: d.phone, date_of_birth: d.dateOfBirth || null, location: d.location, bio: d.bio, portfolio_url: d.portfolioUrl, university: d.university, major: d.major, graduation_year: d.graduationYear ? parseInt(d.graduationYear) : null };
+      Object.keys(mapped).forEach(k => { if (mapped[k] === undefined || mapped[k] === '') mapped[k] = (k === 'date_of_birth' || k === 'graduation_year') ? null : ''; });
   // Trim obvious fields
-  ['first_name','last_name','phone','location','portfolio_url','bio'].forEach(k=>{ if (typeof mapped[k] === 'string') mapped[k] = mapped[k].trim(); });
+  ['first_name','last_name','phone','location','portfolio_url','bio','university','major'].forEach(k=>{ if (typeof mapped[k] === 'string') mapped[k] = mapped[k].trim(); });
       const btn = e.submitter || e.target.querySelector('button[type="submit"]'); const prev = btn?.innerHTML; if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving'; }
       try {
         await api.students.updateProfile(mapped);
