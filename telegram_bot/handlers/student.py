@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -12,7 +13,7 @@ from .state import get_lang as get_global_lang, set_lang as set_global_lang
 from telegram_bot.config import Settings
 
 
-# In-memory state for MVP; replace with Redis later
+# Thread-safe in-memory state for MVP; replace with Redis later
 @dataclass
 class StudentState:
     lang: str = 'en'
@@ -29,11 +30,23 @@ class StudentState:
     pref_tags: set[str] = field(default_factory=set)
 
 
+# Thread-safe state management
 _student_state: dict[int, StudentState] = {}
+_state_lock = threading.Lock()
 
 
 def get_state(user_id: int) -> StudentState:
-    return _student_state.setdefault(user_id, StudentState())
+    """Thread-safe state retrieval"""
+    with _state_lock:
+        if user_id not in _student_state:
+            _student_state[user_id] = StudentState()
+        return _student_state[user_id]
+
+
+def clear_state(user_id: int) -> None:
+    """Clear user state after completion to prevent memory leaks"""
+    with _state_lock:
+        _student_state.pop(user_id, None)
 
 
 _NON_WORD_RE = re.compile(r"[^\w]+", flags=re.UNICODE)
@@ -64,25 +77,37 @@ def wire_student_handlers(bot: TeleBot):
         st = get_state(user_id)
         st.active = True
 
-        # 1) Find or create User by telegram_id
+        # 1) Find or create User by telegram_id with database-level locking
         if User is not None:
-            user = User.objects.filter(telegram_id=user_id).first()
-            if not user:
-                # Create a minimal user with email placeholder; will be updated later
-                email = f"tg_{user_id}@placeholder.local"
-                username = message.from_user.username or str(user_id)
-                first_name = message.from_user.first_name or ''
-                last_name = message.from_user.last_name or ''
-                user = User.objects.create(
-                    telegram_id=user_id,
-                    email=email,
-                    username=username,
-                    first_name=first_name,
-                    last_name=last_name,
-                    user_type='student',
-                )
-                if StudentProfile is not None:
-                    StudentProfile.objects.get_or_create(user=user)
+            from django.db import transaction
+            
+            try:
+                # Use atomic transaction with select_for_update to prevent race conditions
+                with transaction.atomic():
+                    user = User.objects.filter(telegram_id=user_id).select_for_update().first()
+                    if not user:
+                        # Double-check pattern to prevent duplicate creation
+                        user = User.objects.filter(telegram_id=user_id).first()
+                        if not user:
+                            # Create a minimal user with email placeholder; will be updated later
+                            email = f"tg_{user_id}@placeholder.local"
+                            username = message.from_user.username or str(user_id)
+                            first_name = message.from_user.first_name or ''
+                            last_name = message.from_user.last_name or ''
+                            user = User.objects.create(
+                                telegram_id=user_id,
+                                email=email,
+                                username=username,
+                                first_name=first_name,
+                                last_name=last_name,
+                                user_type='student',
+                            )
+                            if StudentProfile is not None:
+                                StudentProfile.objects.get_or_create(user=user)
+            except Exception as e:
+                print(f"[telegram_bot] Error creating user {user_id}: {e}")
+                # Try to find existing user as fallback
+                user = User.objects.filter(telegram_id=user_id).first()
 
         # 2) Prefer persistent language from DB
         global_lang = get_global_lang(user_id)
@@ -330,6 +355,9 @@ def wire_student_handlers(bot: TeleBot):
             reply_markup=markups.student_home(st.lang, webapp_url=settings.webapp_url, channel_url=settings.channel_url),
         )
         st.active = False
+        
+        # Clean up state after successful registration
+        clear_state(chat_id)
 
     # We won't reach here anymore since Finish happens via inline button
     pass
