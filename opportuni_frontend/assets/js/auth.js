@@ -223,7 +223,7 @@ class AuthManager {
             this.setBodyAuthState(false);
             
             // Redirect to home
-            window.location.href = '/';
+            window.location.href = 'index.html';
             
             showToast('You have been logged out', 'info');
         }
@@ -282,7 +282,7 @@ class AuthManager {
 
     // Redirect to appropriate dashboard
     redirectToDashboard() {
-    if (window.DEBUG) Logger.info('redirectToDashboard called');
+        if (window.DEBUG) Logger.info('redirectToDashboard called');
         
         if (!this.currentUser) {
             Logger.error('Cannot redirect: currentUser is null');
@@ -291,7 +291,7 @@ class AuthManager {
             // Try to load user and then redirect
             this.waitForUser().then(user => {
                 if (user) {
-            if (window.DEBUG) Logger.info('User loaded, now redirecting...');
+                    if (window.DEBUG) Logger.info('User loaded, now redirecting...');
                     this.redirectToDashboard();
                 } else {
                     Logger.error('Failed to load user for redirect');
@@ -300,43 +300,54 @@ class AuthManager {
             return;
         }
         
-    if (window.DEBUG) Logger.info('Redirecting user type', { user_type: this.currentUser.user_type });
+        if (window.DEBUG) Logger.info('Redirecting user type', { user_type: this.currentUser.user_type });
         
-        // Check if user is already on appropriate page type - don't redirect
+        // Check current page
         const currentPath = window.location.pathname;
-        const isOnOrgPage = currentPath.includes('/organization/');
-        const isOnStudentPage = !currentPath.includes('/organization/') && !currentPath.includes('/admin/');
+        const isOnAuthPage = currentPath.includes('login.html') || currentPath.includes('signup.html') || currentPath.includes('forgot-password.html');
         
         if (window.DEBUG) {
             console.log('redirectToDashboard - currentPath:', currentPath);
-            console.log('redirectToDashboard - isOnOrgPage:', isOnOrgPage);
+            console.log('redirectToDashboard - isOnAuthPage:', isOnAuthPage);
             console.log('redirectToDashboard - user_type:', this.currentUser.user_type);
         }
         
-        if (this.currentUser.user_type === 'organization' && isOnOrgPage) {
-            if (window.DEBUG) Logger.info('User already on organization page, skipping redirect');
-            return;
+        // Always redirect from auth pages, check for appropriate pages otherwise
+        if (!isOnAuthPage) {
+            const isOnOrgPage = currentPath.includes('/organization/');
+            const isOnStudentPage = !currentPath.includes('/organization/') && !currentPath.includes('/admin/');
+            
+            if (this.currentUser.user_type === 'organization' && isOnOrgPage) {
+                if (window.DEBUG) Logger.info('User already on organization page, skipping redirect');
+                return;
+            }
+            
+            if (this.currentUser.user_type === 'student' && isOnStudentPage) {
+                if (window.DEBUG) Logger.info('User already on student page, skipping redirect');
+                return;
+            }
         }
         
-        if (this.currentUser.user_type === 'student' && isOnStudentPage) {
-            if (window.DEBUG) Logger.info('User already on student page, skipping redirect');
-            return;
-        }
+        // Perform the redirect
+        if (window.DEBUG) Logger.info('Performing redirect now...');
         
-        // Use a small delay to ensure any pending operations complete
         setTimeout(() => {
             switch (this.currentUser.user_type) {
                 case 'student':
-                    window.location.href = '/dashboard.html';
+                    if (window.DEBUG) Logger.info('Redirecting to student dashboard');
+                    window.location.href = 'dashboard.html';
                     break;
                 case 'organization':
-                    window.location.href = '/organization/dashboard.html';
+                    if (window.DEBUG) Logger.info('Redirecting to organization dashboard');
+                    window.location.href = 'organization/dashboard.html';
                     break;
                 case 'admin':
-                    window.location.href = '/admin/dashboard.html';
+                    if (window.DEBUG) Logger.info('Redirecting to admin dashboard');
+                    window.location.href = 'admin/dashboard.html';
                     break;
                 default:
-                    window.location.href = '/dashboard.html';
+                    if (window.DEBUG) Logger.info('Redirecting to default dashboard');
+                    window.location.href = 'dashboard.html';
             }
         }, 200);
     }
@@ -356,7 +367,7 @@ class AuthManager {
             Utils.storage.set('redirect_after_login', window.location.pathname);
             
             // Redirect to login page instead of root
-            window.location.href = '/login.html';
+            window.location.href = 'login.html';
             return false;
         }
         return true;
