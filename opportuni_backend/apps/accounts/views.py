@@ -159,13 +159,23 @@ def telegram_auth(request):
                 unique_username = f"{username_base}_{counter}"
                 counter += 1
             
+            # Create a placeholder email for Telegram users
+            email = f"tg_{telegram_id}@telegram.local"
+            
             user = User.objects.create_user(
                 username=unique_username,
+                email=email,
                 telegram_id=telegram_id,
                 first_name=first_name,
                 last_name=last_name,
+                user_type='student',  # Default to student for Telegram users
                 is_active=True
             )
+            
+            # Create StudentProfile for student users
+            if user.user_type == 'student':
+                from apps.students.models import StudentProfile
+                StudentProfile.objects.get_or_create(user=user)
         
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
