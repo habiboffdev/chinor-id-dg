@@ -247,8 +247,14 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 
 # Telegram Bot configuration
 # Telegram Bot Settings
+# Telegram Bot settings
 TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default=None)
 TELEGRAM_BOT_USERNAME = config('TELEGRAM_BOT_USERNAME', default=None)
+TELEGRAM_BOT_ENABLED = config('TELEGRAM_BOT_ENABLED', default=False, cast=bool)
+TELEGRAM_CHANNEL_ID = config('TELEGRAM_CHANNEL_ID', default=None)
+TELEGRAM_CHANNEL_URL = config('TELEGRAM_CHANNEL_URL', default=None)
+TELEGRAM_WEBAPP_URL = config('TELEGRAM_WEBAPP_URL', default=None)
+TELEGRAM_ADMIN_IDS = config('TELEGRAM_ADMIN_IDS', default='').split(',') if config('TELEGRAM_ADMIN_IDS', default='') else []
 
 # Spectacular settings for API documentation
 SPECTACULAR_SETTINGS = {

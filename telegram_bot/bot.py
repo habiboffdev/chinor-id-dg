@@ -9,6 +9,7 @@ import telebot
 from telegram_bot.config import create_bot, Settings, setup_django
 from telegram_bot.handlers.common import wire_common_handlers
 from telegram_bot.handlers.student import wire_student_handlers
+from telegram_bot.handlers.admin import wire_admin_handlers
 
 
 def build_bot(parse_mode: Optional[str] = 'HTML') -> telebot.TeleBot:
@@ -23,7 +24,8 @@ def build_bot(parse_mode: Optional[str] = 'HTML') -> telebot.TeleBot:
 
     bot = create_bot(parse_mode=parse_mode)
 
-    # Wire student first so common fallback is registered last
+    # Wire handlers: admin first, then student, then common fallback
+    wire_admin_handlers(bot)
     wire_student_handlers(bot)
     wire_common_handlers(bot, settings.webapp_url)
 

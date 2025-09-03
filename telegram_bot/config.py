@@ -19,6 +19,7 @@ class Settings:
     django_settings_module: Optional[str] = None
     webapp_url: Optional[str] = None
     channel_url: Optional[str] = None
+    channel_id: Optional[str] = None  # Channel ID for posting (e.g., @opportuni_channel or -1001234567890)
     default_lang: str = os.getenv('DEFAULT_LANG', 'en')
 
     @staticmethod
@@ -31,6 +32,7 @@ class Settings:
             django_settings_module=os.getenv('DJANGO_SETTINGS_MODULE'),
             webapp_url=os.getenv('TELEGRAM_WEBAPP_URL'),
             channel_url=os.getenv('TELEGRAM_CHANNEL_URL'),
+            channel_id=os.getenv('TELEGRAM_CHANNEL_ID'),
             default_lang=os.getenv('DEFAULT_LANG', 'en'),
         )
 

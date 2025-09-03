@@ -63,6 +63,12 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         'status_completed': "Completed",
         'status_incomplete': "Incomplete",
         'not_set': "Not set",
+        # Admin
+        'access_denied': "❌ Access denied. You are not authorized.",
+        'admin_welcome': "🔧 <b>Admin Panel</b>\n\nChoose an action:",
+        'admin_stats': "📊 Statistics",
+        'admin_broadcast': "📢 Broadcast",
+        'admin_channel_test': "🧪 Test Channel",
     },
     'ru': {
         'start_welcome': "Добро пожаловать в Opportuni! Выберите ваш путь 🚀:",
@@ -125,6 +131,12 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         'status_completed': "Завершен",
         'status_incomplete': "Не завершен",
         'not_set': "Не указано",
+        # Admin
+        'access_denied': "❌ Доступ запрещен. Вы не авторизованы.",
+        'admin_welcome': "🔧 <b>Панель администратора</b>\n\nВыберите действие:",
+        'admin_stats': "📊 Статистика",
+        'admin_broadcast': "📢 Рассылка",
+        'admin_channel_test': "🧪 Тест канала",
     },
     'uz': {
         'start_welcome': "Opportuni ga xush kelibsiz! Yo'nalishni tanlang 🚀:",
@@ -187,6 +199,12 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         'status_completed': "Tugallangan",
         'status_incomplete': "Tugallanmagan",
         'not_set': "Belgilanmagan",
+        # Admin
+        'access_denied': "❌ Ruxsat berilmagan. Siz avtorizatsiya qilinmagansiz.",
+        'admin_welcome': "🔧 <b>Admin Panel</b>\n\nAmalni tanlang:",
+        'admin_stats': "📊 Statistika",
+        'admin_broadcast': "📢 Jo'natish",
+        'admin_channel_test': "🧪 Kanal testi",
     },
 }
 
