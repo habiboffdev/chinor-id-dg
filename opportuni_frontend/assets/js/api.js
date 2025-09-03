@@ -235,6 +235,16 @@ class API {
         // Reset password
         resetPassword: async (email) => {
             return this.post('/auth/reset-password/', { email });
+        },
+
+        // Telegram authentication
+        telegramAuth: async (telegramData) => {
+            return this.post('/auth/telegram-auth/', telegramData);
+        },
+
+        // Get Telegram bot configuration
+        getTelegramConfig: async () => {
+            return this.get('/auth/telegram-config/');
         }
     };
 

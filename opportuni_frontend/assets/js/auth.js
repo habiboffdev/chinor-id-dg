@@ -418,6 +418,51 @@ class AuthManager {
             showLoading(false);
         }
     }
+
+    // Set tokens (for Telegram auth and other direct token setting)
+    setTokens(accessToken, refreshToken) {
+        if (accessToken) {
+            Utils.storage.set('auth_token', accessToken);
+            api.setToken(accessToken);
+        }
+        if (refreshToken) {
+            Utils.storage.set('refresh_token', refreshToken);
+        }
+        this.setBodyAuthState(true);
+    }
+
+    // Set user data (for Telegram auth and other direct user setting)
+    setUser(userData) {
+        this.currentUser = userData;
+        this.updateUIForLoggedInUser();
+        this.setBodyAuthState(true);
+    }
+
+    // Telegram authentication
+    async telegramLogin(telegramData) {
+        try {
+            showLoading(true);
+            const response = await api.auth.telegramAuth(telegramData);
+            
+            // Store tokens
+            this.setTokens(response.access, response.refresh);
+            
+            // Set user data
+            this.setUser(response.user);
+            
+            showToast('Welcome back!', 'success');
+            
+            // Redirect to appropriate dashboard
+            this.redirectToDashboard();
+            
+            return response;
+        } catch (error) {
+            showToast(error.message || 'Telegram authentication failed', 'error');
+            throw error;
+        } finally {
+            showLoading(false);
+        }
+    }
 }
 
 // Global authentication functions

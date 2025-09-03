@@ -282,7 +282,7 @@
 
             try {
                 // Get bot configuration from backend
-                const response = await api.get('/auth/telegram-config/');
+                const response = await api.auth.getTelegramConfig();
                 const botName = response.bot_username;
                 
                 if (!botName) {
@@ -309,26 +309,9 @@
             try {
                 showToast('Authenticating with Telegram...', 'info');
                 
-                const response = await api.post('/auth/telegram-auth/', user);
+                // Use the auth manager's telegram login method
+                await auth.telegramLogin(user);
                 
-                if (response.access && response.user) {
-                    // Store tokens and user data
-                    auth.setTokens(response.access, response.refresh);
-                    auth.setUser(response.user);
-                    
-                    showToast('Login successful! Redirecting...', 'success');
-                    
-                    // Redirect based on user type
-                    setTimeout(() => {
-                        if (response.user.user_type === 'organization') {
-                            window.location.href = 'organization/dashboard.html';
-                        } else {
-                            window.location.href = 'dashboard.html';
-                        }
-                    }, 1500);
-                } else {
-                    throw new Error('Invalid response from server');
-                }
             } catch (error) {
                 console.error('Telegram auth error:', error);
                 showToast(error.message || 'Telegram authentication failed', 'error');
