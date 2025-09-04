@@ -133,6 +133,10 @@ def wire_student_handlers(bot: TeleBot):
     def student_shortcut(message: types.Message):
         # Start student flow via text button
         student_entry(message)
+    @bot.message_handler(func=lambda m: isinstance(m.text, str) and _normalize_text(m.text) in {'organization', 'tashkilot', 'организация'})
+    def organization_shortcut(message: types.Message):
+        # Start organization flow via text button
+        bot.send_message(message.chat.id, "🏢 " + t(get_global_lang(message.from_user.id) or 'en', 'org_coming_soon'))
 
     @bot.message_handler(func=lambda m: _awaiting(m.from_user.id, 'full_name'))
     def collect_full_name(message: types.Message):

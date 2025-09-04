@@ -69,6 +69,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         'admin_stats': "📊 Statistics",
         'admin_broadcast': "📢 Broadcast",
         'admin_channel_test': "🧪 Test Channel",
+        'org_coming_soon': "🏢 Organization features coming soon. Meanwhile, sign up at opportuni.app.",
     },
     'ru': {
         'start_welcome': "Добро пожаловать в Opportuni! Выберите ваш путь 🚀:",
@@ -137,6 +138,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         'admin_stats': "📊 Статистика",
         'admin_broadcast': "📢 Рассылка",
         'admin_channel_test': "🧪 Тест канала",
+        'org_coming_soon': "🏢 Функционал для организаций скоро будет доступен.",
     },
     'uz': {
         'start_welcome': "Opportuni ga xush kelibsiz! Yo'nalishni tanlang 🚀:",
@@ -205,6 +207,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         'admin_stats': "📊 Statistika",
         'admin_broadcast': "📢 Jo'natish",
         'admin_channel_test': "🧪 Kanal testi",
+        'org_coming_soon': "🏢 Tashkilotlar uchun funksiyalar tez orada mavjud bo'ladi. Hozircha opportuni.app orqali ro'yxatdan o'ting.",
     },
 }
 

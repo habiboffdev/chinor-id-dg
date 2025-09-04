@@ -36,11 +36,12 @@ def remove_admin(user_id: int) -> None:
     """Remove user from admin list"""
     with _admin_lock:
         _admin_users.discard(user_id)
+import os
 
+is_local = os.getenv('IS_LOCAL', 'false').lower() == 'true'
 
 def load_admins_from_config() -> None:
     """Load admin user IDs from environment/config"""
-    import os
     admin_ids = os.getenv('TELEGRAM_ADMIN_IDS', '')
     if admin_ids:
         try:
@@ -173,6 +174,8 @@ def post_opportunity_to_channel(bot: telebot.TeleBot, opportunity, channel_id: s
         image = None    
         if opportunity.cover_image:
             image = opportunity.cover_image.url
+            if is_local:
+                image = open(opportunity.cover_image.path, 'rb')
         # Send to channel
         if image is None:
             bot.send_message(
@@ -189,7 +192,6 @@ def post_opportunity_to_channel(bot: telebot.TeleBot, opportunity, channel_id: s
                 caption=message_text,
                 parse_mode='HTML',
                 reply_markup=keyboard,
-
             )
         return True
     except Exception as e:

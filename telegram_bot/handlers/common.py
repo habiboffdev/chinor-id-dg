@@ -70,7 +70,11 @@ def wire_common_handlers(bot: TeleBot, webapp_url: str | None = None):
     def help_cmd(message: types.Message):
         lang = get_lang(message.from_user.id) or 'en'
         bot.send_message(message.chat.id, t(lang, 'help'))
-
+    @bot.message_handler(func=lambda m: m.text and m.text.lower() == 'test')
+    def test_cmd(message: types.Message):
+        url = webapp_url or "https://opportuni.app"
+        # bot.send_message(message.chat.id, f"Test successful! Visit {url} for more info.", disable_web_page_preview=True)
+        bot.send_photo(message.chat.id, "https://cataas.com/cat", caption=f"Test successful! Visit {url} for more info.")
     # Student text is handled inside student handlers to keep flow self-contained
 
     @bot.callback_query_handler(func=lambda c: c.data and c.data.startswith('lang_'))
