@@ -69,7 +69,59 @@ def wire_common_handlers(bot: TeleBot, webapp_url: str | None = None):
     @bot.message_handler(func=lambda m: m.text and m.text.lower() == 'help')
     def help_cmd(message: types.Message):
         lang = get_lang(message.from_user.id) or 'en'
-        bot.send_message(message.chat.id, t(lang, 'help'))
+        
+        # Check if user is registered and show appropriate help
+        user = None
+        try:
+            from telegram_bot.config import setup_django
+            setup_django()
+            import importlib
+            User = importlib.import_module('apps.accounts.models').User  # type: ignore
+            user = User.objects.filter(telegram_id=message.from_user.id).first()
+            
+            if user and user.user_type == 'student':
+                # Check if profile is completed
+                StudentProfile = importlib.import_module('apps.students.models').StudentProfile  # type: ignore
+                student_profile = StudentProfile.objects.filter(user=user).first()
+                if student_profile and student_profile.profile_completed:
+                    # Show registered user help
+                    bot.send_message(message.chat.id, t(lang, 'help_registered'), parse_mode='HTML')
+                    return
+        except Exception:
+            pass
+        
+        # Show registration help for unregistered users
+        bot.send_message(message.chat.id, t(lang, 'help_registration'), parse_mode='HTML')
+
+    @bot.message_handler(func=lambda m: m.text and m.text in [
+        t('en', 'help_button'), t('ru', 'help_button'), t('uz', 'help_button')
+    ])
+    def help_button_main_menu(message: types.Message):
+        """Handle help button from main menu keyboard"""
+        lang = get_lang(message.from_user.id) or 'en'
+        
+        # Check if user is registered and show appropriate help
+        user = None
+        try:
+            from telegram_bot.config import setup_django
+            setup_django()
+            import importlib
+            User = importlib.import_module('apps.accounts.models').User  # type: ignore
+            user = User.objects.filter(telegram_id=message.from_user.id).first()
+            
+            if user and user.user_type == 'student':
+                # Check if profile is completed
+                StudentProfile = importlib.import_module('apps.students.models').StudentProfile  # type: ignore
+                student_profile = StudentProfile.objects.filter(user=user).first()
+                if student_profile and student_profile.profile_completed:
+                    # Show registered user help
+                    bot.send_message(message.chat.id, t(lang, 'help_registered'), parse_mode='HTML')
+                    return
+        except Exception:
+            pass
+        
+        # Show registration help for unregistered users
+        bot.send_message(message.chat.id, t(lang, 'help_registration'), parse_mode='HTML')
     @bot.message_handler(func=lambda m: m.text and m.text.lower() == 'test')
     def test_cmd(message: types.Message):
         url = webapp_url or "https://opportuni.app"

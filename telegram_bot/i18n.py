@@ -10,6 +10,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         'admin': "Admin 🔧",
         'help': "Use the menu below to navigate. ❓",
         'help_button': "Help ❓",
+        'help_registration': "📝 <b>How to Register as a Student:</b>\n\n1️⃣ Click the <b>Student 🎓</b> button in the menu\n2️⃣ Follow the steps to complete your profile:\n   • Full name\n   • Phone number\n   • Email address\n   • University information\n   • Academic scores\n   • Your interests\n\n3️⃣ Once completed, you'll have access to:\n   • 🔍 Discover opportunities\n   • 🧠 Personalized recommendations\n   • 📄 Track your applications\n   • 👤 Manage your profile\n\n💡 <b>Tips:</b>\n• Complete your profile for better recommendations\n• Check the channel regularly for new opportunities\n• Use the web app for detailed opportunity browsing",
+        'help_registered': "🎉 <b>You're registered!</b> Here's what you can do:\n\n🔍 <b>Discover Opportunities</b>\n   Browse scholarships, internships, and programs\n\n🧠 <b>Get Recommendations</b>\n   Personalized matches based on your profile\n\n📄 <b>My Applications</b>\n   Track your submitted applications\n\n👤 <b>My Profile</b>\n   View and update your information\n\n💡 <b>Need help?</b>\n• Visit our web app for detailed browsing\n• Join our channel for latest updates\n• Contact support if you have issues",
         'unknown': "I didn't understand 🤔. Use the menu below.",
         'link_webapp': "Open Web App 🔗",
         # Student onboarding
@@ -79,6 +81,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         'admin': "Админ 🔧",
         'help': "Используйте меню ниже для навигации. ❓",
         'help_button': "Помощь ❓",
+        'help_registration': "📝 <b>Как зарегистрироваться как студент:</b>\n\n1️⃣ Нажмите кнопку <b>Студент 🎓</b> в меню\n2️⃣ Следуйте шагам для заполнения профиля:\n   • Полное имя\n   • Номер телефона\n   • Email адрес\n   • Информация об университете\n   • Академические баллы\n   • Ваши интересы\n\n3️⃣ После завершения у вас будет доступ к:\n   • 🔍 Поиск возможностей\n   • 🧠 Персональные рекомендации\n   • 📄 Отслеживание заявок\n   • 👤 Управление профилем\n\n💡 <b>Советы:</b>\n• Заполните профиль полностью для лучших рекомендаций\n• Проверяйте канал регулярно на новые возможности\n• Используйте веб‑приложение для детального просмотра",
+        'help_registered': "🎉 <b>Вы зарегистрированы!</b> Вот что вы можете делать:\n\n🔍 <b>Открыть возможности</b>\n   Просматривайте стипендии, стажировки и программы\n\n🧠 <b>Получить рекомендации</b>\n   Персональные предложения на основе профиля\n\n📄 <b>Мои заявки</b>\n   Отслеживайте поданные заявки\n\n👤 <b>Мой профиль</b>\n   Просматривайте и обновляйте информацию\n\n💡 <b>Нужна помощь?</b>\n• Посетите наше веб‑приложение для детального просмотра\n• Присоединяйтесь к каналу для последних обновлений\n• Обратитесь в поддержку при проблемах",
         'unknown': "Я не понял 🤔. Используйте меню ниже.",
         'link_webapp': "Открыть веб-приложение 🔗",
         # Student onboarding
@@ -148,6 +152,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         'admin': "Admin 🔧",
         'help': "Navigatsiya uchun pastdagi menyudan foydalaning. ❓",
         'help_button': "Yordam ❓",
+        'help_registration': "📝 <b>Talaba sifatida ro'yxatdan o'tish:</b>\n\n1️⃣ Menyuda <b>Talaba 🎓</b> tugmasini bosing\n2️⃣ Profilingizni to'ldirish uchun qadamlarni bajaring:\n   • To'liq ism\n   • Telefon raqam\n   • Email manzil\n   • Universitet ma'lumotlari\n   • Akademik natijalar\n   • Qiziqishlaringiz\n\n3️⃣ Tugagandan so'ng sizga mavjud bo'ladi:\n   • 🔍 Imkoniyatlarni ko'rish\n   • 🧠 Shaxsiy tavsiyalar\n   • 📄 Arizalaringizni kuzatish\n   • 👤 Profilingizni boshqarish\n\n💡 <b>Maslahatlar:</b>\n• Yaxshi tavsiyalar uchun profilingizni to'liq to'ldiring\n• Yangi imkoniyatlar uchun kanalni muntazam tekshiring\n• Batafsil ko'rish uchun veb ilovadan foydalaning",
+        'help_registered': "🎉 <b>Siz ro'yxatdan o'tgansiz!</b> Nima qila olasiz:\n\n🔍 <b>Imkoniyatlarni ko'rish</b>\n   Stipendiyalar, stajirovkalar va dasturlarni ko'ring\n\n🧠 <b>Tavsiyalar olish</b>\n   Profilingizga asoslangan shaxsiy takliflar\n\n📄 <b>Mening arizalarim</b>\n   Yuborgan arizalaringizni kuzating\n\n👤 <b>Profilim</b>\n   Ma'lumotlaringizni ko'ring va yangilang\n\n💡 <b>Yordam kerakmi?</b>\n• Batafsil ko'rish uchun veb ilovamizga tashrif buyuring\n• So'nggi yangiliklar uchun kanalimizga qo'shiling\n• Muammolar bo'lsa qo'llab-quvvatlashga murojaat qiling",
         'unknown': "Tushunmadim 🤔. Pastdagi menyudan foydalaning.",
         'link_webapp': "Veb ilovani ochish 🔗",
         # Student onboarding

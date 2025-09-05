@@ -415,6 +415,34 @@ def wire_student_handlers(bot: TeleBot):
         # Fallback to basic message
         bot.send_message(message.chat.id, "❌ Profile not found", parse_mode='HTML')
 
+    @bot.message_handler(func=lambda m: m.text and m.text in [
+        t('en', 'help_button'), t('ru', 'help_button'), t('uz', 'help_button')
+    ])
+    def help_button_handler(message: types.Message):
+        """Handle help button from keyboard in any language"""
+        lang = get_global_lang(message.from_user.id) or 'en'
+        
+        # Check if user is registered and show appropriate help
+        user = None
+        try:
+            user = User.objects.filter(telegram_id=message.from_user.id).first()
+            
+            if user and user.user_type == 'student':
+                # Check if profile is completed
+                import importlib
+                _mod = importlib.import_module('apps.students.models')
+                StudentProfile = getattr(_mod, 'StudentProfile')
+                student_profile = StudentProfile.objects.filter(user=user).first()
+                if student_profile and student_profile.profile_completed:
+                    # Show registered user help
+                    bot.send_message(message.chat.id, t(lang, 'help_registered'), parse_mode='HTML')
+                    return
+        except Exception:
+            pass
+        
+        # Show registration help for unregistered users
+        bot.send_message(message.chat.id, t(lang, 'help_registration'), parse_mode='HTML')
+
 
 def _awaiting(user_id: int, field: str) -> bool:
     st = get_state(user_id)
