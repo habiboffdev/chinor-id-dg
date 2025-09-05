@@ -5,14 +5,14 @@ from apps.students.models import Skill
 
 class Opportunity(models.Model):
     OPPORTUNITY_TYPES = (
-        ('internship', 'Internship'),
-        ('volunteer', 'Volunteer'),
-        ('competition', 'Competition'),
-        ('scholarship', 'Scholarship'),
-        ('job', 'Job'),
-        ('workshop', 'Workshop'),
         ('conference', 'Conference'),
-        ('event', 'Event'),
+        ('volunteer', 'Volunteer'),
+        ('international_events', 'International events'),
+        ('scholarship', 'Scholarship'),
+        ('camp', 'Camp'),
+        ('grant', 'Grant'),
+        ('mentoring', 'Mentoring'),
+        ('academic_program', 'Academic Program'),
     )
     
     STATUS_CHOICES = (

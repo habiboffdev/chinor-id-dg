@@ -219,19 +219,20 @@ def wire_student_handlers(bot: TeleBot):
     def _show_preferences(chat_id: int, st: StudentState):
         # Build inline keyboard with toggles
         options = [
-            ('internships', 'pref_internships'),
-            ('scholarships', 'pref_scholarships'),
-            ('remote', 'pref_remote'),
-            ('part_time', 'pref_part_time'),
-            ('full_time', 'pref_full_time'),
-            ('hackathons', 'pref_hackathons'),
+            ('volunteer', 'pref_volunteer'),
+            ('conference', 'pref_conference'),
+            ('international_events', 'pref_international_events'),
+            ('camp', 'pref_camp'),
+            ('grant', 'pref_grant'),
             ('mentoring', 'pref_mentoring'),
-            ('research', 'pref_research'),
+            ('academic_program', 'pref_academic_program'),
+            ('scholarships', 'pref_scholarships'),
         ]
         kb = types.InlineKeyboardMarkup()
         row: list[types.InlineKeyboardButton] = []
         for key, i18n_key in options:
             checked = ' ✅' if key in st.pref_tags else ''
+
             label = t(st.lang, i18n_key) + checked
             row.append(types.InlineKeyboardButton(label, callback_data=f'pref_{key}'))
             if len(row) == 2:
