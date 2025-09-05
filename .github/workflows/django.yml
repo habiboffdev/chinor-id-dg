@@ -24,6 +24,8 @@ jobs:
             
             # Pull latest changes
             echo "📥 Pulling latest code..."
+            git fetch origin
+            git reset --hard origin/main
             git pull origin main
             
             # Activate virtual environment
