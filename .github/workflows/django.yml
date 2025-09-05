@@ -51,7 +51,7 @@ jobs:
             
             # Restart services
             echo "🔄 Restarting services..."
-            sudo supervisorctl restart opportuni
+            sudo supervisorctl restart all
             sudo systemctl reload nginx
             
             # Check status
