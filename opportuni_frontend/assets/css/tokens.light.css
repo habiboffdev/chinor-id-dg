@@ -1,0 +1,126 @@
+/* ===========================================================================
+   Semantic Token Mapping - Light Theme
+   Scope: body.theme-opportuni[data-theme="light"]
+   ======================================================================= */
+
+@layer tokens-theme {
+  body.theme-opportuni[data-theme="light"],
+  body.theme-opportuni.light-mode { /* keep class support during migration */
+    --color-bg-app: var(--neutral-light-900);
+    --color-bg-surface: var(--neutral-light-1000);
+    --color-bg-surface-alt: var(--neutral-light-1000);
+    --color-bg-elevated: var(--neutral-light-800);
+    --color-bg-inset: var(--neutral-light-700);
+
+    --color-text-primary: var(--neutral-light-100);
+    --color-text-secondary: var(--neutral-light-200);
+    --color-text-muted: var(--neutral-light-300);
+    --color-text-inverted: var(--neutral-light-1000);
+
+    --color-border: var(--neutral-light-400);
+    --color-border-strong: var(--neutral-light-600);
+
+    --color-accent-primary: var(--brand-accent-2);
+    --color-accent-secondary: var(--brand-accent-1);
+    --color-accent-tertiary: var(--brand-accent-3);
+    --color-accent-promo: var(--brand-accent-promo);
+
+  /* Soft Accent Surfaces */
+  --accent-1-soft-bg: color-mix(in srgb, var(--color-accent-secondary) 15%, transparent);
+  --accent-2-soft-bg: color-mix(in srgb, var(--color-accent-primary) 15%, transparent);
+  --accent-3-soft-bg: color-mix(in srgb, var(--color-accent-tertiary) 15%, transparent);
+  --promo-soft-bg:     color-mix(in srgb, var(--color-accent-promo) 12%, transparent);
+  --accent-1-soft-border: color-mix(in srgb, var(--color-accent-secondary) 28%, transparent);
+  --accent-2-soft-border: color-mix(in srgb, var(--color-accent-primary) 28%, transparent);
+  --accent-3-soft-border: color-mix(in srgb, var(--color-accent-tertiary) 28%, transparent);
+  --promo-soft-border:    color-mix(in srgb, var(--color-accent-promo) 30%, transparent);
+
+  /* Status soft surfaces */
+  --status-success-soft-bg: color-mix(in srgb, var(--color-state-success) 16%, transparent);
+  --status-warning-soft-bg: color-mix(in srgb, var(--color-state-warning) 16%, transparent);
+  --status-danger-soft-bg:  color-mix(in srgb, var(--color-state-danger) 16%, transparent);
+  --status-success-soft-border: color-mix(in srgb, var(--color-state-success) 30%, transparent);
+  --status-warning-soft-border: color-mix(in srgb, var(--color-state-warning) 30%, transparent);
+  --status-danger-soft-border:  color-mix(in srgb, var(--color-state-danger) 30%, transparent);
+
+  --shadow-brand-hover: 0 6px 20px color-mix(in srgb, var(--color-accent-primary) 22%, transparent);
+  /* Neutral tints (invert for light) */
+  --tint-white-1: rgba(0,0,0,0.02);
+  --tint-white-2: rgba(0,0,0,0.05);
+  --tint-white-3: rgba(0,0,0,0.08);
+  --chip-neutral-bg: var(--tint-white-2);
+  --chip-neutral-bg-hover: var(--tint-white-3);
+
+  /* Scrims & deep shadows */
+  --scrim: rgba(0,0,0,0.45);
+  --scrim-strong: rgba(0,0,0,0.60);
+  --scrim-heavy: rgba(0,0,0,0.70);
+  --shadow-deep: 0 25px 50px -12px rgba(0,0,0,0.45);
+  --shadow-float: 0 10px 30px rgba(0,0,0,0.25);
+
+    --color-state-success: var(--status-success-dark);
+    --color-state-warning: var(--status-warning-dark);
+    --color-state-danger:  var(--status-danger-dark);
+
+    --shadow-focus: 0 0 0 3px rgba(91,82,230,0.25);
+    --shadow-elevation-sm: 0 1px 3px rgba(0,0,0,0.12);
+    --shadow-elevation-md: 0 4px 12px rgba(0,0,0,0.10);
+    --shadow-elevation-lg: 0 8px 32px rgba(0,0,0,0.12);
+    --shadow-glow-brand: 0 10px 30px rgba(107,99,255,0.15), 0 10px 40px rgba(0,229,255,0.10);
+
+  /* Skeleton loading (light) */
+  --skeleton-base: color-mix(in srgb, var(--neutral-light-400) 14%, transparent);
+  --skeleton-pulse: color-mix(in srgb, var(--neutral-light-400) 28%, transparent);
+
+    /* Bridge aliases */
+    --bg-app: var(--color-bg-app);
+    --bg-surface-1: var(--color-bg-surface);
+    --bg-surface-2: var(--color-bg-surface-alt);
+    --bg-surface-3: var(--color-bg-elevated);
+    --bg-elevated: var(--color-bg-inset);
+    --text-primary: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
+    --text-inverse: var(--color-text-inverted);
+    --border-default: var(--color-border);
+    --focus-ring-color: var(--shadow-focus);
+
+   /* =============================
+     Form Control Semantic Tokens
+     (Phase 1 unification)
+     ============================= */
+   --form-control-bg: var(--color-bg-surface);
+   --form-control-bg-hover: var(--color-bg-surface-alt);
+   --form-control-bg-disabled: color-mix(in srgb, var(--color-bg-surface) 65%, transparent);
+   --form-control-border: var(--color-border);
+   --form-control-border-hover: var(--color-border-strong);
+   --form-control-border-focus: var(--color-accent-primary);
+   --form-control-border-error: var(--color-state-danger);
+   --form-control-text: var(--color-text-primary);
+   --form-control-placeholder: var(--color-text-muted);
+   --form-control-icon: var(--color-text-muted);
+   --form-control-radius: var(--radius-sm);
+   --form-control-shadow-focus: 0 0 0 3px color-mix(in srgb, var(--color-accent-primary) 35%, transparent);
+   --form-control-shadow-error: 0 0 0 3px color-mix(in srgb, var(--color-state-danger) 40%, transparent);
+
+   /* ------------------------------------------------------------------
+     Legacy Bridge (temporary)
+     Map old raw palette tokens (ink/slate/mist/white) to semantic light
+     surfaces & text so pages that still reference --ink-900, --mist-200,
+     etc. don't stay dark in light mode. Remove after full migration.
+     ------------------------------------------------------------------ */
+   --ink-1000: var(--color-bg-app);
+   --ink-900:  var(--color-bg-surface);
+   --ink-800:  var(--color-bg-surface-alt);
+   --ink-700:  var(--color-bg-elevated);
+   --slate-600: var(--color-border-strong);
+   --slate-400: var(--color-border);
+   --mist-200: var(--color-text-primary);
+   --mist-300: var(--color-text-secondary);
+   --white-0:  var(--color-text-inverted);
+   /* Common fallbacks used in inline styles */
+   --slate-500: var(--color-border);
+   --ink-750: var(--color-bg-elevated);
+   --ink-950: var(--color-bg-app);
+  }
+}

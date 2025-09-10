@@ -1,0 +1,334 @@
+/* 
+ * Semantic Theme Variables System
+ * This file provides a complete semantic variable system that automatically
+ * adapts to light/dark themes without requiring component-specific overrides.
+ * 
+ * Usage: Components should use semantic variables (--surface-1, --text-primary)
+ * instead of hardcoded colors (--ink-800, #333333).
+ */
+
+:root {
+  /* ==========================================================================
+     SEMANTIC COLOR TOKENS - Automatically switch with theme
+     ========================================================================== */
+  
+  /* Surfaces & Backgrounds */
+  --surface-app: var(--ink-900);           /* Page background */
+  --surface-1: var(--ink-800);             /* Primary surface (cards, panels) */
+  --surface-2: var(--ink-700);             /* Secondary surface (elevated elements) */
+  --surface-3: var(--ink-600);             /* Tertiary surface (highest elevation) */
+  --surface-overlay: rgba(0, 0, 0, 0.8);   /* Modal/overlay background */
+  
+  /* Text Colors */
+  --text-primary: var(--mist-200);         /* Primary text */
+  --text-secondary: var(--mist-300);       /* Secondary text */
+  --text-tertiary: var(--mist-400);        /* Tertiary/muted text */
+  --text-inverse: var(--ink-950);          /* Text on accent backgrounds */
+  --text-placeholder: var(--slate-500);    /* Placeholder text */
+  
+  /* Interactive Elements */
+  --interactive-normal: var(--slate-400);  /* Borders, dividers */
+  --interactive-hover: var(--slate-300);   /* Hover states */
+  --interactive-active: var(--accent-2);   /* Active/focus states */
+  --interactive-disabled: var(--slate-600); /* Disabled states */
+  
+  /* Feedback Colors */
+  --feedback-success: #10B981;             /* Success states */
+  --feedback-warning: #F59E0B;             /* Warning states */
+  --feedback-error: #EF4444;               /* Error states */
+  --feedback-info: var(--accent-3);        /* Info states */
+  
+  /* Shadow & Effects */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.25);
+  --shadow-glow: 0 0 0 3px rgba(200, 255, 0, 0.15);
+  
+  /* Focus & Interaction */
+  --focus-ring: 0 0 0 3px rgba(200, 255, 0, 0.2);
+  --focus-ring-error: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  --focus-ring-success: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+/* ==========================================================================
+   LIGHT MODE SEMANTIC OVERRIDES
+   ========================================================================== */
+
+body.theme-opportuni.light-mode {
+  /* Surfaces & Backgrounds */
+  --surface-app: var(--light-900);
+  --surface-1: var(--light-1000);
+  --surface-2: var(--light-1000);
+  --surface-3: var(--light-800);
+  --surface-overlay: rgba(255, 255, 255, 0.9);
+  
+  /* Text Colors */
+  --text-primary: var(--light-100);
+  --text-secondary: var(--light-200);
+  --text-tertiary: var(--light-400);
+  --text-inverse: var(--light-1000);
+  --text-placeholder: var(--light-400);
+  
+  /* Interactive Elements */
+  --interactive-normal: var(--light-600);
+  --interactive-hover: var(--light-500);
+  --interactive-active: var(--accent-2);
+  --interactive-disabled: var(--light-700);
+  
+  /* Feedback Colors - Adjusted for light mode */
+  --feedback-success: #059669;
+  --feedback-warning: #D97706;
+  --feedback-error: #DC2626;
+  --feedback-info: var(--accent-3);
+  
+  /* Shadow & Effects - Lighter shadows for light mode */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --shadow-glow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+  
+  /* Focus & Interaction */
+  --focus-ring: 0 0 0 3px rgba(108, 99, 255, 0.2);
+  --focus-ring-error: 0 0 0 3px rgba(220, 38, 38, 0.2);
+  --focus-ring-success: 0 0 0 3px rgba(5, 150, 105, 0.2);
+}
+
+/* ==========================================================================
+   SEMANTIC COMPONENT CLASSES
+   These classes use semantic variables and automatically adapt to themes
+   ========================================================================== */
+
+.semantic-surface {
+  background: var(--surface-1);
+  border: 1px solid var(--interactive-normal);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.semantic-surface-elevated {
+  background: var(--surface-2);
+  border: 1px solid var(--interactive-normal);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+
+.semantic-surface-floating {
+  background: var(--surface-3);
+  border: 1px solid var(--interactive-normal);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
+.semantic-text-primary {
+  color: var(--text-primary);
+}
+
+.semantic-text-secondary {
+  color: var(--text-secondary);
+}
+
+.semantic-text-muted {
+  color: var(--text-tertiary);
+}
+
+.semantic-border {
+  border-color: var(--interactive-normal);
+}
+
+.semantic-border-hover {
+  border-color: var(--interactive-hover);
+}
+
+.semantic-divider {
+  height: 1px;
+  background: var(--interactive-normal);
+  border: none;
+}
+
+/* ==========================================================================
+   SEMANTIC FORM CONTROLS
+   ========================================================================== */
+
+.semantic-input {
+  background: var(--surface-1);
+  border: 1px solid var(--interactive-normal);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+
+.semantic-input:focus {
+  outline: none;
+  border-color: var(--interactive-active);
+  box-shadow: var(--focus-ring);
+}
+
+.semantic-input::placeholder {
+  color: var(--text-placeholder);
+}
+
+.semantic-input:disabled {
+  background: var(--surface-app);
+  border-color: var(--interactive-disabled);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   SEMANTIC BUTTONS
+   ========================================================================== */
+
+.semantic-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--interactive-normal);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.semantic-btn:hover {
+  background: var(--surface-3);
+  border-color: var(--interactive-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.semantic-btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.semantic-btn:focus {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.semantic-btn:disabled {
+  background: var(--surface-app);
+  border-color: var(--interactive-disabled);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   SEMANTIC NAVIGATION
+   ========================================================================== */
+
+.semantic-nav {
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--interactive-normal);
+  box-shadow: var(--shadow-sm);
+}
+
+.semantic-nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.semantic-nav-link:hover {
+  color: var(--text-primary);
+  background: var(--surface-2);
+}
+
+.semantic-nav-link.active {
+  color: var(--interactive-active);
+  background: var(--surface-2);
+}
+
+/* ==========================================================================
+   SEMANTIC DROPDOWNS & MENUS
+   ========================================================================== */
+
+.semantic-dropdown {
+  background: var(--surface-2);
+  border: 1px solid var(--interactive-normal);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.semantic-dropdown-item {
+  display: block;
+  padding: 12px 16px;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--interactive-normal);
+}
+
+.semantic-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.semantic-dropdown-item:hover {
+  background: var(--surface-3);
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   SEMANTIC FEEDBACK COMPONENTS
+   ========================================================================== */
+
+.semantic-alert {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border-left: 4px solid;
+  margin: 16px 0;
+}
+
+.semantic-alert-success {
+  background: rgba(16, 185, 129, 0.1);
+  border-left-color: var(--feedback-success);
+  color: var(--feedback-success);
+}
+
+.semantic-alert-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-left-color: var(--feedback-warning);
+  color: var(--feedback-warning);
+}
+
+.semantic-alert-error {
+  background: rgba(239, 68, 68, 0.1);
+  border-left-color: var(--feedback-error);
+  color: var(--feedback-error);
+}
+
+.semantic-alert-info {
+  background: rgba(0, 229, 255, 0.1);
+  border-left-color: var(--feedback-info);
+  color: var(--feedback-info);
+}
+
+/* ==========================================================================
+   MIGRATION HELPERS
+   Map old hardcoded variables to semantic ones
+   ========================================================================== */
+
+body.theme-opportuni {
+  /* Map old ink variables to semantic ones */
+  --bg-app: var(--surface-app);
+  --bg-surface-1: var(--surface-1);
+  --bg-surface-2: var(--surface-2);
+  --bg-surface-3: var(--surface-3);
+  
+  /* Map old text variables */
+  --text-primary-old: var(--text-primary);
+  --text-secondary-old: var(--text-secondary);
+  --text-muted-old: var(--text-tertiary);
+  
+  /* Map old border variables */
+  --border-default: var(--interactive-normal);
+  --border-hover: var(--interactive-hover);
+}

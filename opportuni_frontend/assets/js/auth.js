@@ -315,7 +315,11 @@ class AuthManager {
         // Always redirect from auth pages, check for appropriate pages otherwise
         if (!isOnAuthPage) {
             const isOnOrgPage = currentPath.includes('/organization/');
-            const isOnStudentPage = !currentPath.includes('/organization/') && !currentPath.includes('/admin/');
+            const isOnLandingPage = currentPath === '/' || currentPath === '/index.html' || currentPath.endsWith('/index.html');
+            
+            // Define actual student dashboard/app pages (not landing page)
+            const studentPages = ['dashboard.html', 'opportunities.html', 'applications.html', 'profile.html', 'settings.html'];
+            const isOnStudentPage = studentPages.some(page => currentPath.includes(page));
             
             if (this.currentUser.user_type === 'organization' && isOnOrgPage) {
                 if (window.DEBUG) Logger.info('User already on organization page, skipping redirect');
@@ -325,6 +329,12 @@ class AuthManager {
             if (this.currentUser.user_type === 'student' && isOnStudentPage) {
                 if (window.DEBUG) Logger.info('User already on student page, skipping redirect');
                 return;
+            }
+            
+            // Always redirect from landing page regardless of user type
+            if (isOnLandingPage) {
+                if (window.DEBUG) Logger.info('User on landing page, will redirect to dashboard');
+                // Don't return here - let the redirect happen
             }
         }
         

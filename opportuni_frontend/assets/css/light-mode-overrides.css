@@ -1,0 +1,428 @@
+/* 
+ * Light Mode Overrides for Component Styles
+ * This file provides comprehensive light mode support for all component CSS files
+ * that currently use hardcoded dark mode colors.
+ * 
+ * Architecture: Instead of modifying every CSS file individually, we create
+ * targeted overrides that apply when body.theme-opportuni.light-mode is active.
+ */
+
+/* ==========================================================================
+   WIZARD & OPPORTUNITY CREATE COMPONENTS - Light Mode Overrides
+   ========================================================================== */
+
+body.theme-opportuni.light-mode .wizard-card {
+  background: var(--light-1000) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid var(--light-600) !important;
+  color: var(--light-100) !important;
+}
+
+body.theme-opportuni.light-mode .wizard-header {
+  background: var(--light-900) !important;
+  border-bottom: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .wizard-progress-bar {
+  background: var(--light-800) !important;
+}
+
+body.theme-opportuni.light-mode .wizard-progress-fill {
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2)) !important;
+}
+
+body.theme-opportuni.light-mode .wizard-step {
+  background: var(--light-900) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .wizard-step.active {
+  background: var(--light-1000) !important;
+  border-color: var(--accent-2) !important;
+}
+
+body.theme-opportuni.light-mode .wizard-step.completed {
+  background: var(--light-1000) !important;
+  border-color: var(--accent-1) !important;
+}
+
+body.theme-opportuni.light-mode .step-content {
+  background: var(--light-1000) !important;
+}
+
+body.theme-opportuni.light-mode .field-group {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .field-error {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #dc2626 !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+}
+
+body.theme-opportuni.light-mode .field-info {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: var(--light-200) !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+}
+
+/* ==========================================================================
+   ORGANIZATION DASHBOARD & COMPONENTS - Light Mode Overrides
+   ========================================================================== */
+
+body.theme-opportuni.light-mode .org-nav {
+  background: var(--light-1000) !important;
+  border-bottom: 1px solid var(--light-600) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-opportuni.light-mode .org-nav__links a {
+  color: var(--light-300) !important;
+}
+
+body.theme-opportuni.light-mode .org-nav__links a:hover,
+body.theme-opportuni.light-mode .org-nav__links a.is-active {
+  color: var(--light-100) !important;
+  background: var(--light-900) !important;
+}
+
+body.theme-opportuni.light-mode .kpi {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-opportuni.light-mode .panel {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-opportuni.light-mode .panel__head {
+  border-bottom: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .list-item {
+  border-bottom: 1px solid var(--light-700) !important;
+}
+
+body.theme-opportuni.light-mode .list-item:hover {
+  background: var(--light-900) !important;
+}
+
+/* ==========================================================================
+   PROFILE COMPONENTS - Light Mode Overrides
+   ========================================================================== */
+
+body.theme-opportuni.light-mode .profile-card {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-opportuni.light-mode .profile-card-header {
+  background: var(--light-900) !important;
+  border-bottom: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .profile-section {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .skill-tag {
+  background: var(--light-800) !important;
+  color: var(--light-200) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .progress-bar {
+  background: var(--light-800) !important;
+}
+
+body.theme-opportuni.light-mode .progress-fill {
+  background: var(--accent-2) !important;
+}
+
+/* ==========================================================================
+   OPPORTUNITY DETAIL - Light Mode Overrides
+   ========================================================================== */
+
+body.theme-opportuni.light-mode .opportunity-header {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .opportunity-content {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .requirement-item {
+  background: var(--light-900) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .tag {
+  background: var(--light-800) !important;
+  color: var(--light-200) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+/* ==========================================================================
+   GENERAL COMPONENT OVERRIDES - Light Mode
+   ========================================================================== */
+
+body.theme-opportuni.light-mode .btn {
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .btn:not(.btn-primary):not(.btn-secondary) {
+  background: var(--light-1000) !important;
+  color: var(--light-200) !important;
+}
+
+body.theme-opportuni.light-mode .btn:hover:not(.btn-primary):not(.btn-secondary) {
+  background: var(--light-900) !important;
+}
+
+body.theme-opportuni.light-mode .dropdown-menu {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-opportuni.light-mode .dropdown-item {
+  color: var(--light-200) !important;
+}
+
+body.theme-opportuni.light-mode .dropdown-item:hover {
+  background: var(--light-900) !important;
+  color: var(--light-100) !important;
+}
+
+body.theme-opportuni.light-mode .modal-content {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+body.theme-opportuni.light-mode .modal-header {
+  border-bottom: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .modal-footer {
+  border-top: 1px solid var(--light-600) !important;
+}
+
+/* ==========================================================================
+   FORM CONTROLS - Light Mode Overrides
+   ========================================================================== */
+
+body.theme-opportuni.light-mode input,
+body.theme-opportuni.light-mode textarea,
+body.theme-opportuni.light-mode select {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+  color: var(--light-100) !important;
+}
+
+body.theme-opportuni.light-mode input:focus,
+body.theme-opportuni.light-mode textarea:focus,
+body.theme-opportuni.light-mode select:focus {
+  border-color: var(--accent-2) !important;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1) !important;
+}
+
+body.theme-opportuni.light-mode input::placeholder,
+body.theme-opportuni.light-mode textarea::placeholder {
+  color: var(--light-400) !important;
+}
+
+/* ==========================================================================
+   NAVBAR COMPONENTS - Light Mode Overrides
+   ========================================================================== */
+
+body.theme-opportuni.light-mode .student-nav {
+  background: var(--light-1000) !important;
+  border-bottom: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .student-nav::after {
+  background: var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .link-rail {
+  background: var(--light-900) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .active-indicator {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-opportuni.light-mode .nav-link {
+  color: var(--light-300) !important;
+}
+
+body.theme-opportuni.light-mode .nav-link:hover,
+body.theme-opportuni.light-mode .nav-link.active {
+  color: var(--light-100) !important;
+}
+
+body.theme-opportuni.light-mode .btn-icon {
+  color: var(--light-300) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .btn-icon:hover {
+  background: var(--light-900) !important;
+  color: var(--light-100) !important;
+}
+
+body.theme-opportuni.light-mode .dropdown {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.theme-opportuni.light-mode .dropdown a,
+body.theme-opportuni.light-mode .dropdown button {
+  color: var(--light-200) !important;
+}
+
+body.theme-opportuni.light-mode .dropdown a:hover,
+body.theme-opportuni.light-mode .dropdown button:hover {
+  background: var(--light-900) !important;
+  color: var(--light-100) !important;
+}
+
+/* ==========================================================================
+   LOADING & OVERLAY COMPONENTS - Light Mode Overrides
+   ========================================================================== */
+
+body.theme-opportuni.light-mode #loading-spinner {
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+
+body.theme-opportuni.light-mode #loading-spinner > div {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+  color: var(--light-200) !important;
+}
+
+body.theme-opportuni.light-mode .toast {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+  color: var(--light-200) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ==========================================================================
+   TABLE & LIST COMPONENTS - Light Mode Overrides
+   ========================================================================== */
+
+body.theme-opportuni.light-mode table {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode th {
+  background: var(--light-900) !important;
+  border-bottom: 1px solid var(--light-600) !important;
+  color: var(--light-200) !important;
+}
+
+body.theme-opportuni.light-mode td {
+  border-bottom: 1px solid var(--light-700) !important;
+  color: var(--light-200) !important;
+}
+
+body.theme-opportuni.light-mode tr:hover td {
+  background: var(--light-900) !important;
+}
+
+/* ==========================================================================
+   SPECIFIC PAGE OVERRIDES
+   ========================================================================== */
+
+/* Dashboard page specific overrides */
+body.theme-opportuni.light-mode .animate-pulse > div {
+  background: var(--light-800) !important;
+}
+
+/* Applications page specific overrides */
+body.theme-opportuni.light-mode .application-card {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .status-badge {
+  background: var(--light-800) !important;
+  color: var(--light-200) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+/* Opportunities page specific overrides */
+body.theme-opportuni.light-mode .opportunity-card {
+  background: var(--light-1000) !important;
+  border: 1px solid var(--light-600) !important;
+}
+
+body.theme-opportuni.light-mode .opportunity-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ==========================================================================
+   TEXT AND TYPOGRAPHY - Light Mode Overrides
+   ========================================================================== */
+
+body.theme-opportuni.light-mode h1,
+body.theme-opportuni.light-mode h2,
+body.theme-opportuni.light-mode h3,
+body.theme-opportuni.light-mode h4,
+body.theme-opportuni.light-mode h5,
+body.theme-opportuni.light-mode h6 {
+  color: var(--light-100) !important;
+}
+
+body.theme-opportuni.light-mode p {
+  color: var(--light-200) !important;
+}
+
+body.theme-opportuni.light-mode .text-muted,
+body.theme-opportuni.light-mode .text-gray-500,
+body.theme-opportuni.light-mode .text-gray-600 {
+  color: var(--light-400) !important;
+}
+
+body.theme-opportuni.light-mode .text-secondary {
+  color: var(--light-300) !important;
+}
+
+body.theme-opportuni.light-mode small {
+  color: var(--light-400) !important;
+}
+
+/* ==========================================================================
+   ICON AND INTERACTIVE ELEMENTS - Light Mode Overrides
+   ========================================================================== */
+
+body.theme-opportuni.light-mode i {
+  color: var(--light-300) !important;
+}
+
+body.theme-opportuni.light-mode .fa-icon {
+  color: var(--light-300) !important;
+}
+
+body.theme-opportuni.light-mode a:not(.btn) {
+  color: var(--accent-2) !important;
+}
+
+body.theme-opportuni.light-mode a:not(.btn):hover {
+  color: var(--accent-1) !important;
+}

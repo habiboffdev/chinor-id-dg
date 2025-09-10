@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light/Dark Mode Demo — Opportuni</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Brand Theme -->
+    <link rel="stylesheet" href="assets/css/tokens.base.css?v=1" />
+    <link rel="stylesheet" href="assets/css/tokens.dark.css?v=1" />
+    <link rel="stylesheet" href="assets/css/tokens.light.css?v=1" />
+    <link rel="stylesheet" href="assets/css/theme.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+
+    <style>
+        .demo-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .color-swatch {
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-default);
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        
+        .theme-toggle-demo {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="theme-opportuni">
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle theme-toggle-demo" aria-label="Toggle theme">
+        <i class="fas fa-sun icon-sun"></i>
+        <i class="fas fa-moon icon-moon"></i>
+    </button>
+
+    <!-- Header -->
+    <header class="brand-nav">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <h1 class="brand-wordmark" style="margin: 0; font-size: 1.5rem;">Opportuni</h1>
+            <nav style="display: flex; gap: 2rem;">
+                <a href="#" style="color: var(--text-secondary); text-decoration: none;">Home</a>
+                <a href="#" style="color: var(--text-secondary); text-decoration: none;">About</a>
+                <a href="#" style="color: var(--text-secondary); text-decoration: none;">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+        <div class="demo-section bg-surface-1" style="border: 1px solid var(--border-default);">
+            <h1 style="font-family: var(--font-display); color: var(--text-primary); margin-bottom: 0.5rem;">
+                Light/Dark Mode Demo
+            </h1>
+            <p class="text-secondary" style="margin-bottom: 1.5rem;">
+                This page demonstrates Opportuni's light and dark mode color system. 
+                Click the toggle button in the top-right corner to switch themes.
+            </p>
+            
+            <!-- Color Swatches -->
+            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">Color System</h2>
+            <div class="demo-grid">
+                <div class="color-swatch bg-app">
+                    <strong>App Background</strong><br>
+                    <code>var(--bg-app)</code>
+                </div>
+                <div class="color-swatch bg-surface-1">
+                    <strong>Surface 1</strong><br>
+                    <code>var(--bg-surface-1)</code>
+                </div>
+                <div class="color-swatch bg-surface-2">
+                    <strong>Surface 2</strong><br>
+                    <code>var(--bg-surface-2)</code>
+                </div>
+                <div class="color-swatch bg-surface-3">
+                    <strong>Surface 3</strong><br>
+                    <code>var(--bg-surface-3)</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typography Demo -->
+        <div class="demo-section bg-surface-1" style="border: 1px solid var(--border-default);">
+            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">Typography</h2>
+            <h1 class="text-primary" style="font-family: var(--font-display); margin-bottom: 0.5rem;">
+                Display Heading (Space Grotesk)
+            </h1>
+            <h2 class="text-primary" style="margin-bottom: 0.5rem;">
+                Regular Heading (Inter)
+            </h2>
+            <p class="text-primary" style="margin-bottom: 0.5rem;">
+                Primary text color - highly legible body text for main content.
+            </p>
+            <p class="text-secondary" style="margin-bottom: 0.5rem;">
+                Secondary text color - used for supporting information and metadata.
+            </p>
+            <p class="text-muted">
+                Muted text color - used for less important text and subtle labels.
+            </p>
+        </div>
+
+        <!-- Accent Colors -->
+        <div class="demo-section bg-surface-1" style="border: 1px solid var(--border-default);">
+            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">Accent Colors</h2>
+            <div class="demo-grid">
+                <div style="background: var(--accent-1); color: var(--text-inverse); padding: 1rem; border-radius: var(--radius-md); text-align: center;">
+                    <strong>Neon Lime</strong><br>
+                    <code>var(--accent-1)</code>
+                </div>
+                <div style="background: var(--accent-2); color: white; padding: 1rem; border-radius: var(--radius-md); text-align: center;">
+                    <strong>Electric Violet</strong><br>
+                    <code>var(--accent-2)</code>
+                </div>
+                <div style="background: var(--accent-3); color: white; padding: 1rem; border-radius: var(--radius-md); text-align: center;">
+                    <strong>Cyber Cyan</strong><br>
+                    <code>var(--accent-3)</code>
+                </div>
+                <div style="background: var(--promo); color: white; padding: 1rem; border-radius: var(--radius-md); text-align: center;">
+                    <strong>Pulse Coral</strong><br>
+                    <code>var(--promo)</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Elements -->
+        <div class="demo-section bg-surface-1" style="border: 1px solid var(--border-default);">
+            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">Interactive Elements</h2>
+            
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <button class="btn-primary">Primary Button</button>
+                <button style="background: var(--bg-surface-2); color: var(--text-primary); border: 1px solid var(--border-default); padding: 0.75rem 1rem; border-radius: var(--radius-md); cursor: pointer;">
+                    Secondary Button
+                </button>
+                <button class="theme-toggle">
+                    <i class="fas fa-sun icon-sun"></i>
+                    <i class="fas fa-moon icon-moon"></i>
+                    Theme Toggle
+                </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <input type="text" placeholder="Text input" style="padding: 0.75rem;">
+                <select style="padding: 0.75rem;">
+                    <option>Select option</option>
+                    <option>Option 1</option>
+                    <option>Option 2</option>
+                </select>
+                <textarea placeholder="Textarea" rows="3" style="padding: 0.75rem; resize: vertical;"></textarea>
+            </div>
+        </div>
+
+        <!-- Cards -->
+        <div class="demo-section bg-surface-1" style="border: 1px solid var(--border-default);">
+            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">Cards & Surfaces</h2>
+            <div class="demo-grid">
+                <div class="card" style="padding: 1.5rem;">
+                    <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">Card Title</h3>
+                    <p class="text-secondary" style="margin-bottom: 1rem;">
+                        This is a sample card with brand-compliant styling and proper contrast ratios.
+                    </p>
+                    <button class="btn-primary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                        Card Action
+                    </button>
+                </div>
+                
+                <div style="background: var(--bg-surface-3); border: 1px solid var(--border-default); padding: 1.5rem; border-radius: var(--radius-md);">
+                    <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">Elevated Surface</h3>
+                    <p class="text-secondary">
+                        Higher elevation surface with different background color for visual hierarchy.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- State Colors -->
+        <div class="demo-section bg-surface-1" style="border: 1px solid var(--border-default);">
+            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">State Colors</h2>
+            <div class="demo-grid">
+                <div style="background: var(--success); color: white; padding: 1rem; border-radius: var(--radius-md); text-align: center;">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Success</strong>
+                </div>
+                <div style="background: var(--warning); color: white; padding: 1rem; border-radius: var(--radius-md); text-align: center;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Warning</strong>
+                </div>
+                <div style="background: var(--danger); color: white; padding: 1rem; border-radius: var(--radius-md); text-align: center;">
+                    <i class="fas fa-times-circle"></i>
+                    <strong>Danger</strong>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: var(--bg-surface-1); border-top: 1px solid var(--border-default); margin-top: 3rem; padding: 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+            <p class="text-muted">
+                © 2025 Opportuni. This demo showcases our light and dark mode implementation.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/theme.js"></script>
+    <script>
+        // Add some interactive demo functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Listen for theme changes
+            window.addEventListener('themeChanged', function(e) {
+                console.log('Theme changed to:', e.detail.theme);
+                
+                // You could add additional logic here for theme-specific behavior
+                if (e.detail.isDark) {
+                    console.log('Switched to dark mode');
+                } else {
+                    console.log('Switched to light mode');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

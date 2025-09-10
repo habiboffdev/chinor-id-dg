@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Test - Opportuni</title>
+    
+    <!-- Brand Theme -->
+    <link rel="stylesheet" href="assets/css/tokens.base.css?v=1">
+    <link rel="stylesheet" href="assets/css/tokens.dark.css?v=1">
+    <link rel="stylesheet" href="assets/css/tokens.light.css?v=1">
+    <link rel="stylesheet" href="assets/css/theme.css">
+    
+    <style>
+        .test-card {
+            padding: 20px;
+            margin: 20px;
+            border-radius: 12px;
+            background: var(--bg-surface-2);
+            border: 1px solid var(--border-default);
+            color: var(--text-primary);
+        }
+        
+        .theme-toggle {
+            padding: 12px 20px;
+            background: var(--accent-1);
+            color: var(--text-inverse);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px;
+        }
+        
+        .debug-info {
+            margin: 20px;
+            padding: 15px;
+            background: var(--bg-surface-1);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body class="theme-opportuni">
+    <div style="padding: 20px;">
+        <h1>Theme Test Page</h1>
+        
+        <div class="test-card">
+            <h2>Test Card</h2>
+            <p>This card should change appearance when you toggle the theme.</p>
+            <p class="text-muted">This is muted text.</p>
+        </div>
+        
+        <button class="theme-toggle">
+            <i class="fas fa-sun" data-theme-icon="light"></i>
+            <i class="fas fa-moon" data-theme-icon="dark" style="display: none;"></i>
+            Toggle Theme
+        </button>
+        
+        <button onclick="testTheme()">Manual Theme Test</button>
+        
+        <div class="debug-info">
+            <div>Body Classes: <span id="body-classes"></span></div>
+            <div>Current Theme: <span id="current-theme"></span></div>
+            <div>Stored Theme: <span id="stored-theme"></span></div>
+        </div>
+    </div>
+
+    <script src="assets/js/theme.js"></script>
+    <script>
+        function updateDebugInfo() {
+            document.getElementById('body-classes').textContent = document.body.className;
+            document.getElementById('current-theme').textContent = window.themeManager ? window.themeManager.getCurrentTheme() : 'No theme manager';
+            document.getElementById('stored-theme').textContent = localStorage.getItem('opportuni-theme') || 'none';
+        }
+        
+        function testTheme() {
+            console.log('Manual theme test');
+            if (window.themeManager) {
+                window.themeManager.toggleTheme();
+            } else {
+                console.error('ThemeManager not available');
+            }
+            updateDebugInfo();
+        }
+        
+        // Update debug info every second
+        setInterval(updateDebugInfo, 1000);
+        updateDebugInfo();
+        
+        // Listen for theme changes
+        window.addEventListener('themeChanged', (e) => {
+            console.log('Theme changed event:', e.detail);
+            updateDebugInfo();
+        });
+    </script>
+</body>
+</html>
