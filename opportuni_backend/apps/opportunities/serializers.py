@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Opportunity, OpportunityRequirement, OpportunityCategory, OpportunityQuestion
+from .models import Opportunity, OpportunityRequirement, OpportunityCategory, OpportunityQuestion, OpportunityProfileRequirement
 from apps.students.models import Skill
 from apps.organizations.serializers import OrganizationSerializer
 from apps.students.serializers import SkillSerializer
@@ -21,11 +21,22 @@ class OpportunityQuestionSerializer(serializers.ModelSerializer):
         ]
 
 
+class OpportunityProfileRequirementSerializer(serializers.ModelSerializer):
+    section_display = serializers.CharField(source='get_section_display', read_only=True)
+    requirement_level_display = serializers.CharField(source='get_requirement_level_display', read_only=True)
+    
+    class Meta:
+        model = OpportunityProfileRequirement
+        fields = ['id', 'section', 'section_display', 'requirement_level', 'requirement_level_display', 
+                 'custom_message', 'minimum_items']
+
+
 class OpportunitySerializer(serializers.ModelSerializer):
     organization = OrganizationSerializer(read_only=True)
     required_skills = SkillSerializer(many=True, read_only=True)
     requirements = OpportunityRequirementSerializer(many=True, read_only=True)
     additional_questions = OpportunityQuestionSerializer(many=True, read_only=True)
+    profile_requirements = OpportunityProfileRequirementSerializer(many=True, read_only=True)
     application_count = serializers.ReadOnlyField()
     can_apply = serializers.ReadOnlyField()
     is_deadline_passed = serializers.ReadOnlyField()
@@ -35,12 +46,12 @@ class OpportunitySerializer(serializers.ModelSerializer):
         model = Opportunity
         fields = [
             'id', 'organization', 'title', 'description', 'opportunity_type',
-            'status', 'application_deadline', 'start_date', 'end_date',
+            'status', 'application_deadline', 'start_date', 'end_date', 'result_announcement_date',
             'required_skills', 'min_gpa', 'required_major', 'graduation_year_min',
             'graduation_year_max', 'age_min', 'age_max', 'location', 'is_remote', 'compensation',
-            'benefits', 'cover_image', 'max_applications', 'featured', 'created_at',
-            'updated_at', 'requirements', 'additional_questions', 'application_count', 
-            'can_apply', 'is_deadline_passed', 'days_until_deadline'
+            'benefits', 'application_instructions', 'cover_image', 'max_applications', 'featured', 'created_at',
+            'updated_at', 'requirements', 'additional_questions', 'profile_requirements',
+            'application_count', 'can_apply', 'is_deadline_passed', 'days_until_deadline'
         ]
     
     def get_days_until_deadline(self, obj):
@@ -55,26 +66,72 @@ class OpportunityCreateUpdateSerializer(serializers.ModelSerializer):
     required_skills = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Skill.objects.all(),
-        required=False
+        required=False,
+        allow_empty=True
     )
     requirements = OpportunityRequirementSerializer(many=True, required=False)
     # Accept additional questions on create/update
     additional_questions = OpportunityQuestionSerializer(many=True, required=False)
+    profile_requirements = OpportunityProfileRequirementSerializer(many=True, required=False)
     
     class Meta:
         model = Opportunity
         fields = [
             'title', 'description', 'opportunity_type', 'status',
-            'application_deadline', 'start_date', 'end_date',
+            'application_deadline', 'start_date', 'end_date', 'result_announcement_date',
             'required_skills', 'min_gpa', 'required_major',
             'graduation_year_min', 'graduation_year_max', 'age_min', 'age_max', 'location',
-            'is_remote', 'compensation', 'benefits', 'cover_image', 'max_applications',
-            'featured', 'requirements', 'additional_questions'
+            'is_remote', 'compensation', 'benefits', 'application_instructions', 'cover_image', 'max_applications',
+            'featured', 'requirements', 'additional_questions', 'profile_requirements'
         ]
+    
+    def to_internal_value(self, data):
+        # Handle FormData JSON strings for complex fields
+        mutable_data = data.copy() if hasattr(data, 'copy') else dict(data)
+        
+        # Parse JSON strings for complex fields when using FormData
+        json_fields = ['requirements', 'additional_questions', 'profile_requirements']
+        for field in json_fields:
+            if field in mutable_data:
+                value = mutable_data[field]
+                if isinstance(value, str):
+                    try:
+                        import json
+                        mutable_data[field] = json.loads(value)
+                    except (json.JSONDecodeError, TypeError, ValueError):
+                        # If parsing fails, keep as is or set to empty list
+                        mutable_data[field] = []
+        
+        return super().to_internal_value(mutable_data)
+    
+    def validate_required_skills(self, value):
+        """Ensure required_skills contains only valid skill IDs"""
+        if not value:
+            return []
+        
+        # Filter out any non-integer values
+        valid_ids = []
+        for item in value:
+            try:
+                if hasattr(item, 'id'):
+                    valid_ids.append(item)
+                elif isinstance(item, int):
+                    skill = Skill.objects.filter(id=item).first()
+                    if skill:
+                        valid_ids.append(skill)
+                elif isinstance(item, str) and item.isdigit():
+                    skill = Skill.objects.filter(id=int(item)).first()
+                    if skill:
+                        valid_ids.append(skill)
+            except (ValueError, TypeError):
+                continue
+                
+        return valid_ids
     
     def create(self, validated_data):
         requirements_data = validated_data.pop('requirements', [])
         questions_data = validated_data.pop('additional_questions', [])
+        profile_requirements_data = validated_data.pop('profile_requirements', [])
 
         required_skills = validated_data.pop('required_skills', [])
         opportunity = Opportunity.objects.create(**validated_data)
@@ -88,12 +145,16 @@ class OpportunityCreateUpdateSerializer(serializers.ModelSerializer):
 
         for q in questions_data:
             OpportunityQuestion.objects.create(opportunity=opportunity, **q)
+        
+        for pr in profile_requirements_data:
+            OpportunityProfileRequirement.objects.create(opportunity=opportunity, **pr)
 
         return opportunity
     
     def update(self, instance, validated_data):
         requirements_data = validated_data.pop('requirements', [])
         questions_data = validated_data.pop('additional_questions', [])
+        profile_requirements_data = validated_data.pop('profile_requirements', [])
         skills = validated_data.pop('required_skills', None)
 
         # Update opportunity fields
@@ -116,6 +177,11 @@ class OpportunityCreateUpdateSerializer(serializers.ModelSerializer):
         instance.additional_questions.all().delete()
         for q in questions_data:
             OpportunityQuestion.objects.create(opportunity=instance, **q)
+        
+        # Replace profile requirements
+        instance.profile_requirements.all().delete()
+        for pr in profile_requirements_data:
+            OpportunityProfileRequirement.objects.create(opportunity=instance, **pr)
 
         return instance
 

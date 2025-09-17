@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline Demo - Opportuni</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Demo styles -->
+    <style>
+        :root {
+          --ink-1000: #070A0F;
+          --ink-900:  #0B0F14;
+          --ink-800:  #0F1621;
+          --ink-700:  #131B27;
+          --slate-600:#1A2433;
+          --slate-400:#2A3443;
+          --mist-300: #8FA2B8;
+          --mist-200: #B6C3D3;
+          --white-0:  #FFFFFF;
+
+          /* Accents */
+          --accent-1: #C8FF00; /* Neon Lime */
+          --accent-2: #6C63FF; /* Electric Violet */
+          --accent-3: #00E5FF; /* Cyber Cyan */
+          --promo:    #FF5C7C; /* Pulse Coral */
+
+          /* States */
+          --success: #1DD1A1;
+          --warning: #FBC02D;
+          --danger:  #FF4D4F;
+
+          /* Typography */
+          --font-display: 'Space Grotesk', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+          --font-text:    'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+          /* Radius & Shadow */
+          --radius: 10px;
+          --radius-pill: 999px;
+          --shadow-focus: 0 0 0 3px rgba(108, 99, 255, 0.35);
+        }
+
+        body {
+            background: var(--ink-900);
+            color: var(--mist-200);
+            font-family: var(--font-text);
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .demo-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--white-0);
+            margin-bottom: 1rem;
+        }
+
+        .demo-subtitle {
+            color: var(--mist-300);
+            font-size: 1.1rem;
+        }
+
+        /* Timeline styles (copied from opportunity-detail.css) */
+        .timeline-section {
+            background: var(--ink-800);
+            border: 1px solid var(--slate-400);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--white-0);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--slate-400);
+            padding-bottom: 0.5rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 1rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--slate-600);
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .timeline-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            z-index: 2;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-item.left {
+            justify-content: flex-end;
+            text-align: right;
+        }
+
+        .timeline-item.right {
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        .timeline-content {
+            background: var(--ink-700);
+            border: 1px solid var(--slate-400);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            max-width: 280px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            background: var(--slate-600);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-content.current {
+            background: var(--accent-2);
+            color: var(--ink-900);
+            border-color: var(--accent-2);
+        }
+
+        .timeline-content.current .timeline-title,
+        .timeline-content.current .timeline-subtitle {
+            color: var(--ink-900);
+        }
+
+        .timeline-content.past {
+            background: var(--slate-600);
+            border-color: var(--mist-300);
+        }
+
+        .timeline-content.future {
+            background: var(--ink-700);
+            border-color: var(--slate-400);
+        }
+
+        .timeline-content.overdue {
+            background: rgba(255, 77, 79, 0.1);
+            border-color: var(--danger);
+        }
+
+        .timeline-point {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--slate-600);
+            border: 3px solid var(--ink-800);
+            z-index: 3;
+        }
+
+        .timeline-item.current .timeline-point {
+            background: var(--accent-2);
+            width: 20px;
+            height: 20px;
+            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.2);
+        }
+
+        .timeline-item.past .timeline-point {
+            background: var(--success);
+        }
+
+        .timeline-item.future .timeline-point {
+            background: var(--mist-300);
+        }
+
+        .timeline-item.overdue .timeline-point {
+            background: var(--danger);
+            animation: pulse-danger 2s infinite;
+        }
+
+        @keyframes pulse-danger {
+            0% { box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(255, 77, 79, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 77, 79, 0); }
+        }
+
+        .timeline-title {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--white-0);
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-date {
+            font-size: 0.85rem;
+            color: var(--mist-300);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-subtitle {
+            font-size: 0.8rem;
+            color: var(--mist-300);
+            opacity: 0.8;
+        }
+
+        .timeline-icon {
+            display: inline-block;
+            margin-right: 0.5rem;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Arrow indicators */
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+        }
+
+        .timeline-item.left .timeline-content::before {
+            right: -16px;
+            border-left-color: var(--slate-400);
+        }
+
+        .timeline-item.right .timeline-content::before {
+            left: -16px;
+            border-right-color: var(--slate-400);
+        }
+
+        .timeline-item.current.left .timeline-content::before {
+            border-left-color: var(--accent-2);
+        }
+
+        .timeline-item.current.right .timeline-content::before {
+            border-right-color: var(--accent-2);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+            
+            .timeline-item {
+                justify-content: flex-start !important;
+                text-align: left !important;
+                padding-left: 3rem;
+            }
+            
+            .timeline-point {
+                left: 20px !important;
+            }
+            
+            .timeline-content {
+                max-width: none;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            
+            .timeline-content::before {
+                display: none;
+            }
+            
+            .timeline-item.left .timeline-content::after,
+            .timeline-item.right .timeline-content::after {
+                content: '';
+                position: absolute;
+                left: -8px;
+                top: 20px;
+                width: 0;
+                height: 0;
+                border: 8px solid transparent;
+                border-right-color: var(--slate-400);
+            }
+            
+            .timeline-item.current .timeline-content::after {
+                border-right-color: var(--accent-2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="demo-header">
+            <h1 class="demo-title">Timeline Component Demo</h1>
+            <p class="demo-subtitle">Professional timeline showing opportunity important dates</p>
+        </div>
+
+        <!-- Demo Timeline 1: Normal Scholarship Timeline -->
+        <div class="timeline-section">
+            <h2 class="section-title">
+                <i class="fas fa-calendar-alt" style="margin-right: 0.5rem;"></i>
+                Scholarship Timeline - Normal Flow
+            </h2>
+            <div class="timeline">
+                <div class="timeline-item left overdue">
+                    <div class="timeline-content overdue">
+                        <div class="timeline-title">
+                            <i class="fas fa-clock timeline-icon"></i>
+                            Application Deadline
+                        </div>
+                        <div class="timeline-date">August 15, 2025</div>
+                        <div class="timeline-subtitle">Last day to submit applications</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+                
+                <div class="timeline-item right current">
+                    <div class="timeline-content current">
+                        <div class="timeline-title">
+                            <i class="fas fa-bullhorn timeline-icon"></i>
+                            Results Announced
+                        </div>
+                        <div class="timeline-date">September 15, 2025</div>
+                        <div class="timeline-subtitle">Application results will be released</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+
+                <div class="timeline-item left future">
+                    <div class="timeline-content future">
+                        <div class="timeline-title">
+                            <i class="fas fa-play timeline-icon"></i>
+                            Program Starts
+                        </div>
+                        <div class="timeline-date">October 1, 2025</div>
+                        <div class="timeline-subtitle">Opportunity/program begins</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+
+                <div class="timeline-item right future">
+                    <div class="timeline-content future">
+                        <div class="timeline-title">
+                            <i class="fas fa-flag-checkered timeline-icon"></i>
+                            Program Ends
+                        </div>
+                        <div class="timeline-date">December 15, 2025</div>
+                        <div class="timeline-subtitle">Opportunity/program concludes</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Timeline 2: Conference Timeline -->
+        <div class="timeline-section">
+            <h2 class="section-title">
+                <i class="fas fa-calendar-alt" style="margin-right: 0.5rem;"></i>
+                Conference Timeline - Active Applications
+            </h2>
+            <div class="timeline">
+                <div class="timeline-item left current">
+                    <div class="timeline-content current">
+                        <div class="timeline-title">
+                            <i class="fas fa-clock timeline-icon"></i>
+                            Application Deadline
+                        </div>
+                        <div class="timeline-date">September 20, 2025</div>
+                        <div class="timeline-subtitle">Last day to submit applications</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+                
+                <div class="timeline-item right future">
+                    <div class="timeline-content future">
+                        <div class="timeline-title">
+                            <i class="fas fa-bullhorn timeline-icon"></i>
+                            Results Announced
+                        </div>
+                        <div class="timeline-date">October 5, 2025</div>
+                        <div class="timeline-subtitle">Application results will be released</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+
+                <div class="timeline-item left future">
+                    <div class="timeline-content future">
+                        <div class="timeline-title">
+                            <i class="fas fa-play timeline-icon"></i>
+                            Conference Starts
+                        </div>
+                        <div class="timeline-date">November 15, 2025</div>
+                        <div class="timeline-subtitle">Conference begins</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+
+                <div class="timeline-item right future">
+                    <div class="timeline-content future">
+                        <div class="timeline-title">
+                            <i class="fas fa-flag-checkered timeline-icon"></i>
+                            Conference Ends
+                        </div>
+                        <div class="timeline-date">November 18, 2025</div>
+                        <div class="timeline-subtitle">Conference concludes</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Timeline 3: Internship Timeline -->
+        <div class="timeline-section">
+            <h2 class="section-title">
+                <i class="fas fa-calendar-alt" style="margin-right: 0.5rem;"></i>
+                Internship Timeline - Long Term Program
+            </h2>
+            <div class="timeline">
+                <div class="timeline-item left past">
+                    <div class="timeline-content past">
+                        <div class="timeline-title">
+                            <i class="fas fa-clock timeline-icon"></i>
+                            Application Deadline
+                        </div>
+                        <div class="timeline-date">July 30, 2025</div>
+                        <div class="timeline-subtitle">Last day to submit applications</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+                
+                <div class="timeline-item right past">
+                    <div class="timeline-content past">
+                        <div class="timeline-title">
+                            <i class="fas fa-bullhorn timeline-icon"></i>
+                            Results Announced
+                        </div>
+                        <div class="timeline-date">August 30, 2025</div>
+                        <div class="timeline-subtitle">Application results were released</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+
+                <div class="timeline-item left current">
+                    <div class="timeline-content current">
+                        <div class="timeline-title">
+                            <i class="fas fa-play timeline-icon"></i>
+                            Internship Starts
+                        </div>
+                        <div class="timeline-date">September 1, 2025</div>
+                        <div class="timeline-subtitle">Internship program begins</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+
+                <div class="timeline-item right future">
+                    <div class="timeline-content future">
+                        <div class="timeline-title">
+                            <i class="fas fa-flag-checkered timeline-icon"></i>
+                            Internship Ends
+                        </div>
+                        <div class="timeline-date">May 31, 2026</div>
+                        <div class="timeline-subtitle">Internship program concludes</div>
+                    </div>
+                    <div class="timeline-point"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -214,9 +214,28 @@ class WizardApp {
         </div>
       </div>
 
+      <div class="step-field">
+        <label for="step_result_announcement_date">Result Announcement Date</label>
+        <input type="datetime-local" id="step_result_announcement_date" class="step-input">
+        <div class="step-tip">
+          <i class="fas fa-megaphone"></i>
+          <span>When will you announce the selected candidates? This helps students plan accordingly.</span>
+        </div>
+      </div>
+
+      <div class="step-field">
+        <label for="step_benefits">Benefits & Perks</label>
+        <textarea id="step_benefits" class="step-input step-textarea" 
+                  placeholder="e.g. Health insurance, learning stipend, mentorship, networking opportunities, flexible hours..."></textarea>
+        <div class="step-tip">
+          <i class="fas fa-gift"></i>
+          <span>Highlight the additional benefits that make your opportunity attractive beyond compensation.</span>
+        </div>
+      </div>
+
       <div class="step-tip">
         <i class="fas fa-calendar-alt"></i>
-        <span>Start and end dates help students understand the time commitment involved.</span>
+        <span>Clear timelines help students understand the full process and commitment involved.</span>
       </div>
     `;
   }
@@ -324,6 +343,163 @@ class WizardApp {
         </div>
       </div>
 
+      <div class="step-divider">
+        <span>Profile Requirements</span>
+      </div>
+
+      <div class="step-field">
+        <label>Required Profile Sections</label>
+        <div class="step-tip">
+          <i class="fas fa-user-check"></i>
+          <span>Choose which profile sections students must complete before applying. This ensures you get quality applications with all necessary information.</span>
+        </div>
+        <div class="profile-requirements-grid">
+          <div class="profile-req-item">
+            <div class="profile-req-header">
+              <i class="fas fa-graduation-cap"></i>
+              <span>Education</span>
+            </div>
+            <div class="profile-req-controls">
+              <label class="radio-label">
+                <input type="radio" name="education_requirement" value="required">
+                <span class="radio-custom"></span>
+                Required
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="education_requirement" value="recommended">
+                <span class="radio-custom"></span>
+                Recommended
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="education_requirement" value="optional" checked>
+                <span class="radio-custom"></span>
+                Optional
+              </label>
+            </div>
+          </div>
+
+          <div class="profile-req-item">
+            <div class="profile-req-header">
+              <i class="fas fa-briefcase"></i>
+              <span>Work Experience</span>
+            </div>
+            <div class="profile-req-controls">
+              <label class="radio-label">
+                <input type="radio" name="experience_requirement" value="required">
+                <span class="radio-custom"></span>
+                Required
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="experience_requirement" value="recommended">
+                <span class="radio-custom"></span>
+                Recommended
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="experience_requirement" value="optional" checked>
+                <span class="radio-custom"></span>
+                Optional
+              </label>
+            </div>
+          </div>
+
+          <div class="profile-req-item">
+            <div class="profile-req-header">
+              <i class="fas fa-tools"></i>
+              <span>Skills</span>
+            </div>
+            <div class="profile-req-controls">
+              <label class="radio-label">
+                <input type="radio" name="skills_requirement" value="required">
+                <span class="radio-custom"></span>
+                Required
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="skills_requirement" value="recommended">
+                <span class="radio-custom"></span>
+                Recommended
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="skills_requirement" value="optional" checked>
+                <span class="radio-custom"></span>
+                Optional
+              </label>
+            </div>
+          </div>
+
+          <div class="profile-req-item">
+            <div class="profile-req-header">
+              <i class="fas fa-project-diagram"></i>
+              <span>Projects</span>
+            </div>
+            <div class="profile-req-controls">
+              <label class="radio-label">
+                <input type="radio" name="projects_requirement" value="required">
+                <span class="radio-custom"></span>
+                Required
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="projects_requirement" value="recommended">
+                <span class="radio-custom"></span>
+                Recommended
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="projects_requirement" value="optional" checked>
+                <span class="radio-custom"></span>
+                Optional
+              </label>
+            </div>
+          </div>
+
+          <div class="profile-req-item">
+            <div class="profile-req-header">
+              <i class="fas fa-file-alt"></i>
+              <span>Resume</span>
+            </div>
+            <div class="profile-req-controls">
+              <label class="radio-label">
+                <input type="radio" name="resume_requirement" value="required">
+                <span class="radio-custom"></span>
+                Required
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="resume_requirement" value="recommended">
+                <span class="radio-custom"></span>
+                Recommended
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="resume_requirement" value="optional" checked>
+                <span class="radio-custom"></span>
+                Optional
+              </label>
+            </div>
+          </div>
+
+          <div class="profile-req-item">
+            <div class="profile-req-header">
+              <i class="fas fa-user"></i>
+              <span>Personal Info</span>
+            </div>
+            <div class="profile-req-controls">
+              <label class="radio-label">
+                <input type="radio" name="personal_info_requirement" value="required" checked>
+                <span class="radio-custom"></span>
+                Required
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="personal_info_requirement" value="recommended">
+                <span class="radio-custom"></span>
+                Recommended
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="personal_info_requirement" value="optional">
+                <span class="radio-custom"></span>
+                Optional
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="builder-section">
         <div class="builder-header">
           <span class="builder-title">Additional Requirements</span>
@@ -418,6 +594,8 @@ class WizardApp {
         this.data.application_deadline = document.getElementById('step_application_deadline')?.value || '';
         this.data.start_date = document.getElementById('step_start_date')?.value || '';
         this.data.end_date = document.getElementById('step_end_date')?.value || '';
+        this.data.result_announcement_date = document.getElementById('step_result_announcement_date')?.value || '';
+        this.data.benefits = document.getElementById('step_benefits')?.value || '';
         break;
       case 4:
         this.data.location_type = document.querySelector('.segment-btn.active')?.dataset.value || '';
@@ -436,6 +614,13 @@ class WizardApp {
         const coverImageFile = document.getElementById('step_cover_image')?.files[0];
         if (coverImageFile) {
           this.data.cover_image_file = coverImageFile;
+        }
+        // Collect profile requirements
+        try {
+          this.data.profile_requirements = this.collectProfileRequirements();
+        } catch (error) {
+          console.warn('Error collecting profile requirements:', error);
+          this.data.profile_requirements = [];
         }
         break;
       case 6:
@@ -463,6 +648,8 @@ class WizardApp {
           if (this.data.application_deadline) document.getElementById('step_application_deadline').value = this.data.application_deadline;
           if (this.data.start_date) document.getElementById('step_start_date').value = this.data.start_date;
           if (this.data.end_date) document.getElementById('step_end_date').value = this.data.end_date;
+          if (this.data.result_announcement_date) document.getElementById('step_result_announcement_date').value = this.data.result_announcement_date;
+          if (this.data.benefits) document.getElementById('step_benefits').value = this.data.benefits;
           break;
         case 4:
           this.setupSegmentButtons();
@@ -478,6 +665,7 @@ class WizardApp {
           if (this.data.max_year) document.getElementById('step_max_year').value = this.data.max_year;
           if (this.data.age_min) document.getElementById('step_age_min').value = this.data.age_min;
           if (this.data.age_max) document.getElementById('step_age_max').value = this.data.age_max;
+          this.populateProfileRequirements();
           this.renderRequirements();
           break;
         case 6:
@@ -1060,6 +1248,8 @@ class WizardApp {
         application_deadline: this.data.application_deadline,
         start_date: this.data.start_date ? this.data.start_date.split('T')[0] : new Date().toISOString().split('T')[0], // default to today if empty
         end_date: this.data.end_date ? this.data.end_date.split('T')[0] : null,
+        result_announcement_date: this.data.result_announcement_date ? this.data.result_announcement_date.split('T')[0] : null,
+        benefits: this.data.benefits || '',
         
         // Location and compensation (step 4)
         location: this.data.location || '',
@@ -1087,8 +1277,10 @@ class WizardApp {
           placeholder: q.placeholder || '',
           order: index
         })),
-        // Use processed skill IDs
-        required_skills: skillIds
+        // Use processed skill IDs - only include if we have valid IDs
+        required_skills: skillIds.length > 0 ? skillIds : [],
+        // Profile requirements from step 5
+        profile_requirements: this.data.profile_requirements || []
       };
 
       console.log('Submitting opportunity with payload:', payload);
@@ -1190,6 +1382,36 @@ class WizardApp {
     };
     
     return yearMap[yearString] || null;
+  }
+
+  // Add these new methods
+  collectProfileRequirements() {
+    const requirements = [];
+    const sections = ['education', 'experience', 'skills', 'projects', 'resume', 'personal_info'];
+    
+    sections.forEach(section => {
+      const checkedRadio = document.querySelector(`input[name="${section}_requirement"]:checked`);
+      if (checkedRadio && checkedRadio.value !== 'optional') {
+        requirements.push({
+          section: section,
+          requirement_level: checkedRadio.value
+        });
+      }
+    });
+    
+    console.log('Collected profile requirements:', requirements);
+    return requirements;
+  }
+
+  populateProfileRequirements() {
+    if (this.data.profile_requirements) {
+      this.data.profile_requirements.forEach(req => {
+        const radio = document.querySelector(`input[name="${req.section}_requirement"][value="${req.requirement_level}"]`);
+        if (radio) {
+          radio.checked = true;
+        }
+      });
+    }
   }
 
   capitalizeFirst(str) {

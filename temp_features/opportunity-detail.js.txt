@@ -1,3 +1,9 @@
+import './utils.js';
+import './api.js';
+import './auth.js';
+import './components.js';
+import './navbar.js';
+
 // assets/js/opportunity-detail.js
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -246,16 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </section>
         `;
-    };
-
-    const formatStatusName = (status) => {
-        const statusMap = {
-            'pending': 'Under Review',
-            'accepted': 'Accepted',
-            'rejected': 'Not Selected',
-            'withdrawn': 'Withdrawn'
-        };
-        return statusMap[status] || status;
     };
 
     const renderQuestion = (q) => {

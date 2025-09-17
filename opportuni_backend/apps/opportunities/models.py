@@ -32,6 +32,7 @@ class Opportunity(models.Model):
     application_deadline = models.DateTimeField()
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
+    result_announcement_date = models.DateField(null=True, blank=True, help_text="Date when application results will be announced")
     
     # Requirements
     required_skills = models.ManyToManyField(Skill, blank=True)
@@ -45,7 +46,8 @@ class Opportunity(models.Model):
     location = models.CharField(max_length=200)
     is_remote = models.BooleanField(default=False)
     compensation = models.CharField(max_length=100, blank=True)
-    benefits = models.TextField(blank=True)
+    benefits = models.TextField(blank=True, help_text="Additional benefits and perks offered")
+    application_instructions = models.TextField(blank=True, help_text="Guidelines and instructions for applicants")
     cover_image = models.ImageField(upload_to='opportunity_covers/', blank=True, null=True)
     
     # Meta
@@ -141,3 +143,44 @@ class OpportunityQuestion(models.Model):
     
     def __str__(self):
         return f"{self.opportunity.title} - {self.question[:50]}"
+
+
+class OpportunityProfileRequirement(models.Model):
+    """Defines which profile sections are required for an opportunity"""
+    PROFILE_SECTIONS = (
+        ('basic_info', 'Basic Information'),
+        ('education', 'Education'),
+        ('experience', 'Experience'),
+        ('skills', 'Skills'),
+        ('projects', 'Projects'),
+        ('languages', 'Languages'),
+        ('certifications', 'Certifications'),
+        ('awards', 'Awards'),
+        ('extracurricular', 'Extracurricular Activities'),
+        ('personal_statement', 'Personal Statement'),
+        ('portfolio', 'Portfolio'),
+        ('resume', 'Resume'),
+        ('linkedin', 'LinkedIn Profile'),
+        ('github', 'GitHub Profile'),
+        ('website', 'Personal Website'),
+    )
+    
+    REQUIREMENT_LEVELS = (
+        ('required', 'Required'),
+        ('recommended', 'Recommended'),
+        ('optional', 'Optional'),
+    )
+    
+    opportunity = models.ForeignKey('Opportunity', on_delete=models.CASCADE, related_name='profile_requirements')
+    section = models.CharField(max_length=50, choices=PROFILE_SECTIONS)
+    requirement_level = models.CharField(max_length=20, choices=REQUIREMENT_LEVELS, default='required')
+    custom_message = models.TextField(blank=True, help_text="Custom message to show when this requirement is not met")
+    minimum_items = models.PositiveIntegerField(default=1, help_text="Minimum number of items required in this section")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('opportunity', 'section')
+        ordering = ['requirement_level', 'section']
+    
+    def __str__(self):
+        return f"{self.opportunity.title} - {self.get_section_display()} ({self.get_requirement_level_display()})"

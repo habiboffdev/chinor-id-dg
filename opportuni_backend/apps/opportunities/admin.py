@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Opportunity, OpportunityRequirement, OpportunityCategory, OpportunityQuestion
+from .models import Opportunity, OpportunityRequirement, OpportunityCategory, OpportunityQuestion, OpportunityProfileRequirement
 
 
 class OpportunityRequirementInline(admin.TabularInline):
@@ -14,23 +14,30 @@ class OpportunityQuestionInline(admin.TabularInline):
     ordering = ('order',)
 
 
+class OpportunityProfileRequirementInline(admin.TabularInline):
+    model = OpportunityProfileRequirement
+    extra = 1
+    fields = ('section', 'requirement_level', 'custom_message', 'minimum_items')
+    ordering = ('requirement_level', 'section')
+
+
 @admin.register(Opportunity)
 class OpportunityAdmin(admin.ModelAdmin):
     list_display = ('title', 'organization', 'opportunity_type', 'status', 'application_deadline', 'featured', 'created_at')
     list_filter = ('opportunity_type', 'status', 'is_remote', 'featured', 'created_at', 'organization__organization_type')
     search_fields = ('title', 'description', 'organization__name', 'location')
     ordering = ('-created_at',)
-    inlines = [OpportunityQuestionInline, OpportunityRequirementInline]
+    inlines = [OpportunityQuestionInline, OpportunityRequirementInline, OpportunityProfileRequirementInline]
     
     fieldsets = (
         ('Basic Information', {
             'fields': ('organization', 'title', 'description', 'opportunity_type', 'status', 'cover_image')
         }),
         ('Dates', {
-            'fields': ('application_deadline', 'start_date', 'end_date')
+            'fields': ('application_deadline', 'start_date', 'end_date', 'result_announcement_date', 'application_instructions')
         }),
         ('Requirements', {
-            'fields': ('required_skills', 'min_gpa', 'required_major', 'graduation_year_min', 'graduation_year_max')
+            'fields': ('required_skills', 'min_gpa', 'required_major', 'graduation_year_min', 'graduation_year_max', 'age_min', 'age_max')
         }),
         ('Location & Details', {
             'fields': ('location', 'is_remote', 'compensation', 'benefits')
@@ -69,3 +76,11 @@ class OpportunityQuestionAdmin(admin.ModelAdmin):
     def question_preview(self, obj):
         return obj.question[:50] + '...' if len(obj.question) > 50 else obj.question
     question_preview.short_description = 'Question'
+
+
+@admin.register(OpportunityProfileRequirement)
+class OpportunityProfileRequirementAdmin(admin.ModelAdmin):
+    list_display = ('opportunity', 'section', 'requirement_level', 'minimum_items')
+    list_filter = ('requirement_level', 'section', 'opportunity__opportunity_type')
+    search_fields = ('opportunity__title', 'section')
+    ordering = ('opportunity', 'requirement_level', 'section')

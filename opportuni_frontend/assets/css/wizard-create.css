@@ -870,3 +870,135 @@
 .error-actions .btn {
   min-width: 120px;
 }
+
+/* Profile Requirements Styles */
+.step-divider {
+  display: flex;
+  align-items: center;
+  margin: 32px 0 24px;
+  color: var(--mist-200);
+  font-weight: 500;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.step-divider::before,
+.step-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--slate-400);
+}
+
+.step-divider::before {
+  margin-right: 16px;
+}
+
+.step-divider::after {
+  margin-left: 16px;
+}
+
+.profile-requirements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.profile-req-item {
+  background: var(--ink-700);
+  border: 1px solid var(--slate-400);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+.profile-req-item:hover {
+  border-color: var(--accent-1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.profile-req-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: var(--white-0);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.profile-req-header i {
+  color: var(--accent-1);
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.profile-req-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--mist-200);
+  font-size: 14px;
+  padding: 6px 0;
+  transition: color 0.2s ease;
+}
+
+.radio-label:hover {
+  color: var(--white-0);
+}
+
+.radio-label input[type="radio"] {
+  display: none;
+}
+
+.radio-custom {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--slate-400);
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom {
+  border-color: var(--accent-1);
+  background: var(--accent-1);
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--white-0);
+}
+
+.radio-label:hover .radio-custom {
+  border-color: var(--accent-1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-requirements-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-req-item {
+    padding: 16px;
+  }
+}
