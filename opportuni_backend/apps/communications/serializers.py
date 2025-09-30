@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from .models import EmailTemplate, Message, BulkEmail, MessageThread
 
 
@@ -55,13 +56,43 @@ class MessageThreadSerializer(serializers.ModelSerializer):
             'last_message', 'unread_count'
         ]
     
+    @extend_schema_field(serializers.CharField)
+
+    
     def get_participants_names(self, obj):
         return [user.get_full_name() for user in obj.participants.all()]
+    
+    @extend_schema_field(serializers.DictField)
+
     
     def get_last_message(self, obj):
         last_message = obj.participants.first()  # This would need proper implementation
         return None  # Placeholder
     
+    @extend_schema_field(serializers.IntegerField)
+
+    
     def get_unread_count(self, obj):
         # This would need proper implementation based on user
         return 0
+
+
+# Action Response Serializers for OpenAPI Documentation  
+# MessageSerializer already exists and can be reused for mark_message_as_read response
+
+class BulkEmailRequestSerializer(serializers.Serializer):
+    """Serializer for bulk email request"""
+    template_id = serializers.IntegerField(required=False, help_text="Optional email template ID")
+    subject = serializers.CharField(help_text="Email subject")
+    body = serializers.CharField(help_text="Email body content")
+    recipient_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        help_text="List of recipient user IDs"
+    )
+
+
+class BulkEmailResponseSerializer(serializers.Serializer):
+    """Response serializer for bulk email"""
+    message = serializers.CharField(help_text="Success message")
+    sent_count = serializers.IntegerField(help_text="Number of emails sent")
+    bulk_email_id = serializers.IntegerField(help_text="Created bulk email record ID")

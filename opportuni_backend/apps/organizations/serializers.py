@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from django.contrib.auth import get_user_model
 from .models import Organization, OrganizationMember
 from apps.opportunities.models import Opportunity
@@ -23,6 +24,9 @@ class OrganizationSerializer(serializers.ModelSerializer):
             'updated_at', 'member_count', 'opportunity_count'
         ]
         read_only_fields = ('user', 'is_verified', 'created_at', 'updated_at')
+    
+    @extend_schema_field(serializers.IntegerField)
+
     
     def get_member_count(self, obj):
         return obj.members.count()
@@ -90,8 +94,14 @@ class OrganizationDashboardSerializer(serializers.ModelSerializer):
     def get_interviews_scheduled(self, obj):
         return Application.objects.filter(opportunity__organization=obj, status='interview_scheduled').count()
     
+    @extend_schema_field(serializers.IntegerField)
+
+    
     def get_member_count(self, obj):
         return obj.members.count()
+    
+    @extend_schema_field(serializers.ListField)
+
     
     def get_recent_applications(self, obj):
         qs = Application.objects.filter(opportunity__organization=obj).select_related(
@@ -112,3 +122,83 @@ class OrganizationDashboardSerializer(serializers.ModelSerializer):
                 'opportunity_title': app.opportunity.title if app.opportunity else '',
             })
         return out
+
+
+# File Upload Serializers for OpenAPI Documentation
+class LogoUploadSerializer(serializers.Serializer):
+    """Serializer for organization logo uploads"""
+    logo = serializers.ImageField(
+        help_text="Organization logo image file (JPEG, PNG, WebP). Max size: 5MB. Images will be resized appropriately."
+    )
+    
+    def validate_logo(self, value):
+        """Validate uploaded logo file"""
+        # File size validation (5MB)
+        if value.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError("File size too large. Maximum size is 5MB.")
+        
+        # File type validation
+        allowed_types = ['image/jpeg', 'image/png', 'image/webp']
+        if value.content_type not in allowed_types:
+            raise serializers.ValidationError("Invalid file type. Only JPEG, PNG, and WebP are allowed.")
+        
+        return value
+
+
+class LogoUploadResponseSerializer(serializers.Serializer):
+    """Response serializer for successful logo upload"""
+    id = serializers.IntegerField(help_text="Organization ID")
+    name = serializers.CharField(help_text="Organization name")
+    logo = serializers.URLField(help_text="URL of the uploaded logo")
+    description = serializers.CharField(help_text="Organization description")
+    website = serializers.URLField(required=False, help_text="Organization website")
+
+
+# Organization Management Serializers for OpenAPI Documentation
+class InviteMemberSerializer(serializers.Serializer):
+    """Serializer for inviting a member to organization"""
+    email = serializers.EmailField(help_text="Email address of the user to invite")
+    role = serializers.ChoiceField(
+        choices=[('admin', 'Admin'), ('editor', 'Editor'), ('viewer', 'Viewer')],
+        default='viewer',
+        help_text="Role to assign to the invited member"
+    )
+
+
+class InviteMemberResponseSerializer(serializers.Serializer):
+    """Response serializer for successful member invitation"""
+    message = serializers.CharField(help_text="Success message")
+    member = OrganizationMemberSerializer(help_text="Created member object")
+
+
+class InviteStudentsSerializer(serializers.Serializer):
+    """Serializer for inviting students to opportunities"""
+    student_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        help_text="List of student profile IDs to invite"
+    )
+    message = serializers.CharField(
+        required=False,
+        help_text="Optional message to include with the invitation"
+    )
+
+
+class InviteStudentsResponseSerializer(serializers.Serializer):
+    """Response serializer for student invitation"""
+    message = serializers.CharField(help_text="Success message")
+    invited_count = serializers.IntegerField(help_text="Number of students invited")
+
+
+class StudentStatsSerializer(serializers.Serializer):
+    """Serializer for student statistics"""
+    total_students = serializers.IntegerField(help_text="Total number of students")
+    active_students = serializers.IntegerField(help_text="Number of active students")
+    students_with_applications = serializers.IntegerField(help_text="Students who have applied")
+    top_universities = serializers.ListField(
+        child=serializers.DictField(),
+        help_text="Top universities with student counts"
+    )
+    top_majors = serializers.ListField(
+        child=serializers.DictField(),
+        help_text="Top majors with student counts"
+    )

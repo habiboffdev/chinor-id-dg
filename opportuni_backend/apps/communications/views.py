@@ -1,4 +1,5 @@
 from rest_framework import generics, status, permissions
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -7,7 +8,7 @@ from django.utils import timezone
 from .models import EmailTemplate, Message, BulkEmail, MessageThread
 from .serializers import (
     EmailTemplateSerializer, MessageSerializer, MessageCreateSerializer,
-    BulkEmailSerializer, MessageThreadSerializer
+    BulkEmailSerializer, MessageThreadSerializer, BulkEmailRequestSerializer, BulkEmailResponseSerializer
 )
 from apps.organizations.models import Organization
 
@@ -17,6 +18,10 @@ class EmailTemplateListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return EmailTemplate.objects.none()
+            
         if self.request.user.user_type == 'organization':
             try:
                 organization = Organization.objects.get(user=self.request.user)
@@ -35,6 +40,10 @@ class EmailTemplateDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return EmailTemplate.objects.none()
+            
         if self.request.user.user_type == 'organization':
             try:
                 organization = Organization.objects.get(user=self.request.user)
@@ -48,6 +57,10 @@ class MessageListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Message.objects.none()
+            
         user = self.request.user
         return Message.objects.filter(
             models.Q(sender=user) | models.Q(recipient=user)
@@ -67,12 +80,27 @@ class MessageDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Message.objects.none()
+            
         user = self.request.user
         return Message.objects.filter(
             models.Q(sender=user) | models.Q(recipient=user)
         )
 
 
+@extend_schema(
+    operation_id="communications_mark_message_as_read",
+    summary="Mark Message as Read",
+    description="Mark a specific message as read for the authenticated user",
+    responses={
+        200: MessageSerializer,
+        401: OpenApiResponse(description="Authentication required"),
+        404: OpenApiResponse(description="Message not found"),
+    },
+    tags=["communications"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def mark_message_as_read(request, pk):
@@ -99,6 +127,19 @@ def mark_message_as_read(request, pk):
         )
 
 
+@extend_schema(
+    operation_id="communications_send_bulk_email",
+    summary="Send Bulk Email",
+    description="Send bulk email to multiple recipients (organizations only)",
+    request=BulkEmailRequestSerializer,
+    responses={
+        201: BulkEmailResponseSerializer,
+        400: OpenApiResponse(description="Bad request - missing required fields"),
+        403: OpenApiResponse(description="Only organizations allowed"),
+        404: OpenApiResponse(description="Organization not found"),
+    },
+    tags=["communications"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def send_bulk_email(request):

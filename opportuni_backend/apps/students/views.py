@@ -1,4 +1,5 @@
 from rest_framework import generics, status, permissions
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -12,8 +13,12 @@ from .serializers import (
     StudentProfileSerializer, StudentProfileUpdateSerializer,
     EducationSerializer, ExperienceSerializer, SkillSerializer,
     StudentSkillSerializer, ProjectSerializer, AchievementSerializer,
-    LanguageSerializer, StudentDashboardSerializer, SocialLinkSerializer,
+    LanguageSerializer, SocialLinkSerializer, StudentDashboardSerializer,
     AcademicExamSerializer, AcademicExamSectionSerializer, StudentExamScoreSerializer,
+    ProfilePictureUploadSerializer, ProfilePictureResponseSerializer,
+    ResumeUploadSerializer, ResumeUploadResponseSerializer,
+    StudentApplicationStatsSerializer, PublicOpportuniCardSerializer,
+    SocialLinkUpsertSerializer, DefaultExamsSeedResponseSerializer,
 )
 
 User = get_user_model()
@@ -82,6 +87,13 @@ class EducationListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Education.objects.none()
+            
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -98,6 +110,13 @@ class EducationDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Education.objects.none()
+            
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -109,6 +128,9 @@ class ExperienceListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -125,6 +147,9 @@ class ExperienceDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -141,6 +166,9 @@ class StudentSkillListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -157,6 +185,9 @@ class StudentSkillDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -168,6 +199,9 @@ class ProjectListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -184,6 +218,9 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -195,6 +232,9 @@ class AchievementListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -211,6 +251,9 @@ class AchievementDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -222,6 +265,9 @@ class LanguageListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -238,6 +284,9 @@ class LanguageDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, created = StudentProfile.objects.get_or_create(
             user=self.request.user
         )
@@ -249,6 +298,9 @@ class SocialLinkListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, _ = StudentProfile.objects.get_or_create(user=self.request.user)
         return SocialLink.objects.filter(student=student_profile)
 
@@ -262,10 +314,25 @@ class SocialLinkDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         student_profile, _ = StudentProfile.objects.get_or_create(user=self.request.user)
         return SocialLink.objects.filter(student=student_profile)
 
 
+@extend_schema(
+    operation_id="students_upsert_social_link",
+    summary="Upsert Social Link",
+    description="Create or update a single social link by platform for the current student",
+    request=SocialLinkUpsertSerializer,
+    responses={
+        200: SocialLinkSerializer,
+        400: OpenApiResponse(description="Bad request - platform and url are required"),
+        401: OpenApiResponse(description="Authentication required"),
+    },
+    tags=["students"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def upsert_social_link(request):
@@ -297,6 +364,18 @@ def upsert_social_link(request):
         return Response({'detail': f'Failed to upsert social link: {e}'}, status=status.HTTP_400_BAD_REQUEST)
 
 # Resume Upload View
+@extend_schema(
+    operation_id="student_upload_resume",
+    summary="Upload Resume",
+    description="Upload a resume file for the authenticated student profile",
+    request=ResumeUploadSerializer,
+    responses={
+        200: ResumeUploadResponseSerializer,
+        400: OpenApiResponse(description="Bad request - invalid file type or size"),
+        401: OpenApiResponse(description="Authentication required"),
+    },
+    tags=["students"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def upload_resume(request):
@@ -331,6 +410,18 @@ def upload_resume(request):
         'resume_url': student_profile.resume.url if student_profile.resume else None
     }, status=status.HTTP_200_OK)
 
+@extend_schema(
+    operation_id="student_upload_profile_picture",
+    summary="Upload Profile Picture",
+    description="Upload a profile picture for the authenticated user",
+    request=ProfilePictureUploadSerializer,
+    responses={
+        200: ProfilePictureResponseSerializer,
+        400: OpenApiResponse(description="Bad request - invalid file type or size"),
+        401: OpenApiResponse(description="Authentication required"),
+    },
+    tags=["students"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def upload_profile_picture(request):
@@ -362,6 +453,17 @@ def upload_profile_picture(request):
         'avatar_url': request.user.avatar.url if request.user.avatar else None
     }, status=status.HTTP_200_OK)
 
+@extend_schema(
+    operation_id="students_get_application_stats",
+    summary="Get Student Application Statistics",
+    description="Get application statistics for the authenticated student",
+    responses={
+        200: StudentApplicationStatsSerializer,
+        401: OpenApiResponse(description="Authentication required"),
+        500: OpenApiResponse(description="Failed to get statistics"),
+    },
+    tags=["students"],
+)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def student_application_stats(request):
@@ -406,6 +508,9 @@ class AcademicExamSectionListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         exam_id = self.kwargs.get('exam_id')
         return AcademicExamSection.objects.filter(exam_id=exam_id)
 
@@ -415,6 +520,9 @@ class StudentExamScoreListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         profile, _ = get_or_create_student_profile(self.request.user)
         # exam and section are FK (select_related OK); sections is reverse M2O from exam, so prefetch
         return (
@@ -434,10 +542,24 @@ class StudentExamScoreDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return StudentSkill.objects.none()
         profile, _ = get_or_create_student_profile(self.request.user)
         return StudentExamScore.objects.filter(student=profile)
 
 
+@extend_schema(
+    operation_id="students_seed_default_exams",
+    summary="Seed Default Exams",
+    description="Seed a set of default exams with common sections (SAT, GRE, IELTS, TOEFL). Safe to call multiple times.",
+    responses={
+        200: DefaultExamsSeedResponseSerializer,
+        401: OpenApiResponse(description="Authentication required"),
+        500: OpenApiResponse(description="Failed to seed exams"),
+    },
+    tags=["students"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def seed_default_exams(request):
@@ -510,6 +632,16 @@ def seed_default_exams(request):
 
 
 # Public Opportuni Card (read-only, no auth)
+@extend_schema(
+    operation_id="students_get_public_opportuni_card",
+    summary="Get Public Student Card",
+    description="Get a public, shareable snapshot of a student's profile (respecting privacy)",
+    responses={
+        200: PublicOpportuniCardSerializer,
+        404: OpenApiResponse(description="Student profile not found"),
+    },
+    tags=["students"],
+)
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
 def public_opportuni_card(request, student_id):

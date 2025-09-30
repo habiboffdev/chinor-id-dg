@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from django.contrib.auth import get_user_model
 from .models import (
     StudentProfile, Education, Experience, Skill, StudentSkill,
@@ -266,6 +267,9 @@ class StudentDashboardSerializer(serializers.ModelSerializer):
             'rejected_applications', 'recent_applications', 'profile_completion'
         ]
     
+    @extend_schema_field(serializers.IntegerField)
+
+    
     def get_total_applications(self, obj):
         try:
             from apps.applications.models import Application
@@ -293,6 +297,9 @@ class StudentDashboardSerializer(serializers.ModelSerializer):
             return Application.objects.filter(student=obj, status='rejected').count()
         except:
             return 0
+    
+    @extend_schema_field(serializers.ListField)
+
     
     def get_recent_applications(self, obj):
         try:
@@ -331,3 +338,95 @@ class StudentDashboardSerializer(serializers.ModelSerializer):
             'completed_fields': completed_fields,
             'total_fields': total_fields
         }
+
+
+# File Upload Serializers for OpenAPI Documentation
+class ProfilePictureUploadSerializer(serializers.Serializer):
+    """Serializer for profile picture uploads"""
+    avatar = serializers.ImageField(
+        help_text="Profile picture image file (JPEG, PNG, WebP). Max size: 5MB. Images will be resized to 300x300px."
+    )
+    
+    def validate_avatar(self, value):
+        """Validate uploaded image file"""
+        from django.core.exceptions import ValidationError
+        
+        # File size validation (5MB)
+        if value.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError("File size too large. Maximum size is 5MB.")
+        
+        # File type validation
+        allowed_types = ['image/jpeg', 'image/png', 'image/webp']
+        if value.content_type not in allowed_types:
+            raise serializers.ValidationError("Invalid file type. Only JPEG, PNG, and WebP are allowed.")
+        
+        return value
+
+
+class ProfilePictureResponseSerializer(serializers.Serializer):
+    """Response serializer for successful profile picture upload"""
+    message = serializers.CharField(help_text="Success message")
+    avatar_url = serializers.URLField(help_text="URL of the uploaded profile picture")
+
+
+class ResumeUploadSerializer(serializers.Serializer):
+    """Serializer for resume uploads"""
+    resume = serializers.FileField(
+        help_text="Resume file (PDF only). Max size: 10MB."
+    )
+    
+    def validate_resume(self, value):
+        """Validate uploaded resume file"""
+        # File size validation (10MB)
+        if value.size > 10 * 1024 * 1024:
+            raise serializers.ValidationError("File size too large. Maximum size is 10MB.")
+        
+        # File type validation
+        if value.content_type != 'application/pdf':
+            raise serializers.ValidationError("Invalid file type. Only PDF files are allowed.")
+        
+        return value
+
+
+class ResumeUploadResponseSerializer(serializers.Serializer):
+    """Response serializer for successful resume upload"""
+    message = serializers.CharField(help_text="Success message")
+    resume_url = serializers.URLField(help_text="URL of the uploaded resume file")
+
+
+# Student Statistics and Utility Serializers for OpenAPI Documentation
+class StudentApplicationStatsSerializer(serializers.Serializer):
+    """Serializer for student application statistics"""
+    total = serializers.IntegerField(help_text="Total number of applications")
+    pending = serializers.IntegerField(help_text="Number of pending applications")
+    under_review = serializers.IntegerField(help_text="Number of applications under review")
+    interview_scheduled = serializers.IntegerField(help_text="Number of applications with interviews scheduled")
+    accepted = serializers.IntegerField(help_text="Number of accepted applications")
+    rejected = serializers.IntegerField(help_text="Number of rejected applications")
+    withdrawn = serializers.IntegerField(help_text="Number of withdrawn applications")
+
+
+class PublicOpportuniCardSerializer(serializers.Serializer):
+    """Serializer for public opportunity card data"""
+    student_name = serializers.CharField(help_text="Student's full name")
+    university = serializers.CharField(help_text="Student's university")
+    major = serializers.CharField(help_text="Student's major")
+    graduation_year = serializers.IntegerField(help_text="Expected graduation year")
+    avatar_url = serializers.URLField(required=False, help_text="Profile picture URL")
+    skills = serializers.ListField(
+        child=serializers.CharField(),
+        help_text="List of student skills"
+    )
+
+
+class SocialLinkUpsertSerializer(serializers.Serializer):
+    """Serializer for upserting social links"""
+    platform = serializers.CharField(help_text="Social media platform name")
+    url = serializers.URLField(help_text="Profile URL on the platform")
+    is_public = serializers.BooleanField(default=True, help_text="Whether the link is publicly visible")
+
+
+class DefaultExamsSeedResponseSerializer(serializers.Serializer):
+    """Response serializer for seeding default exams"""
+    message = serializers.CharField(help_text="Success message")
+    created_count = serializers.IntegerField(help_text="Number of exams created")

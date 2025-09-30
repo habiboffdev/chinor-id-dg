@@ -1,4 +1,5 @@
 from rest_framework import generics, status, permissions
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -14,7 +15,11 @@ from .serializers import (
     UserRegistrationSerializer, 
     UserSerializer, 
     ProfileSerializer, 
-    ChangePasswordSerializer
+    ChangePasswordSerializer,
+    LogoutResponseSerializer,
+    TelegramAuthSerializer,
+    TelegramAuthResponseSerializer,
+    TelegramConfigSerializer
 )
 from .models import Profile
 
@@ -75,6 +80,16 @@ class ChangePasswordView(generics.UpdateAPIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(
+    operation_id="accounts_logout",
+    summary="Logout User",
+    description="Logout the authenticated user (client should delete the token)",
+    responses={
+        200: LogoutResponseSerializer,
+        401: OpenApiResponse(description="Authentication required"),
+    },
+    tags=["accounts"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def logout_view(request):
@@ -120,6 +135,18 @@ def verify_telegram_auth(auth_data):
     return True
 
 
+@extend_schema(
+    operation_id="accounts_telegram_auth",
+    summary="Telegram Authentication",
+    description="Authenticate user with Telegram login data",
+    request=TelegramAuthSerializer,
+    responses={
+        200: TelegramAuthResponseSerializer,
+        400: OpenApiResponse(description="Invalid Telegram authentication data"),
+        500: OpenApiResponse(description="Authentication failed"),
+    },
+    tags=["accounts"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def telegram_auth(request):
@@ -197,6 +224,15 @@ def telegram_auth(request):
         )
 
 
+@extend_schema(
+    operation_id="accounts_telegram_config",
+    summary="Get Telegram Configuration",
+    description="Get Telegram bot configuration for frontend",
+    responses={
+        200: TelegramConfigSerializer,
+    },
+    tags=["accounts"],
+)
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
 def telegram_config(request):

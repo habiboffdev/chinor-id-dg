@@ -1,10 +1,11 @@
 from rest_framework import generics, status, permissions
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from .models import Notification, NotificationSettings
-from .serializers import NotificationSerializer, NotificationSettingsSerializer
+from .serializers import NotificationSerializer, NotificationSettingsSerializer, MarkAllNotificationsReadResponseSerializer, NotificationStatsSerializer
 
 
 class NotificationListView(generics.ListAPIView):
@@ -12,6 +13,10 @@ class NotificationListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Notification.objects.none()
+            
         return Notification.objects.filter(
             recipient=self.request.user
         ).order_by('-created_at')
@@ -22,6 +27,10 @@ class NotificationDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Notification.objects.none()
+            
         return Notification.objects.filter(recipient=self.request.user)
 
 
@@ -36,6 +45,17 @@ class NotificationSettingsView(generics.RetrieveUpdateAPIView):
         return settings
 
 
+@extend_schema(
+    operation_id="notifications_mark_as_read",
+    summary="Mark Notification as Read",
+    description="Mark a specific notification as read for the authenticated user",
+    responses={
+        200: NotificationSerializer,
+        401: OpenApiResponse(description="Authentication required"),
+        404: OpenApiResponse(description="Notification not found"),
+    },
+    tags=["notifications"],
+)
 @api_view(['PUT'])
 @permission_classes([permissions.IsAuthenticated])
 def mark_notification_as_read(request, pk):
@@ -62,6 +82,16 @@ def mark_notification_as_read(request, pk):
         )
 
 
+@extend_schema(
+    operation_id="notifications_mark_all_as_read",
+    summary="Mark All Notifications as Read",
+    description="Mark all unread notifications as read for the authenticated user",
+    responses={
+        200: MarkAllNotificationsReadResponseSerializer,
+        401: OpenApiResponse(description="Authentication required"),
+    },
+    tags=["notifications"],
+)
 @api_view(['PUT'])
 @permission_classes([permissions.IsAuthenticated])
 def mark_all_notifications_as_read(request):
@@ -80,6 +110,17 @@ def mark_all_notifications_as_read(request):
     )
 
 
+@extend_schema(
+    operation_id="notifications_delete",
+    summary="Delete Notification",
+    description="Delete a specific notification for the authenticated user",
+    responses={
+        204: OpenApiResponse(description="Notification deleted successfully"),
+        401: OpenApiResponse(description="Authentication required"),
+        404: OpenApiResponse(description="Notification not found"),
+    },
+    tags=["notifications"],
+)
 @api_view(['DELETE'])
 @permission_classes([permissions.IsAuthenticated])
 def delete_notification(request, pk):
@@ -101,6 +142,16 @@ def delete_notification(request, pk):
         )
 
 
+@extend_schema(
+    operation_id="notifications_get_stats",
+    summary="Get Notification Statistics",
+    description="Get notification statistics for the authenticated user",
+    responses={
+        200: NotificationStatsSerializer,
+        401: OpenApiResponse(description="Authentication required"),
+    },
+    tags=["notifications"],
+)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def notification_stats(request):

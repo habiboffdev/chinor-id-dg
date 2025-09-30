@@ -19,3 +19,17 @@ class NotificationSettingsSerializer(serializers.ModelSerializer):
             'email_notifications', 'push_notifications', 'application_updates',
             'new_opportunities', 'deadline_reminders', 'messages', 'system_announcements'
         ]
+
+
+# Action Response Serializers for OpenAPI Documentation
+class MarkAllNotificationsReadResponseSerializer(serializers.Serializer):
+    """Response serializer for marking all notifications as read"""
+    message = serializers.CharField(help_text="Success message with count of notifications marked as read")
+
+
+class NotificationStatsSerializer(serializers.Serializer):
+    """Serializer for notification statistics"""
+    total_count = serializers.IntegerField(help_text="Total number of notifications")
+    unread_count = serializers.IntegerField(help_text="Number of unread notifications")
+    read_count = serializers.IntegerField(help_text="Number of read notifications")
+    recent_count = serializers.IntegerField(help_text="Number of notifications from last 7 days")

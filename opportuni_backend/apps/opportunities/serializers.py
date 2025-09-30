@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from django.utils import timezone
 from .models import Opportunity, OpportunityRequirement, OpportunityCategory, OpportunityQuestion, OpportunityProfileRequirement
 from apps.students.models import Skill
@@ -215,8 +216,44 @@ class OpportunityCategorySerializer(serializers.ModelSerializer):
         model = OpportunityCategory
         fields = ['id', 'name', 'description', 'is_active', 'opportunity_count']
     
+    @extend_schema_field(serializers.IntegerField)
+
+    
     def get_opportunity_count(self, obj):
         return Opportunity.objects.filter(
             opportunity_type=obj.name.lower(),
             status='published'
         ).count()
+
+
+# Action Response Serializers for OpenAPI Documentation
+class OpportunityActionResponseSerializer(serializers.Serializer):
+    """Response serializer for opportunity publish/close actions"""
+    id = serializers.IntegerField(help_text="Opportunity ID")
+    title = serializers.CharField(help_text="Opportunity title")
+    status = serializers.CharField(help_text="Updated opportunity status")
+    organization = serializers.IntegerField(help_text="Organization ID")
+    deadline = serializers.DateTimeField(help_text="Application deadline")
+    created_at = serializers.DateTimeField(help_text="Creation timestamp")
+    updated_at = serializers.DateTimeField(help_text="Last update timestamp")
+
+
+# Statistics and Debug Serializers for OpenAPI Documentation
+class OpportunityStatsSerializer(serializers.Serializer):
+    """Serializer for opportunity statistics"""
+    total_opportunities = serializers.IntegerField(help_text="Total number of opportunities")
+    published_opportunities = serializers.IntegerField(help_text="Number of published opportunities")
+    draft_opportunities = serializers.IntegerField(help_text="Number of draft opportunities")
+    closed_opportunities = serializers.IntegerField(help_text="Number of closed opportunities")
+    total_applications = serializers.IntegerField(help_text="Total applications received")
+    recent_applications = serializers.IntegerField(help_text="Applications in last 7 days")
+
+
+class DebugOpportunitiesSerializer(serializers.Serializer):
+    """Serializer for debug opportunities information"""
+    user_type = serializers.CharField(help_text="Type of authenticated user")
+    total_opportunities = serializers.IntegerField(help_text="Total opportunities in database")
+    published_opportunities = serializers.IntegerField(help_text="Published opportunities count")
+    future_deadlines = serializers.IntegerField(help_text="Opportunities with future deadlines")
+    visible_opportunities = serializers.IntegerField(help_text="Opportunities visible to current user")
+    user_organization_id = serializers.IntegerField(required=False, help_text="User's organization ID if applicable")

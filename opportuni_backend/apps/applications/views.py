@@ -2,6 +2,7 @@ from rest_framework import generics, status, permissions, filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
@@ -9,7 +10,7 @@ from .models import Application, ApplicationDocument, ApplicationNote, Applicati
 from .serializers import (
     ApplicationSerializer, ApplicationCreateSerializer, ApplicationUpdateSerializer,
     ApplicationListSerializer, ApplicationDocumentSerializer, ApplicationNoteSerializer,
-    BulkStatusUpdateSerializer
+    BulkStatusUpdateSerializer, ApplicationDocumentUploadSerializer, ApplicationDocumentUploadResponseSerializer
 )
 from apps.students.models import StudentProfile
 from apps.organizations.models import Organization
@@ -38,10 +39,14 @@ class ApplicationListCreateView(generics.ListCreateAPIView):
     ordering = ['-applied_at']
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Application.objects.none()
+            
         user = self.request.user
         
         # Students see their own applications
-        if user.user_type == 'student':
+        if user.user_type == 'student': 
             try:
                 student_profile = StudentProfile.objects.get(user=user)
                 return Application.objects.filter(student=student_profile)
@@ -75,9 +80,6 @@ class ApplicationListCreateView(generics.ListCreateAPIView):
         additional_documents = self.request.data.get('additional_documents', [])
         notes = self.request.data.get('notes', '')
         
-        print(f"Creating application with additional_documents: {additional_documents}")
-        print(f"Creating application with notes: {notes}")
-        
         # Create application
         application = serializer.save(
             student=student_profile,
@@ -85,23 +87,37 @@ class ApplicationListCreateView(generics.ListCreateAPIView):
             reviewer_notes=notes  # Store notes in reviewer_notes field for now
         )
         
-        print(f"Application created: {application.id}")
-        print(f"Application additional_documents: {application.additional_documents}")
-        
-        # Handle all question answers dynamically
+        # Handle question answers - support both formats
         opportunity = application.opportunity
         questions = opportunity.additional_questions.all()
         
-        for question in questions:
-            answer_key = f'question_{question.id}'
-            answer_value = self.request.data.get(answer_key)
-            
-            if answer_value:
-                ApplicationAnswer.objects.create(
-                    application=application,
-                    question=question,
-                    answer_text=answer_value
-                )
+        # Check if answers are provided in dict format (new format)
+        answers_dict = self.request.data.get('answers', {})
+        if answers_dict:
+            for question_id_str, answer_value in answers_dict.items():
+                try:
+                    question_id = int(question_id_str)
+                    question = questions.filter(id=question_id).first()
+                    if question and answer_value:
+                        ApplicationAnswer.objects.create(
+                            application=application,
+                            question=question,
+                            answer_text=answer_value
+                        )
+                except (ValueError, TypeError):
+                    continue
+        else:
+            # Fallback to old format (question_{id})
+            for question in questions:
+                answer_key = f'question_{question.id}'
+                answer_value = self.request.data.get(answer_key)
+                
+                if answer_value:
+                    ApplicationAnswer.objects.create(
+                        application=application,
+                        question=question,
+                        answer_text=answer_value
+                    )
 
 
 class OrganizationApplicationListView(generics.ListAPIView):
@@ -115,6 +131,10 @@ class OrganizationApplicationListView(generics.ListAPIView):
     ordering = ['-applied_at']
 
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Application.objects.none()
+            
         if self.request.user.user_type != 'organization':
             return Application.objects.none()
         try:
@@ -130,9 +150,14 @@ class OrganizationApplicationListView(generics.ListAPIView):
 
 
 class ApplicationDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ApplicationSerializer
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Application.objects.none()
+            
         user = self.request.user
         
         # Students can access their own applications
@@ -218,6 +243,10 @@ class ApplicationNoteListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
+        # Handle schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return ApplicationNote.objects.none()
+            
         application_id = self.kwargs.get('application_id')
         user = self.request.user
         
@@ -246,6 +275,15 @@ class ApplicationNoteListCreateView(generics.ListCreateAPIView):
         serializer.save(application=application, author=user)
 
 
+@extend_schema(
+    operation_id='withdraw_application',
+    description='Withdraw a student application',
+    responses={
+        200: OpenApiResponse(description='Application withdrawn successfully'),
+        400: OpenApiResponse(description='Invalid operation'),
+        404: OpenApiResponse(description='Application not found'),
+    }
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def withdraw_application(request, pk):
@@ -289,6 +327,16 @@ def withdraw_application(request, pk):
         )
 
 
+@extend_schema(
+    operation_id='bulk_update_application_status',
+    description='Bulk update application status for organization',
+    request=BulkStatusUpdateSerializer,
+    responses={
+        200: OpenApiResponse(description='Applications updated successfully'),
+        400: OpenApiResponse(description='Invalid data'),
+        403: OpenApiResponse(description='Only organizations allowed'),
+    }
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def bulk_update_status(request):
@@ -344,6 +392,14 @@ def bulk_update_status(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    operation_id='get_application_stats',
+    description='Get application statistics for organization',
+    responses={
+        200: OpenApiResponse(description='Application statistics'),
+        403: OpenApiResponse(description='Only organizations allowed'),
+    }
+)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def application_stats(request):
@@ -392,6 +448,19 @@ def application_stats(request):
     return Response(stats, status=status.HTTP_200_OK)
 
 
+@extend_schema(
+    operation_id="applications_upload_document",
+    summary="Upload Application Document",
+    description="Upload a document file for applications (temporary storage until linked to specific application)",
+    request=ApplicationDocumentUploadSerializer,
+    responses={
+        201: ApplicationDocumentUploadResponseSerializer,
+        400: OpenApiResponse(description="Bad request - invalid file type or size"),
+        401: OpenApiResponse(description="Authentication required"),
+        500: OpenApiResponse(description="File upload failed"),
+    },
+    tags=["applications"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def upload_application_document(request):
@@ -466,6 +535,17 @@ def upload_application_document(request):
         )
 
 
+@extend_schema(
+    operation_id="applications_check_status",
+    summary="Check Application Status",
+    description="Check if the current student has already applied to a specific opportunity",
+    responses={
+        200: ApplicationListSerializer,
+        403: OpenApiResponse(description="Only students allowed"),
+        404: OpenApiResponse(description="Student profile not found"),
+    },
+    tags=["applications"],
+)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def check_application_status(request, opportunity_id):

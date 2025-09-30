@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from django.utils import timezone
 from .models import Application, ApplicationDocument, ApplicationNote, ApplicationStatusHistory, ApplicationAnswer
 from apps.opportunities.serializers import OpportunityListSerializer
@@ -59,6 +60,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             'opportunity_title', 'organization_name', 'days_since_applied'
         ]
     
+    @extend_schema_field(serializers.IntegerField)
     def get_days_since_applied(self, obj):
         delta = timezone.now() - obj.applied_at
         return delta.days
@@ -89,7 +91,7 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
 class ApplicationUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        fields = ['status', 'reviewer_notes', 'interview_date', 'interview_notes']
+        fields = ['status', 'reviewer_notes', 'interview_date', 'interview_notes', 'reviewed_at']
 
 
 class ApplicationListSerializer(serializers.ModelSerializer):
@@ -120,3 +122,40 @@ class BulkStatusUpdateSerializer(serializers.Serializer):
     )
     status = serializers.ChoiceField(choices=Application.STATUS_CHOICES)
     reason = serializers.CharField(required=False, allow_blank=True)
+
+
+# File Upload Serializers for OpenAPI Documentation
+class ApplicationDocumentUploadSerializer(serializers.Serializer):
+    """Serializer for application document uploads"""
+    file = serializers.FileField(
+        help_text="Document file (PDF, DOC, DOCX, TXT, JPG, PNG). Max size: 10MB."
+    )
+    
+    def validate_file(self, value):
+        """Validate uploaded document file"""
+        # File size validation (10MB)
+        if value.size > 10 * 1024 * 1024:
+            raise serializers.ValidationError("File size too large. Maximum size is 10MB.")
+        
+        # File type validation
+        allowed_types = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/plain',
+            'image/jpeg',
+            'image/jpg',
+            'image/png'
+        ]
+        if value.content_type not in allowed_types:
+            raise serializers.ValidationError("Invalid file type. Allowed: PDF, DOC, DOCX, TXT, JPG, PNG.")
+        
+        return value
+
+
+class ApplicationDocumentUploadResponseSerializer(serializers.Serializer):
+    """Response serializer for successful document upload"""
+    file_url = serializers.URLField(help_text="URL of the uploaded document")
+    filename = serializers.CharField(help_text="Original filename")
+    size = serializers.IntegerField(help_text="File size in bytes")
+    content_type = serializers.CharField(help_text="MIME type of the uploaded file")

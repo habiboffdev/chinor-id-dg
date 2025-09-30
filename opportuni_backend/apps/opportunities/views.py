@@ -1,13 +1,15 @@
 from rest_framework import generics, status, permissions, filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Opportunity, OpportunityCategory
 from .serializers import (
     OpportunitySerializer, OpportunityCreateUpdateSerializer,
-    OpportunityListSerializer, OpportunityCategorySerializer
+    OpportunityListSerializer, OpportunityCategorySerializer,
+    OpportunityActionResponseSerializer, OpportunityStatsSerializer, DebugOpportunitiesSerializer
 )
 from apps.organizations.models import Organization
 import django_filters
@@ -192,6 +194,18 @@ class OpportunityCategoryListView(generics.ListAPIView):
     queryset = OpportunityCategory.objects.filter(is_active=True)
 
 
+@extend_schema(
+    operation_id="opportunities_publish",
+    summary="Publish Opportunity",
+    description="Publish a draft opportunity to make it available for applications",
+    responses={
+        200: OpportunityActionResponseSerializer,
+        400: OpenApiResponse(description="Bad request - opportunity already published"),
+        401: OpenApiResponse(description="Authentication required"),
+        404: OpenApiResponse(description="Organization or opportunity not found"),
+    },
+    tags=["opportunities"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def publish_opportunity(request, pk):
@@ -219,6 +233,18 @@ def publish_opportunity(request, pk):
         )
 
 
+@extend_schema(
+    operation_id="opportunities_close",
+    summary="Close Opportunity",
+    description="Close an opportunity to stop accepting new applications",
+    responses={
+        200: OpportunityActionResponseSerializer,
+        400: OpenApiResponse(description="Bad request - opportunity already closed"),
+        401: OpenApiResponse(description="Authentication required"),
+        404: OpenApiResponse(description="Organization or opportunity not found"),
+    },
+    tags=["opportunities"],
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def close_opportunity(request, pk):
@@ -246,6 +272,17 @@ def close_opportunity(request, pk):
         )
 
 
+@extend_schema(
+    operation_id="opportunities_get_stats",
+    summary="Get Opportunity Statistics",
+    description="Get opportunity statistics for the organization",
+    responses={
+        200: OpportunityStatsSerializer,
+        401: OpenApiResponse(description="Authentication required"),
+        404: OpenApiResponse(description="Organization not found"),
+    },
+    tags=["opportunities"],
+)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def opportunity_stats(request):
@@ -270,6 +307,16 @@ def opportunity_stats(request):
         )
 
 
+@extend_schema(
+    operation_id="opportunities_debug",
+    summary="Debug Opportunities",
+    description="Debug endpoint to check opportunities status and visibility",
+    responses={
+        200: DebugOpportunitiesSerializer,
+        401: OpenApiResponse(description="Authentication required"),
+    },
+    tags=["opportunities"],
+)
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def debug_opportunities(request):
