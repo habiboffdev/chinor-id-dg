@@ -1,13 +1,14 @@
 # Copilot Instructions for Opportuni MVP
 
 ## Project Overview
-This is a Django REST API backend with a vanilla HTML/CSS/JS frontend for a student-organization opportunity matching platform. The system connects students with internship/scholarship opportunities from organizations.
+This is a Django REST API backend with vanilla HTML/CSS/JS frontend for a student-organization opportunity matching platform. The system connects students with internship/scholarship opportunities from organizations, with integrated Telegram bot for channel administration and user engagement.
 
 ## Architecture
 - **Backend**: Django REST Framework with JWT authentication
 - **Frontend**: Vanilla HTML/CSS/JS (no frameworks, no Tailwind)
 - **Database**: PostgreSQL (production), SQLite (development)
-- **Deployment**: Gunicorn + Nginx on Linux VPS
+- **Telegram Bot**: pyTelegramBotAPI with dedicated virtual environment
+- **Deployment**: Gunicorn + Nginx + Supervisor for multi-service management
 
 ## Brand & Design System
 - **Fonts**: Space Grotesk (display), Inter (body)
@@ -96,12 +97,19 @@ This is a Django REST API backend with a vanilla HTML/CSS/JS frontend for a stud
 2. **API Testing**: Use Django shell or curl for endpoint testing
 3. **System Checks**: Run `python manage.py check` before commits
 4. **Permissions**: Always check user permissions in views (student vs org data)
+5. **Telegram Bot**: Use dedicated `.venv_bot` environment and management commands
 
 ### Frontend Development
 1. **Local Server**: `cd opportuni_frontend && python3 -m http.server 8080`
 2. **Page Structure**: Always include theme.css, relevant navbar, brand wrapper
 3. **Script Loading**: Load dependencies in order: utils → api → auth → components → page-specific
 4. **API Integration**: Use api.js client methods, handle errors gracefully
+
+### Telegram Bot Development
+1. **Environment**: Always use `.venv_bot` virtual environment
+2. **Django Integration**: Use `setup_django()` for ORM access
+3. **Testing**: Use management commands with `--mock-bot` flag for safe testing
+4. **Channel Setup**: Configure bot as channel admin with posting permissions
 
 ### Organization Pages Checklist
 - [ ] Include theme.css, org.css, layout-shim.css
@@ -124,6 +132,46 @@ const apps = await api.applications.listForOrg();
 const opportunity = await api.opportunities.create(data);
 ```
 
+## Telegram Bot Integration
+
+### Architecture & Environment Setup
+- **Isolated Environment**: Bot runs in dedicated `.venv_bot` virtual environment
+- **Django Integration**: Uses `setup_django()` for ORM access and Django management commands
+- **Channel Administration**: Automatic opportunity posting to Telegram channels
+- **Multi-service Deployment**: Managed via Supervisor alongside Django app
+
+### Key Bot Components
+- **config.py**: Environment loading, TeleBot instance, Django setup
+- **handlers/**: Modular command handlers (student, admin, common)
+- **bot.py**: Main entry point with `run_polling()` and `run_webhook()`
+- **markups.py**: Telegram keyboards and inline buttons
+- **i18n.py**: Multi-language support (en/ru/uz)
+
+### Django Integration Patterns
+```python
+# Django management commands for bot operations
+python manage.py run_telegram_bot  # Run bot from Django
+python manage.py test_telegram_channel --latest  # Test channel posting
+python manage.py test_telegram_posting --mock-bot  # Test with mocks
+
+# Bot configuration in Django settings
+TELEGRAM_BOT_TOKEN = config('BOT_TOKEN')
+TELEGRAM_CHANNEL_ID = config('TELEGRAM_CHANNEL_ID')
+TELEGRAM_ADMIN_IDS = config('TELEGRAM_ADMIN_IDS', default='').split(',')
+```
+
+### Environment Management
+```bash
+# Bot environment setup (from project root)
+python3 -m venv .venv_bot
+source .venv_bot/bin/activate
+pip install -r telegram_bot/requirements.txt
+
+# Django environment (separate)
+cd opportuni_backend
+source venv/bin/activate  # or ../venv/bin/activate
+```
+
 ## Common Pitfalls
 
 ### Backend
@@ -138,6 +186,12 @@ const opportunity = await api.opportunities.create(data);
 - Mount navbars explicitly with JavaScript
 - Test dropdown menus on mobile devices
 - Verify API endpoints match backend URLs exactly
+
+### Telegram Bot Development
+- Always switch to `.venv_bot` environment before bot work
+- Use `setup_django()` in bot code to access Django ORM
+- Test with `--mock-bot` flag to avoid hitting Telegram API during development
+- Keep bot and Django environments separate to avoid dependency conflicts
 
 ### Brand Compliance
 - Use Space Grotesk for headings, Inter for body text
@@ -165,6 +219,13 @@ opportuni_frontend/
 │   └── js/               # API client and controllers
 ├── organization/         # Organization-specific pages
 └── *.html               # Student-facing pages
+
+telegram_bot/
+├── handlers/             # Modular command handlers
+├── config.py             # Environment & Django setup
+├── bot.py                # Entry points (polling/webhook)
+├── markups.py            # Keyboards and buttons
+└── i18n.py               # Multi-language support
 ```
 
 This structure ensures maintainable, scalable code that follows Django and frontend best practices while maintaining strict brand consistency.

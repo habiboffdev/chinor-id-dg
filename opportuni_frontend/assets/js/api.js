@@ -481,6 +481,40 @@ class API {
             return this.get('/applications/stats/');
         },
 
+        // Student management endpoints
+        getStudentStats: async () => {
+            return this.get('/organizations/students/stats/');
+        },
+
+        getStudents: async (params = {}) => {
+            return this.get('/organizations/students/', params);
+        },
+
+        inviteStudents: async (inviteData) => {
+            return this.post('/organizations/students/invite/', inviteData);
+        },
+
+        exportStudents: async (params = {}) => {
+            // Return blob for CSV download
+            const response = await this.request('/organizations/students/export/', {
+                method: 'GET',
+                params,
+                headers: {
+                    ...this.getHeaders(),
+                    'Accept': 'text/csv'
+                }
+            });
+            return response.blob();
+        },
+
+        getStudentLocations: async () => {
+            return this.get('/organizations/students/locations/');
+        },
+
+        getPopularSkills: async () => {
+            return this.get('/organizations/students/skills/');
+        },
+
         // Get organization opportunities (active by default via dedicated endpoint)
         getOpportunities: async (params = {}) => {
             // Prefer org-scoped active endpoint when no explicit scope provided
@@ -629,6 +663,34 @@ class API {
         // Bulk update application statuses (organization only)
         bulkUpdateStatus: async (application_ids = [], status, reason = '') => {
             return this.post('/applications/bulk-update/', { application_ids, status, reason });
+        },
+
+        // Organization-specific application methods
+        listForOrg: async (params = {}) => {
+            return this.get('/applications/org/', params);
+        },
+
+        getDetail: async (id) => {
+            return this.get(`/applications/${id}/`);
+        },
+
+        updateReview: async (id, reviewData) => {
+            return this.put(`/applications/${id}/review/`, reviewData);
+        },
+
+        bulkUpdate: async (data) => {
+            return this.post('/applications/bulk-update/', data);
+        },
+
+        downloadResume: async (applicationId) => {
+            const response = await this.request(`/applications/${applicationId}/resume/`, {
+                method: 'GET'
+            });
+            return response.blob();
+        },
+
+        getLocations: async () => {
+            return this.get('/applications/locations/');
         }
     };
 
@@ -663,6 +725,39 @@ class API {
         // Get message/email history (backend exposes as messages)
         getEmailHistory: async (params = {}) => {
             return this.get('/communications/messages/', params);
+        },
+
+        // Real-time messaging methods
+        getConversations: async (params = {}) => {
+            return this.get('/communications/conversations/', params);
+        },
+
+        getMessages: async (conversationId, params = {}) => {
+            return this.get(`/communications/conversations/${conversationId}/messages/`, params);
+        },
+
+        sendMessage: async (messageData) => {
+            return this.post('/communications/messages/', messageData);
+        },
+
+        sendNewMessage: async (messageData) => {
+            return this.post('/communications/conversations/', messageData);
+        },
+
+        startConversation: async (participantId) => {
+            return this.post('/communications/conversations/', { participant_id: participantId });
+        },
+
+        markAsRead: async (conversationId) => {
+            return this.put(`/communications/conversations/${conversationId}/read/`);
+        },
+
+        markMessageAsRead: async (messageId) => {
+            return this.put(`/communications/messages/${messageId}/read/`);
+        },
+
+        searchRecipients: async (query) => {
+            return this.get('/communications/search-recipients/', { q: query });
         }
     };
 

@@ -1,10 +1,14 @@
+import { Utils, Logger } from './utils.js';
+import { api } from './api.js';
+import { showToast, showLoading, createModal, closeModal } from './components.js';
+
 // Authentication module for Opportuni Platform
 
 class AuthManager {
     constructor() {
         this.currentUser = null;
         this.userLoadPromise = null;
-    this.init();
+        this.init();
     }
 
     // Initialize authentication
@@ -853,7 +857,8 @@ function togglePassword(button) {
 }
 
 // Create global auth manager instance
-window.auth = new AuthManager();
+export const auth = new AuthManager();
+window.auth = auth; // For backward compatibility
 
 // Export any needed functions for standalone pages
 window.togglePassword = togglePassword;
