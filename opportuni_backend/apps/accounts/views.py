@@ -84,6 +84,7 @@ class ChangePasswordView(generics.UpdateAPIView):
     operation_id="accounts_logout",
     summary="Logout User",
     description="Logout the authenticated user (client should delete the token)",
+    request=None,
     responses={
         200: LogoutResponseSerializer,
         401: OpenApiResponse(description="Authentication required"),

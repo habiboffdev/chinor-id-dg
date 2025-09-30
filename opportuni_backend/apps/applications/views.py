@@ -18,6 +18,10 @@ from apps.opportunities.models import Opportunity
 import django_filters
 
 
+def _get_user_type(user):
+    return getattr(user, 'user_type', None)
+
+
 class ApplicationFilter(django_filters.FilterSet):
     status = django_filters.MultipleChoiceFilter(choices=Application.STATUS_CHOICES)
     applied_after = django_filters.DateTimeFilter(field_name='applied_at', lookup_expr='gte')
@@ -46,7 +50,7 @@ class ApplicationListCreateView(generics.ListCreateAPIView):
         user = self.request.user
         
         # Students see their own applications
-        if user.user_type == 'student': 
+        if _get_user_type(user) == 'student': 
             try:
                 student_profile = StudentProfile.objects.get(user=user)
                 return Application.objects.filter(student=student_profile)
@@ -54,7 +58,7 @@ class ApplicationListCreateView(generics.ListCreateAPIView):
                 return Application.objects.none()
         
         # Organizations see applications to their opportunities
-        elif user.user_type == 'organization':
+        elif _get_user_type(user) == 'organization':
             try:
                 organization = Organization.objects.get(user=user)
                 return Application.objects.filter(opportunity__organization=organization)
@@ -134,8 +138,8 @@ class OrganizationApplicationListView(generics.ListAPIView):
         # Handle schema generation
         if getattr(self, 'swagger_fake_view', False):
             return Application.objects.none()
-            
-        if self.request.user.user_type != 'organization':
+
+        if _get_user_type(self.request.user) != 'organization':
             return Application.objects.none()
         try:
             organization = Organization.objects.get(user=self.request.user)
@@ -161,7 +165,7 @@ class ApplicationDetailView(generics.RetrieveUpdateDestroyAPIView):
         user = self.request.user
         
         # Students can access their own applications
-        if user.user_type == 'student':
+        if _get_user_type(user) == 'student':
             try:
                 student_profile = StudentProfile.objects.get(user=user)
                 return Application.objects.filter(student=student_profile)
@@ -169,7 +173,7 @@ class ApplicationDetailView(generics.RetrieveUpdateDestroyAPIView):
                 return Application.objects.none()
         
         # Organizations can access applications to their opportunities
-        elif user.user_type == 'organization':
+        elif _get_user_type(user) == 'organization':
             try:
                 organization = Organization.objects.get(user=user)
                 return Application.objects.filter(opportunity__organization=organization)
@@ -182,14 +186,14 @@ class ApplicationDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
             # Only organizations can update applications
-            if self.request.user.user_type == 'organization':
+            if _get_user_type(self.request.user) == 'organization':
                 return ApplicationUpdateSerializer
             return ApplicationSerializer
         return ApplicationSerializer
     
     def update(self, request, *args, **kwargs):
         # Only organizations can update application status
-        if request.user.user_type != 'organization':
+        if _get_user_type(request.user) != 'organization':
             return Response(
                 {'error': 'Only organizations can update application status'},
                 status=status.HTTP_403_FORBIDDEN
@@ -229,9 +233,9 @@ class ApplicationDocumentListCreateView(generics.ListCreateAPIView):
         
         # Check permissions
         user = self.request.user
-        if user.user_type == 'student' and application.student.user != user:
+        if _get_user_type(user) == 'student' and application.student.user != user:
             raise permissions.PermissionDenied("You can only upload documents to your own applications")
-        elif user.user_type == 'organization':
+        elif _get_user_type(user) == 'organization':
             if not application.opportunity.organization.user == user:
                 raise permissions.PermissionDenied("You can only access applications to your opportunities")
         
@@ -251,7 +255,7 @@ class ApplicationNoteListCreateView(generics.ListCreateAPIView):
         user = self.request.user
         
         # Students only see non-internal notes
-        if user.user_type == 'student':
+        if _get_user_type(user) == 'student':
             return ApplicationNote.objects.filter(
                 application_id=application_id,
                 is_internal=False
@@ -266,9 +270,9 @@ class ApplicationNoteListCreateView(generics.ListCreateAPIView):
         
         # Check permissions
         user = self.request.user
-        if user.user_type == 'student' and application.student.user != user:
+        if _get_user_type(user) == 'student' and application.student.user != user:
             raise permissions.PermissionDenied("You can only add notes to your own applications")
-        elif user.user_type == 'organization':
+        elif _get_user_type(user) == 'organization':
             if not application.opportunity.organization.user == user:
                 raise permissions.PermissionDenied("You can only add notes to applications for your opportunities")
         
@@ -278,8 +282,9 @@ class ApplicationNoteListCreateView(generics.ListCreateAPIView):
 @extend_schema(
     operation_id='withdraw_application',
     description='Withdraw a student application',
+    request=None,
     responses={
-        200: OpenApiResponse(description='Application withdrawn successfully'),
+        200: ApplicationSerializer,
         400: OpenApiResponse(description='Invalid operation'),
         404: OpenApiResponse(description='Application not found'),
     }
@@ -341,7 +346,7 @@ def withdraw_application(request, pk):
 @permission_classes([permissions.IsAuthenticated])
 def bulk_update_status(request):
     """Bulk update application status (for organizations)"""
-    if request.user.user_type != 'organization':
+    if _get_user_type(request.user) != 'organization':
         return Response(
             {'error': 'Only organizations can bulk update application status'},
             status=status.HTTP_403_FORBIDDEN
@@ -406,7 +411,8 @@ def application_stats(request):
     """Get application statistics"""
     user = request.user
     
-    if user.user_type == 'student':
+    user_type = _get_user_type(user)
+    if user_type == 'student':
         try:
             student_profile = StudentProfile.objects.get(user=user)
             applications = Application.objects.filter(student=student_profile)
@@ -424,7 +430,7 @@ def application_stats(request):
         except StudentProfile.DoesNotExist:
             stats = {'error': 'Student profile not found'}
     
-    elif user.user_type == 'organization':
+    elif user_type == 'organization':
         try:
             organization = Organization.objects.get(user=user)
             applications = Application.objects.filter(opportunity__organization=organization)
@@ -553,7 +559,7 @@ def check_application_status(request, opportunity_id):
     Check if the current user has already applied to a specific opportunity.
     Returns application details if found, or null if not found.
     """
-    if request.user.user_type != 'student':
+    if _get_user_type(request.user) != 'student':
         return Response({'error': 'Only students can check application status'}, 
                        status=status.HTTP_403_FORBIDDEN)
     

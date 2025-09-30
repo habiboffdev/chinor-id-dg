@@ -553,6 +553,7 @@ class StudentExamScoreDetailView(generics.RetrieveUpdateDestroyAPIView):
     operation_id="students_seed_default_exams",
     summary="Seed Default Exams",
     description="Seed a set of default exams with common sections (SAT, GRE, IELTS, TOEFL). Safe to call multiple times.",
+    request=None,
     responses={
         200: DefaultExamsSeedResponseSerializer,
         401: OpenApiResponse(description="Authentication required"),

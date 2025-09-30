@@ -94,6 +94,7 @@ class MessageDetailView(generics.RetrieveAPIView):
     operation_id="communications_mark_message_as_read",
     summary="Mark Message as Read",
     description="Mark a specific message as read for the authenticated user",
+    request=None,
     responses={
         200: MessageSerializer,
         401: OpenApiResponse(description="Authentication required"),

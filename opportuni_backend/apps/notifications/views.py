@@ -49,6 +49,7 @@ class NotificationSettingsView(generics.RetrieveUpdateAPIView):
     operation_id="notifications_mark_as_read",
     summary="Mark Notification as Read",
     description="Mark a specific notification as read for the authenticated user",
+    request=None,
     responses={
         200: NotificationSerializer,
         401: OpenApiResponse(description="Authentication required"),
@@ -86,6 +87,7 @@ def mark_notification_as_read(request, pk):
     operation_id="notifications_mark_all_as_read",
     summary="Mark All Notifications as Read",
     description="Mark all unread notifications as read for the authenticated user",
+    request=None,
     responses={
         200: MarkAllNotificationsReadResponseSerializer,
         401: OpenApiResponse(description="Authentication required"),
@@ -114,6 +116,7 @@ def mark_all_notifications_as_read(request):
     operation_id="notifications_delete",
     summary="Delete Notification",
     description="Delete a specific notification for the authenticated user",
+    request=None,
     responses={
         204: OpenApiResponse(description="Notification deleted successfully"),
         401: OpenApiResponse(description="Authentication required"),
@@ -146,6 +149,7 @@ def delete_notification(request, pk):
     operation_id="notifications_get_stats",
     summary="Get Notification Statistics",
     description="Get notification statistics for the authenticated user",
+    request=None,
     responses={
         200: NotificationStatsSerializer,
         401: OpenApiResponse(description="Authentication required"),

@@ -109,6 +109,9 @@ class OrganizationActiveOpportunitiesView(generics.ListAPIView):
     ordering = ['-created_at']
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Opportunity.objects.none()
+
         organization = get_object_or_404(Organization, user=self.request.user)
         qs = Opportunity.objects.filter(
             organization=organization,
@@ -198,8 +201,9 @@ class OpportunityCategoryListView(generics.ListAPIView):
     operation_id="opportunities_publish",
     summary="Publish Opportunity",
     description="Publish a draft opportunity to make it available for applications",
+    request=None,
     responses={
-        200: OpportunityActionResponseSerializer,
+        200: OpportunitySerializer,
         400: OpenApiResponse(description="Bad request - opportunity already published"),
         401: OpenApiResponse(description="Authentication required"),
         404: OpenApiResponse(description="Organization or opportunity not found"),
@@ -237,8 +241,9 @@ def publish_opportunity(request, pk):
     operation_id="opportunities_close",
     summary="Close Opportunity",
     description="Close an opportunity to stop accepting new applications",
+    request=None,
     responses={
-        200: OpportunityActionResponseSerializer,
+        200: OpportunitySerializer,
         400: OpenApiResponse(description="Bad request - opportunity already closed"),
         401: OpenApiResponse(description="Authentication required"),
         404: OpenApiResponse(description="Organization or opportunity not found"),
