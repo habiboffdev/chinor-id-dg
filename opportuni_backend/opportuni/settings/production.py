@@ -48,8 +48,8 @@ if os.environ.get('USE_HTTPS', 'False').lower() == 'true':
 
 # CORS settings for production
 CORS_ALLOWED_ORIGINS = [
-    "https://opportuni.com",  # Replace with your domain
-    "https://www.opportuni.com",  # Replace with your domain
+    "https://opportuni.app",  # Replace with your domain
+    "https://www.opportuni.app",  # Replace with your domain
     "http://localhost:8080",  # For testing
 ]
 

@@ -355,10 +355,10 @@ class ProfilePictureUploadSerializer(serializers.Serializer):
         if value.size > 5 * 1024 * 1024:
             raise serializers.ValidationError("File size too large. Maximum size is 5MB.")
         
-        # File type validation
-        allowed_types = ['image/jpeg', 'image/png', 'image/webp']
+        # File type validation (align with view validation)
+        allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
         if value.content_type not in allowed_types:
-            raise serializers.ValidationError("Invalid file type. Only JPEG, PNG, and WebP are allowed.")
+            raise serializers.ValidationError("Invalid file type. Only JPEG, JPG, PNG, GIF, and WebP are allowed.")
         
         return value
 
