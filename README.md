@@ -176,7 +176,7 @@ mkdir -p mediafiles/{avatars,org_logos,resumes,opportunity_covers,application_do
 chmod -R 755 mediafiles/
 ```
 
-## 🤖 Telegram Bot
+## Telegram Bot
 
 Separate virtual environment for bot dependencies:
 
@@ -190,7 +190,7 @@ pip install -r telegram_bot/requirements.txt
 python -c "from telegram_bot.bot import run_polling; run_polling()"
 ```
 
-## 📝 Key Features
+## Key Features
 
 - **Dual User Types**: Students and organizations with separate interfaces
 - **JWT Authentication**: Secure token-based auth with refresh
@@ -200,7 +200,7 @@ python -c "from telegram_bot.bot import run_polling; run_polling()"
 - **Application Workflow**: Submit, review, accept/reject applications
 - **OpenAPI Schema**: Auto-generated API documentation
 
-## 🔐 Security
+## Security
 
 - CORS configuration for frontend integration
 - File upload validation (type, size)
@@ -208,14 +208,7 @@ python -c "from telegram_bot.bot import run_polling; run_polling()"
 - JWT token blacklisting on logout
 - HTTPS enforcement (production)
 
-## � Additional Documentation
-
-- `BRAND_BLUEPRINT.md` - Frontend design system (for React integration)
-- `API_SCHEMA_GUIDE.md` - OpenAPI schema details
-- `DEBUG_PRODUCTION_UPLOADS.md` - Troubleshooting guide
-- `.github/copilot-instructions.md` - Development guidelines
-
-## 📞 Support
+## Support
 
 For issues or questions, refer to inline documentation or check application logs:
 ```bash
