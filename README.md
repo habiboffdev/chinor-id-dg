@@ -1,243 +1,127 @@
-	# Opportuni - Student Opportunity Management Platform
+	# Opportuni - Backend API
 
-## 📋 Project Overview
+Django REST API for student-organization opportunity matching platform. Connects students with internships, scholarships, and opportunities while providing organizations with application management tools.
 
-Opportuni is a comprehensive platform that connects students with opportunities such as internships, scholarships, competitions, and volunteer positions while providing organizations with powerful tools to manage applications and communicate with candidates.
+## 🏗️ Tech Stack
 
-## 🏗️ Architecture
-
-### Backend (Django + DRF)
 - **Framework**: Django 4.2+ with Django REST Framework
 - **Database**: PostgreSQL
-- **Authentication**: JWT tokens
-- **Real-time**: Django Channels + WebSockets
-- **Background Tasks**: Celery + Redis
-- **File Storage**: AWS S3 (production) / Local (development)
-
-### Frontend (Vanilla JS)
-- **Technologies**: HTML5, CSS3, ES6+ JavaScript
-- **Styling**: CSS Grid, Flexbox, Custom Properties
-- **No Dependencies**: Pure vanilla implementation
-- **Responsive**: Mobile-first design
+- **Authentication**: JWT (simplejwt)
+- **Documentation**: drf-spectacular (OpenAPI 3.0)
+- **Telegram Bot**: pyTelegramBotAPI
+- **Deployment**: Gunicorn + Nginx + Supervisor
 
 ## 📁 Project Structure
 
 ```
-opportuni_platform/
-├── opportuni_backend/          # Django backend
-│   ├── manage.py
-│   ├── requirements.txt
-│   ├── .env.example
-│   ├── opportuni/              # Main Django project
-│   │   ├── settings/
-│   │   │   ├── base.py
-│   │   │   ├── development.py
-│   │   │   └── production.py
-│   │   ├── urls.py
-│   │   ├── wsgi.py
-│   │   ├── asgi.py
-│   │   └── celery.py
-│   └── apps/                   # Django applications
-│       ├── accounts/           # User authentication
-│       ├── students/           # Student profiles
-│       ├── organizations/      # Organization management
-│       ├── opportunities/      # Events and opportunities
-│       ├── applications/       # Application management
-│       ├── communications/     # Email and messaging
-│       ├── notifications/      # Real-time notifications
-│       └── core/               # Shared utilities
-├── opportuni_frontend/         # Frontend application
-│   ├── index.html              # Landing page
-│   ├── dashboard.html          # Student dashboard
-│   ├── profile.html            # Student profile
-│   ├── opportunities.html      # Browse opportunities
-│   ├── organization/           # Organization pages
-│   ├── css/                    # Stylesheets
-│   │   ├── styles.css
-│   │   ├── components.css
-│   │   └── responsive.css
-│   ├── js/                     # JavaScript modules
-│   │   ├── main.js
-│   │   ├── auth.js
-│   │   └── utils.js
-│   └── assets/                 # Images and icons
-└── docs/                       # Documentation
+opportuni_backend/
+├── apps/
+│   ├── accounts/         # Authentication & users
+│   ├── students/         # Student profiles & data
+│   ├── organizations/    # Organization management
+│   ├── opportunities/    # Job/internship listings
+│   ├── applications/     # Application workflow
+│   ├── communications/   # Messaging system
+│   ├── notifications/    # Real-time notifications
+│   └── core/            # Shared utilities
+├── opportuni/
+│   └── settings/        # Environment configs
+├── media/               # Uploaded files (dev)
+├── mediafiles/          # Uploaded files (prod)
+└── logs/               # Application logs
+
+telegram_bot/
+├── handlers/           # Bot command handlers
+├── bot.py             # Entry points
+└── config.py          # Django integration
+
+deployment/
+├── nginx.conf         # Web server config
+├── supervisor.conf    # Process management
+└── deploy.sh          # Deployment script
 ```
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Python 3.8+
-- Node.js 14+ (for development tools)
-- PostgreSQL 12+
-- Redis 6+
+### Development Setup
 
-### Backend Setup
+```bash
+# Clone repository
+git clone https://github.com/habiboffdev/chinor-id-dg.git
+cd chinor-id-dg/opportuni_backend
 
-1. **Create virtual environment**
-   ```bash
-   cd opportuni_backend
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
-2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Install dependencies
+pip install -r requirements.txt
 
-3. **Setup environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+# Setup database
+python manage.py migrate
 
-4. **Setup database**
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   python manage.py createsuperuser
-   ```
+# Create superuser
+python manage.py createsuperuser
 
-5. **Run development server**
-   ```bash
-   python manage.py runserver
-   ```
+# Run development server
+python manage.py runserver
+```
 
-6. **Start Celery worker** (in separate terminal)
-   ```bash
-   celery -A opportuni worker --loglevel=info
-   ```
+### Environment Variables
 
-### Frontend Setup
+Create `.env` file in `opportuni_backend/`:
 
-1. **Start local server**
-   ```bash
-   cd opportuni_frontend
-   # Using Python's built-in server
-   python -m http.server 8080
-   # Or using Node.js
-   npx http-server -p 8080
-   ```
+```env
+# Django
+SECRET_KEY=your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
 
-2. **Access the application**
-   - Frontend: http://localhost:8080
-   - Backend API: http://localhost:8000
-   - Admin Panel: http://localhost:8000/admin
-   - API Documentation: http://localhost:8000/api/docs
+# Database
+DB_NAME=opportuni_db
+DB_USER=opportuni_user
+DB_PASSWORD=your-password
+DB_HOST=localhost
+DB_PORT=5432
 
-## 🔧 Development Workflow
+# Telegram Bot (optional)
+TELEGRAM_BOT_TOKEN=your-bot-token
+TELEGRAM_CHANNEL_ID=your-channel-id
+```
 
-### Backend Development
+## 📊 API Documentation
 
-1. **Create new Django app**
-   ```bash
-   python manage.py startapp app_name apps/app_name
-   ```
+**Interactive docs**: http://localhost:8000/api/docs/
 
-2. **Run migrations**
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
+### Key Endpoints
 
-3. **Run tests**
-   ```bash
-   python manage.py test
-   ```
+**Authentication**
+- `POST /api/auth/register/` - User registration (student/organization)
+- `POST /api/auth/login/` - Login (returns JWT)
+- `POST /api/auth/token/refresh/` - Refresh access token
 
-### Frontend Development
-
-1. **File Structure**
-   - Keep components modular
-   - Use CSS custom properties for theming
-   - Organize JavaScript into modules
-
-2. **Styling Guidelines**
-   - Mobile-first responsive design
-   - Use semantic HTML
-   - Follow BEM methodology for CSS classes
-
-3. **JavaScript Guidelines**
-   - Use ES6+ features
-   - Keep functions pure when possible
-   - Handle errors gracefully
-
-## 📊 API Endpoints
-
-### Authentication
-- `POST /api/auth/register/` - User registration
-- `POST /api/auth/login/` - User login
-- `POST /api/auth/refresh/` - Token refresh
-- `GET/PUT /api/auth/profile/` - User profile
-
-### Students
+**Students**
 - `GET/PUT /api/students/profile/` - Student profile
-- `GET/POST /api/students/education/` - Education history
-- `GET/POST /api/students/experience/` - Work experience
+- `POST /api/students/upload-profile-picture/` - Avatar upload
+- `GET /api/students/education/` - Education history
 
-### Organizations
+**Organizations**
 - `GET/PUT /api/organizations/profile/` - Organization profile
-- `GET /api/organizations/members/` - Team members
+- `POST /api/organizations/upload-logo/` - Logo upload
+- `GET /api/organizations/dashboard/` - Dashboard stats
 
-### Opportunities
+**Opportunities**
 - `GET /api/opportunities/` - List opportunities
-- `POST /api/opportunities/` - Create opportunity
-- `GET/PUT/DELETE /api/opportunities/{id}/` - Opportunity CRUD
+- `POST /api/opportunities/` - Create opportunity (org only)
+- `GET /api/opportunities/{id}/` - Opportunity details
 
-### Applications
+**Applications**
 - `POST /api/applications/` - Submit application
 - `GET /api/applications/` - List applications
-- `PUT /api/applications/{id}/status/` - Update status
-
-## 🎨 UI/UX Guidelines
-
-### Design System
-- **Primary Color**: #3b82f6 (Blue)
-- **Secondary Color**: #10b981 (Green)
-- **Success**: #10b981
-- **Warning**: #f59e0b
-- **Error**: #ef4444
-
-### Typography
-- **Font Family**: Inter, system fonts
-- **Base Size**: 16px
-- **Scale**: 0.75rem - 2.25rem
-
-### Components
-- Buttons with hover states
-- Form validation feedback
-- Modal dialogs
-- Toast notifications
-- Responsive tables
-- Card layouts
-
-## 🔐 Security Features
-
-- JWT authentication with refresh tokens
-- CORS configuration
-- Input validation and sanitization
-- File upload restrictions
-- Rate limiting (production)
-- HTTPS enforcement (production)
-
-## 📈 Performance Optimization
-
-### Backend
-- Database query optimization
-- Caching with Redis
-- Background task processing
-- File compression and CDN
-
-### Frontend
-- Lazy loading of images
-- Minimized CSS/JS (production)
-- Browser caching strategies
-- Responsive image formats
+- `PUT /api/applications/{id}/status/` - Update status (org only)
 
 ## 🧪 Testing
 
-### Backend Testing
 ```bash
 # Run all tests
 python manage.py test
@@ -245,70 +129,99 @@ python manage.py test
 # Run specific app tests
 python manage.py test apps.accounts
 
-# Coverage report
-coverage run --source='.' manage.py test
-coverage report
+# Check for issues
+python manage.py check
 ```
 
-### Frontend Testing
-- Manual testing checklist
-- Cross-browser compatibility
-- Mobile device testing
-- Accessibility testing
+## 🚢 Production Deployment
 
-## 🚢 Deployment
+### Requirements
+- Ubuntu 22.04+
+- PostgreSQL 12+
+- Nginx
+- Supervisor
 
-### Backend Deployment
-1. **Environment Configuration**
-   ```bash
-   export DJANGO_SETTINGS_MODULE=opportuni.settings.production
-   ```
+### Deploy Steps
 
-2. **Static Files**
-   ```bash
-   python manage.py collectstatic
-   ```
+```bash
+# On production server
+cd /home/chinor-id-dg/chinor_id_new
 
-3. **Database Migration**
-   ```bash
-   python manage.py migrate
-   ```
+# Pull latest changes
+git pull origin main
 
-### Frontend Deployment
-1. **Build Optimization**
-   - Minify CSS/JS files
-   - Optimize images
-   - Configure CDN
+# Activate environment
+source venv/bin/activate
 
-2. **Server Configuration**
-   - NGINX/Apache setup
-   - SSL certificate
-   - Cache headers
+# Install dependencies
+pip install -r opportuni_backend/requirements.txt
 
-## 📞 Support & Contributing
+# Run migrations
+cd opportuni_backend
+python manage.py migrate
 
-### Getting Help
-- Check documentation first
-- Search existing issues
-- Create detailed bug reports
+# Collect static files
+python manage.py collectstatic --noinput
 
-### Contributing
-1. Fork the repository
-2. Create feature branch
-3. Make changes with tests
-4. Submit pull request
+# Restart services
+sudo supervisorctl restart opportuni
+sudo systemctl reload nginx
+```
 
-## 📄 License
+### Media Files
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Ensure media directories exist:
+```bash
+mkdir -p mediafiles/{avatars,org_logos,resumes,opportunity_covers,application_docs}
+chmod -R 755 mediafiles/
+```
 
-## 👥 Team
+## 🤖 Telegram Bot
 
-- **Backend Development**: Django REST Framework
-- **Frontend Development**: Vanilla JavaScript
-- **UI/UX Design**: Modern CSS
-- **DevOps**: Docker, AWS, CI/CD
+Separate virtual environment for bot dependencies:
+
+```bash
+# Create bot environment
+python3 -m venv .venv_bot
+source .venv_bot/bin/activate
+pip install -r telegram_bot/requirements.txt
+
+# Run bot (managed by supervisor in production)
+python -c "from telegram_bot.bot import run_polling; run_polling()"
+```
+
+## 📝 Key Features
+
+- **Dual User Types**: Students and organizations with separate interfaces
+- **JWT Authentication**: Secure token-based auth with refresh
+- **File Uploads**: Avatar, logo, resume, document handling
+- **Telegram Integration**: Bot for channel administration and notifications
+- **Organization Scoped Data**: Organizations only see their own data
+- **Application Workflow**: Submit, review, accept/reject applications
+- **OpenAPI Schema**: Auto-generated API documentation
+
+## 🔐 Security
+
+- CORS configuration for frontend integration
+- File upload validation (type, size)
+- Organization data scoping
+- JWT token blacklisting on logout
+- HTTPS enforcement (production)
+
+## � Additional Documentation
+
+- `BRAND_BLUEPRINT.md` - Frontend design system (for React integration)
+- `API_SCHEMA_GUIDE.md` - OpenAPI schema details
+- `DEBUG_PRODUCTION_UPLOADS.md` - Troubleshooting guide
+- `.github/copilot-instructions.md` - Development guidelines
+
+## 📞 Support
+
+For issues or questions, refer to inline documentation or check application logs:
+```bash
+tail -f /home/chinor-id-dg/chinor_id_new/opportuni_backend/logs/django.log
+```
 
 ---
 
-For more detailed information, please refer to the specific documentation in each module's directory.
+**Note**: Frontend is a separate React application deployed independently.
