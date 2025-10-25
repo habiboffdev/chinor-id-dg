@@ -30,11 +30,13 @@ show_menu() {
     echo "  8) Search for errors in last 500 lines"
     echo "  9) Search for 500 errors"
     echo " 10) Search for custom pattern"
+    echo " 11) View logs at specific time/date"
+    echo " 12) View logs in time range"
     echo ""
     echo "Log Management:"
-    echo " 11) Show log file sizes"
-    echo " 12) Clear old logs (keep last 100 lines)"
-    echo " 13) View all logs side-by-side"
+    echo " 13) Show log file sizes"
+    echo " 14) Clear old logs (keep last 100 lines)"
+    echo " 15) View all logs side-by-side"
     echo ""
     echo "  0) Exit"
     echo ""
@@ -84,10 +86,48 @@ case "$1" in
         grep -i "$pattern" "${LOGS_DIR}"/*.log --color=always | tail -n 100
         ;;
     11)
+        echo -e "${YELLOW}View logs at specific time${NC}"
+        echo "Format examples:"
+        echo "  - Date: 2025-10-25"
+        echo "  - Date + Hour: 2025-10-25 14"
+        echo "  - Full time: 2025-10-25 14:30"
+        read -p "Enter timestamp: " timestamp
+        echo -e "${BLUE}Searching for logs at '${timestamp}'...${NC}"
+        echo ""
+        for logfile in "${LOGS_DIR}"/*.log; do
+            if [ -f "$logfile" ]; then
+                results=$(grep "$timestamp" "$logfile" --color=always)
+                if [ -n "$results" ]; then
+                    echo -e "${GREEN}=== $(basename $logfile) ===${NC}"
+                    echo "$results"
+                    echo ""
+                fi
+            fi
+        done
+        ;;
+    12)
+        echo -e "${YELLOW}View logs in time range${NC}"
+        echo "Format: YYYY-MM-DD HH:MM (e.g., 2025-10-25 14:30)"
+        read -p "Start time: " start_time
+        read -p "End time: " end_time
+        echo -e "${BLUE}Extracting logs from ${start_time} to ${end_time}...${NC}"
+        echo ""
+        for logfile in "${LOGS_DIR}"/*.log; do
+            if [ -f "$logfile" ]; then
+                results=$(awk -v start="$start_time" -v end="$end_time" '$0 >= start && $0 <= end' "$logfile")
+                if [ -n "$results" ]; then
+                    echo -e "${GREEN}=== $(basename $logfile) ===${NC}"
+                    echo "$results"
+                    echo ""
+                fi
+            fi
+        done
+        ;;
+    13)
         echo -e "${BLUE}Log file sizes:${NC}"
         du -sh "${LOGS_DIR}"/*.log 2>/dev/null | sort -h
         ;;
-    12)
+    14)
         echo -e "${YELLOW}Clearing old logs (keeping last 100 lines)...${NC}"
         for logfile in "${LOGS_DIR}"/*.log; do
             if [ -f "$logfile" ]; then
@@ -97,7 +137,7 @@ case "$1" in
         done
         echo -e "${GREEN}Done!${NC}"
         ;;
-    13)
+    15)
         echo -e "${BLUE}Viewing all logs (press Ctrl+C to exit)...${NC}"
         tail -f "${LOGS_DIR}"/*.log
         ;;

@@ -74,54 +74,22 @@ class ApplicationListCreateView(generics.ListCreateAPIView):
         return ApplicationListSerializer
     
     def perform_create(self, serializer):
+        """
+        🔴 CRITICAL: Create application with validated data
+        Serializer already validates:
+        - Required questions are answered
+        - Answers are not empty
+        - Profile requirements are met
+        """
         # Get student profile
         try:
             student_profile = StudentProfile.objects.get(user=self.request.user)
         except StudentProfile.DoesNotExist:
-            raise ValidationError("Student profile not found")
+            raise ValidationError({"student": "Talaba profili topilmadi."})
         
-        # Extract additional fields from request data
-        additional_documents = self.request.data.get('additional_documents', [])
-        notes = self.request.data.get('notes', '')
-        
-        # Create application
-        application = serializer.save(
-            student=student_profile,
-            additional_documents=additional_documents,
-            reviewer_notes=notes  # Store notes in reviewer_notes field for now
-        )
-        
-        # Handle question answers - support both formats
-        opportunity = application.opportunity
-        questions = opportunity.additional_questions.all()
-        
-        # Check if answers are provided in dict format (new format)
-        answers_dict = self.request.data.get('answers', {})
-        if answers_dict:
-            for question_id_str, answer_value in answers_dict.items():
-                try:
-                    question_id = int(question_id_str)
-                    question = questions.filter(id=question_id).first()
-                    if question and answer_value:
-                        ApplicationAnswer.objects.create(
-                            application=application,
-                            question=question,
-                            answer_text=answer_value
-                        )
-                except (ValueError, TypeError):
-                    continue
-        else:
-            # Fallback to old format (question_{id})
-            for question in questions:
-                answer_key = f'question_{question.id}'
-                answer_value = self.request.data.get(answer_key)
-                
-                if answer_value:
-                    ApplicationAnswer.objects.create(
-                        application=application,
-                        question=question,
-                        answer_text=answer_value
-                    )
+        # Save application with student profile
+        # The serializer.create() method handles answers creation
+        application = serializer.save(student=student_profile)
 
 
 class OrganizationApplicationListView(generics.ListAPIView):
